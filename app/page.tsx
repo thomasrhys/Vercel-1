@@ -37,6 +37,12 @@ const GAMES = [
     id: "slope-2",
     title: "Slope 2",
     url: "https://yoplay.io/slope-2.embed",
+  },
+  {
+    id: "drift-boss",
+    title: "Drift Boss",
+    url: "https://html5.gamedistribution.com/0a8b51e5eaee42e7b4db83ca00afc92e/?gd_sdk_referrer_url=https://oldmadfut.co.uk",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
