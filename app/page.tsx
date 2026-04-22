@@ -41,7 +41,7 @@ const GAMES = [
   {
     id: "drift-boss",
     title: "Drift Boss",
-    url: "https://html5.gamedistribution.com/0a8b51e5eaee42e7b4db83ca00afc92e/?gd_sdk_referrer_url=https://oldmadfut.co.uk",
+    url: "https://azgames.io/drift-boss.embed",
   },
   // Add more games here:
   // {
