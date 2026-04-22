@@ -33,6 +33,11 @@ const GAMES = [
     title: "Escape Road City 2",
     url: "https://yoplay.io/escape-road-city-2.embed",
   },
+  {
+    id: "slope-2",
+    title: "Slope 2",
+    url: "https://yoplay.io/slope-2.embed",
+  },  
   // Add more games here:
   // {
   //   id: "my-game",
