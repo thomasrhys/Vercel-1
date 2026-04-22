@@ -48,6 +48,11 @@ const GAMES = [
     title: "Tap Road",
     url: "https://azgames.io/tap-road.embed",
   },
+  {
+    id: "basket-random",
+    title: "Basket Random",
+    url: "https://www.twoplayergames.org/embed/basket-random",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
