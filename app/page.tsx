@@ -43,6 +43,21 @@ const GAMES = [
     title: "Drift Boss",
     url: "https://azgames.io/drift-boss.embed",
   },
+  {
+    id: "tap-road",
+    title: "Tap Road",
+    url: "https://azgames.io/tap-road.embed",
+  },
+  {
+    id: "basket-random",
+    title: "Basket Random",
+    url: "https://www.twoplayergames.org/embed/basket-random",
+  },
+  {
+    id: "soccer-random",
+    title: "Soccer Random",
+    url: "https://www.twoplayergames.org/embed/soccer-random",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
