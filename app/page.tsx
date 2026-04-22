@@ -37,7 +37,6 @@ const GAMES = [
     id: "slope-2",
     title: "Slope 2",
     url: "https://yoplay.io/slope-2.embed",
-  },
   // Add more games here:
   // {
   //   id: "my-game",
