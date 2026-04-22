@@ -43,6 +43,11 @@ const GAMES = [
     title: "Drift Boss",
     url: "https://azgames.io/drift-boss.embed",
   },
+  {
+    id: "tap-road",
+    title: "Tap Road",
+    url: "https://azgames.io/tap-road.embed",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
