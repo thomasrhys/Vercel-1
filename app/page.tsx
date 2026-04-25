@@ -51,7 +51,7 @@ const GAMES = [
   {
     id: "basket-random",
     title: "Basket Random",
-    url: "https://www.twoplayergames.org/embed/basket-random",
+    url: "https://azgames.io/basket-random.embed",
   },
   {
     id: "soccer-random",
