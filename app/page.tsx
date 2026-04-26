@@ -26,7 +26,7 @@ const GAMES = [
   {
     id: "slope",
     title: "Slope",
-    url: "https://yoplay.io/slope.embed",
+    url: "https://azgames.io/slope.embed",
   },
   {
     id: "escape-road-city-2",
@@ -36,7 +36,7 @@ const GAMES = [
   {
     id: "slope-2",
     title: "Slope 2",
-    url: "https://yoplay.io/slope-2.embed",
+    url: "https://game.azgame.io/slope-2/",
   },
   {
     id: "drift-boss",
@@ -59,9 +59,9 @@ const GAMES = [
     url: "https://www.twoplayergames.org/embed/soccer-random",
   },
   {
-    id: "infinite-craft",
-    title: "Infinite Craft",
-    url: "https://html5.gamedistribution.com/4d455d6cdff443b5855ee472dff23f8c/?gd_sdk_referrer_url=https://gamedistribution.com/games/infinite-craft/",
+    id: "slope-3",
+    title: "Slope 3",
+    url: "https://game.azgame.io/slope-3/",
   },
   // Add more games here:
   // {
