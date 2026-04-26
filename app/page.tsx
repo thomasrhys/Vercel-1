@@ -16,12 +16,12 @@ const GAMES = [
   {
     id: "geometry-dash",
     title: "Geometry Dash",
-    url: "https://yoplay.io/geometry-dash.embed",
+    url: "https://azgames.io/geometry-dash.embed",
   },
   {
     id: "monkey-mart",
     title: "Monkey Mart",
-    url: "https://yoplay.io/monkey-mart.embed",
+    url: "https://azgames.io/monkey-mart.embed",
   },
   {
     id: "slope",
@@ -31,7 +31,7 @@ const GAMES = [
   {
     id: "escape-road-city-2",
     title: "Escape Road City 2",
-    url: "https://yoplay.io/escape-road-city-2.embed",
+    url: "https://game.azgame.io/escape-road-city-2/",
   },
   {
     id: "slope-2",
