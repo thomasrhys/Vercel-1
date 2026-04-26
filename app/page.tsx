@@ -61,7 +61,7 @@ const GAMES = [
   {
     id: "infinite-craft",
     title: "Infinite Craft",
-    url: "https://neal.fun/infinite-craft",
+    url: "https://html5.gamedistribution.com/4d455d6cdff443b5855ee472dff23f8c/?gd_sdk_referrer_url=https://gamedistribution.com/games/infinite-craft/",
   },
   // Add more games here:
   // {
