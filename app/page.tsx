@@ -63,6 +63,16 @@ const GAMES = [
     title: "Slope 3",
     url: "https://game.azgame.io/slope-3/",
   },
+  {
+    id: "slide-down",
+    title: "Slide Down",
+    url: "https://gamea.azgame.io/slide-down/",
+  },
+  {
+    id: "paper-io",
+    title: "Paper.io",
+    url: "https://www.paperio.site",
+  }
   // Add more games here:
   // {
   //   id: "my-game",
