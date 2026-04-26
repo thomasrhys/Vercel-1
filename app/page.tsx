@@ -58,6 +58,11 @@ const GAMES = [
     title: "Soccer Random",
     url: "https://www.twoplayergames.org/embed/soccer-random",
   },
+  {
+    id: "infinite-craft"
+    title: "Infinite Craft"
+    url: "https://neal.fun/infinite-craft"
+  },
   // Add more games here:
   // {
   //   id: "my-game",
