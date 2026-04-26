@@ -26,7 +26,7 @@ const GAMES = [
   {
     id: "slope",
     title: "Slope",
-    url: "https://azgames.io/slope.embed",
+    url: "https://yoplay.io/slope.embed",
   },
   {
     id: "escape-road-city-2",
