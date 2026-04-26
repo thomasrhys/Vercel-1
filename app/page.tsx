@@ -59,9 +59,9 @@ const GAMES = [
     url: "https://www.twoplayergames.org/embed/soccer-random",
   },
   {
-    id: "infinite-craft"
-    title: "Infinite Craft"
-    url: "https://neal.fun/infinite-craft"
+    id: "infinite-craft",
+    title: "Infinite Craft",
+    url: "https://neal.fun/infinite-craft",
   },
   // Add more games here:
   // {
