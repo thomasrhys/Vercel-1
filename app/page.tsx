@@ -16,12 +16,12 @@ const GAMES = [
   {
     id: "geometry-dash",
     title: "Geometry Dash",
-    url: "https://azgames.io/geometry-dash.embed",
+    url: "https://yoplay.io/geometry-dash.embed",
   },
   {
     id: "monkey-mart",
     title: "Monkey Mart",
-    url: "https://azgames.io/monkey-mart.embed",
+    url: "https://yoplay.io/monkey-mart.embed",
   },
   {
     id: "slope",
@@ -46,7 +46,7 @@ const GAMES = [
   {
     id: "tap-road",
     title: "Tap Road",
-    url: "https://azgames.io/tap-road.embed",
+    url: "https://yoplay.io/tap-road.embed",
   },
   {
     id: "basket-random",
