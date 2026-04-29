@@ -41,7 +41,7 @@ const GAMES = [
   {
     id: "drift-boss",
     title: "Drift Boss",
-    url: "https://azgame.io/drift-boss.embed",
+    url: "https://azgames.io/drift-boss.embed",
   },
   {
     id: "tap-road",
