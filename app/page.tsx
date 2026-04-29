@@ -41,7 +41,7 @@ const GAMES = [
   {
     id: "drift-boss",
     title: "Drift Boss",
-    url: "https://www.mathplayground.com/drift-boss/index.html",
+    url: "https://azgame.io/drift-boss.embed",
   },
   {
     id: "tap-road",
