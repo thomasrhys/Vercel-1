@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-import Script from 'next/script' // This handles the Head snippet
+// Import the Script component for the Head snippet
+import Script from 'next/script'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -38,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* --- GTM HEAD SNIPPET --- */}
+        
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -48,7 +49,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="font-sans antialiased">
-        {/* --- GTM BODY SNIPPET (The "Number Three" part) --- */}
+        
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WS27V73W"
@@ -59,7 +60,7 @@ export default function RootLayout({
         </noscript>
 
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === 'production' && <Analytics/>}
       </body>
     </html>
   )
