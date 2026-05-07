@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-// Step 1: Import the Next.js Script component
-import Script from 'next/script'
+import Script from 'next/script' // This handles the Head snippet
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -39,9 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Step 2: The GTM Head Snippet. 
-            We use curly braces {} and backticks `` to wrap the JavaScript logic 
-            so it doesn't conflict with TypeScript syntax. */}
+        {/* --- GTM HEAD SNIPPET --- */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -51,8 +48,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="font-sans antialiased">
-        {/* Step 3: The GTM Noscript Snippet. 
-            Note the 'style' attribute is converted to a TypeScript object. */}
+        {/* --- GTM BODY SNIPPET (The "Number Three" part) --- */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WS27V73W"
