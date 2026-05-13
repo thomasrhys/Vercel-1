@@ -72,11 +72,21 @@ const GAMES = [
     id: "paper-io",
     title: "Paper.io",
     url: "https://www.paperio.site",
-  }
+  },
   {
     id: "escape-road",
     title: "Escape Road",
     url: "https://yoplay.io/escape-road.embed",
+  },
+  {
+    id: "escape-road-2",
+    title: "Escape Road 2",
+    url: "https://game.azgame.io/escape-road-2/",
+  },
+  {
+    id: "escape-road-3",
+    title: "Escape Road 3",
+    url: "https://gamea.azgame.io/escape-road-3/",
   },
   // Add more games here:
   // {
