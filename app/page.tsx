@@ -73,6 +73,11 @@ const GAMES = [
     title: "Paper.io",
     url: "https://www.paperio.site",
   }
+  {
+    id: "escape-road",
+    title: "Escape Road",
+    url: "https://yoplay.io/escape-road.embed",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
