@@ -88,6 +88,21 @@ const GAMES = [
     title: "Escape Road 3",
     url: "https://gamea.azgame.io/escape-road-3/",
   },
+  {
+    id: "og-slope",
+    title: "OG Slope",
+    url: "https://y8.com/embed/slope",
+  },
+  {
+    id: "jelly-run-2048",
+    title: "Jelly Run 2048",
+    url: "https://www.y8.com/games/jelly_run_2048",
+  },
+  {
+    id: "moto-x3m",
+    title: "Moto X3M",
+    url: "https://www.y8.com/games/moto_x3m",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
