@@ -94,9 +94,9 @@ const GAMES = [
     url: "https://y8.com/embed/slope",
   },
   {
-    id: "jelly-run-2048",
-    title: "Jelly Run 2048",
-    url: "https://www.y8.com/games/jelly_run_2048",
+    id: "fnf",
+    title: "Friday Night Funkin'",
+    url: "https://uploads.ungrounded.net/alternate/1528000/1528775_alternate_113347_r142.zip/?NewgroundsAPI_PublisherID=1&NewgroundsAPI_SandboxID=6a0c4ed597dc5&NewgroundsAPI_SessionID=&NewgroundsAPI_UserName=%26lt%3Bdeleted%26gt%3B&NewgroundsAPI_UserID=0&ng_username=%26lt%3Bdeleted%26gt%3B",
   },
   {
     id: "moto-x3m",
