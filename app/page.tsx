@@ -99,9 +99,9 @@ const GAMES = [
     url: "https://uploads.ungrounded.net/alternate/1528000/1528775_alternate_113347_r142.zip/?NewgroundsAPI_PublisherID=1&NewgroundsAPI_SandboxID=6a0c4ed597dc5&NewgroundsAPI_SessionID=&NewgroundsAPI_UserName=%26lt%3Bdeleted%26gt%3B&NewgroundsAPI_UserID=0&ng_username=%26lt%3Bdeleted%26gt%3B",
   },
   {
-    id: "moto-x3m",
-    title: "Moto X3M",
-    url: "https://www.y8.com/games/moto_x3m",
+    id: "fire-ice",
+    title: "A Dance of Fire and Ice",
+    url: "https://turbowarp.org/783499628/fullscreen",
   },
   // Add more games here:
   // {
