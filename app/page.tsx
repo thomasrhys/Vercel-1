@@ -58,6 +58,51 @@ const GAMES = [
     title: "Soccer Random",
     url: "https://www.twoplayergames.org/embed/soccer-random",
   },
+  {
+    id: "slope-3",
+    title: "Slope 3",
+    url: "https://game.azgame.io/slope-3/",
+  },
+  {
+    id: "slide-down",
+    title: "Slide Down",
+    url: "https://gamea.azgame.io/slide-down/",
+  },
+  {
+    id: "paper-io",
+    title: "Paper.io",
+    url: "https://www.paperio.site",
+  },
+  {
+    id: "escape-road",
+    title: "Escape Road",
+    url: "https://yoplay.io/escape-road.embed",
+  },
+  {
+    id: "escape-road-2",
+    title: "Escape Road 2",
+    url: "https://game.azgame.io/escape-road-2/",
+  },
+  {
+    id: "escape-road-3",
+    title: "Escape Road 3",
+    url: "https://gamea.azgame.io/escape-road-3/",
+  },
+  {
+    id: "og-slope",
+    title: "OG Slope",
+    url: "https://y8.com/embed/slope",
+  },
+  {
+    id: "fnf",
+    title: "Friday Night Funkin'",
+    url: "https://uploads.ungrounded.net/alternate/1528000/1528775_alternate_113347_r142.zip/?NewgroundsAPI_PublisherID=1&NewgroundsAPI_SandboxID=6a0c4ed597dc5&NewgroundsAPI_SessionID=&NewgroundsAPI_UserName=%26lt%3Bdeleted%26gt%3B&NewgroundsAPI_UserID=0&ng_username=%26lt%3Bdeleted%26gt%3B",
+  },
+  {
+    id: "fire-ice",
+    title: "A Dance of Fire and Ice",
+    url: "https://turbowarp.org/783499628/fullscreen",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
