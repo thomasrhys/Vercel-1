@@ -96,7 +96,7 @@ const GAMES = [
   {
     id: "fnf",
     title: "Friday Night Funkin'",
-    url: "https://uploads.ungrounded.net/alternate/1528000/1528775_alternate_113347_r142.zip/?NewgroundsAPI_PublisherID=1&NewgroundsAPI_SandboxID=6a0c4ed597dc5&NewgroundsAPI_SessionID=&NewgroundsAPI_UserName=%26lt%3Bdeleted%26gt%3B&NewgroundsAPI_UserID=0&ng_username=%26lt%3Bdeleted%26gt%3B",
+    url: "https://www.newgrounds.com/portal/view/770371",
   },
   {
     id: "fire-ice",
