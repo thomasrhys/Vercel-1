@@ -99,9 +99,9 @@ const GAMES = [
     url: "https://www.newgrounds.com/portal/view/770371",
   },
   {
-    id: "fire-ice",
-    title: "A Dance of Fire and Ice",
-    url: "https://turbowarp.org/783499628/fullscreen",
+    id: "cherry-pickr",
+    title: "Cherry Pickr",
+    url: "https://thomasrhys.github.io/cherry-pickr",
   },
   // Add more games here:
   // {
