@@ -103,6 +103,11 @@ const GAMES = [
     title: "Cherry Pickr",
     url: "https://thomasrhys.github.io/cherry-pickr",
   },
+  {
+    id: "gun-spin",
+    title: "GunSpin",
+    url: "https://play.famobi.com/gun-spin",
+  },
   // Add more games here:
   // {
   //   id: "my-game",
