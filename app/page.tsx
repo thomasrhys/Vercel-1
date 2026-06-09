@@ -244,6 +244,7 @@ export default function GamePortal() {
                 src={activeGame.url}
                 className="w-full h-full border-0"
                 allowFullScreen
+                sandbox="allow-same-origin allow-scripts allow-pointer-lock allow-popups"
                 title={activeGame.title}
               />
             </div>
