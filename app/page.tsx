@@ -106,7 +106,7 @@ const GAMES = [
   {
     id: "gun-spin",
     title: "GunSpin",
-    url: "https://play.famobi.com/gun-spin",
+    url: "https://thomasrhys.github.io/gunspin",
   },
   // Add more games here:
   // {
