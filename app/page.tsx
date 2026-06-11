@@ -106,7 +106,8 @@ const GAMES = [
   {
     id: "cherry-picker-2",
     title: "Cherry Picker 2",
-    url: "https://thomasrhys.github.io/cherry-picker-by-at12/
+    url: "https://thomasrhys.github.io/cherry-picker-by-at12/",
+  }
   {
     id: "gunspin",
     title: "GunSpin",
