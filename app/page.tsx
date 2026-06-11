@@ -31,12 +31,12 @@ const GAMES = [
   {
     id: "escape-road-city-2",
     title: "Escape Road City 2",
-    url: "https://game.azgame.io/escape-road-city-2/",
+    url: "https://game.azgame.io/escape-road-city-2",
   },
   {
     id: "slope-2",
     title: "Slope 2",
-    url: "https://game.azgame.io/slope-2/",
+    url: "https://game.azgame.io/slope-2",
   },
   {
     id: "drift-boss",
@@ -51,22 +51,22 @@ const GAMES = [
   {
     id: "basket-random",
     title: "Basket Random",
-    url: "https://www.twoplayergames.org/embed/basket-random/",
+    url: "https://www.twoplayergames.org/embed/basket-random",
   },
   {
     id: "soccer-random",
     title: "Soccer Random",
-    url: "https://www.twoplayergames.org/embed/soccer-random/",
+    url: "https://www.twoplayergames.org/embed/soccer-random",
   },
   {
     id: "slope-3",
     title: "Slope 3",
-    url: "https://game.azgame.io/slope-3/",
+    url: "https://game.azgame.io/slope-3",
   },
   {
     id: "slide-down",
     title: "Slide Down",
-    url: "https://gamea.azgame.io/slide-down/",
+    url: "https://gamea.azgame.io/slide-down",
   },
   {
     id: "paper-io",
@@ -81,17 +81,17 @@ const GAMES = [
   {
     id: "escape-road-2",
     title: "Escape Road 2",
-    url: "https://game.azgame.io/escape-road-2/",
+    url: "https://game.azgame.io/escape-road-2",
   },
   {
     id: "escape-road-3",
     title: "Escape Road 3",
-    url: "https://gamea.azgame.io/escape-road-3/",
+    url: "https://gamea.azgame.io/escape-road-3",
   },
   {
     id: "og-slope",
     title: "OG Slope",
-    url: "https://y8.com/embed/slope/",
+    url: "https://y8.com/embed/slope",
   },
   {
     id: "fnf",
@@ -101,22 +101,22 @@ const GAMES = [
   {
     id: "cherry-pickr",
     title: "Cherry Pickr",
-    url: "https://thomasrhys.github.io/cherry-pickr/",
+    url: "https://thomasrhys.github.io/cherry-pickr",
   },
   {
     id: "cherry-picker-2",
     title: "Cherry Picker 2",
-    url: "https://thomasrhys.github.io/cherry-picker-by-at12/",
+    url: "https://thomasrhys.github.io/cherry-picker-by-at12",
   }
   {
     id: "gunspin",
     title: "GunSpin",
-    url: "https://thomasrhys.github.io/angry-games/gunspin/",
+    url: "https://thomasrhys.github.io/angry-games/gunspin",
   },
   {
     id: "bitlife",
     title "BitLife",
-    url: "https://thomasrhys.github.io/angry-games/bitlife/",
+    url: "https://thomasrhys.github.io/angry-games/bitlife",
   },
   // Add more games here:
   // {
