@@ -71,7 +71,7 @@ const GAMES = [
   {
     id: "paper-io",
     title: "Paper.io",
-    url: "https://www.paperio.site",
+    url: "https://thomasrhys.github.io/angry-games/paperio2",
   },
   {
     id: "escape-road",
