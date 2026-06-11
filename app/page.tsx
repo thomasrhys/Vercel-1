@@ -51,12 +51,12 @@ const GAMES = [
   {
     id: "basket-random",
     title: "Basket Random",
-    url: "https://www.twoplayergames.org/embed/basket-random",
+    url: "https://www.twoplayergames.org/embed/basket-random/",
   },
   {
     id: "soccer-random",
     title: "Soccer Random",
-    url: "https://www.twoplayergames.org/embed/soccer-random",
+    url: "https://www.twoplayergames.org/embed/soccer-random/",
   },
   {
     id: "slope-3",
@@ -91,7 +91,7 @@ const GAMES = [
   {
     id: "og-slope",
     title: "OG Slope",
-    url: "https://y8.com/embed/slope",
+    url: "https://y8.com/embed/slope/",
   },
   {
     id: "fnf",
@@ -101,12 +101,21 @@ const GAMES = [
   {
     id: "cherry-pickr",
     title: "Cherry Pickr",
-    url: "https://thomasrhys.github.io/cherry-pickr",
+    url: "https://thomasrhys.github.io/cherry-pickr/",
   },
   {
-    id: "gun-spin",
+    id: "cherry-picker-2",
+    title: "Cherry Picker 2",
+    url: "https://thomasrhys.github.io/cherry-picker-by-at12/
+  {
+    id: "gunspin",
     title: "GunSpin",
-    url: "https://thomasrhys.github.io/gunspin",
+    url: "https://thomasrhys.github.io/angry-games/gunspin/",
+  },
+  {
+    id: "bitlife",
+    title "BitLife",
+    url: "https://thomasrhys.github.io/angry-games/bitlife/",
   },
   // Add more games here:
   // {
