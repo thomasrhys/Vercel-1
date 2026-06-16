@@ -31,7 +31,7 @@ const GAMES = [
   {
     id: "escape-road-city-2",
     title: "Escape Road City 2",
-    url: "https://game.azgame.io/escape-road-city-2",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoadcity2.html",
   },
   {
     id: "slope-2",
@@ -91,7 +91,7 @@ const GAMES = [
   {
     id: "escape-road-3",
     title: "Escape Road 3",
-    url: "https://gamea.azgame.io/escape-road-3",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad3.html",
   },
   {
     id: "og-slope",
