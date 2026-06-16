@@ -120,7 +120,7 @@ const GAMES = [
   },
   {
     id: "bitlife",
-    title "BitLife",
+    title: "BitLife",
     url: "https://thomasrhys.github.io/angry-games/bitlife",
   },
   // Add more games here:
