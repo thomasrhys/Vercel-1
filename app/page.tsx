@@ -91,7 +91,7 @@ const GAMES = [
   {
     id: "escape-road-3",
     title: "Escape Road 3",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad3.html",
+    url: "https://thomasrhys.github.io/escape-road-3/game.html",
   },
   {
     id: "og-slope",
