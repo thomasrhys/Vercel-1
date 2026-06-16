@@ -16,12 +16,12 @@ const GAMES = [
   {
     id: "geometry-dash",
     title: "Geometry Dash",
-    url: "https://yoplay.io/geometry-dash.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/geometrydashlite.html",
   },
   {
     id: "monkey-mart",
     title: "Monkey Mart",
-    url: "https://yoplay.io/monkey-mart.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/monkeymart.htm",
   },
   {
     id: "slope",
@@ -41,23 +41,28 @@ const GAMES = [
   {
     id: "drift-boss",
     title: "Drift Boss",
-    url: "https://azgames.io/drift-boss.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/driftboss.htm",
   },
   {
     id: "tap-road",
     title: "Tap Road",
-    url: "https://yoplay.io/tap-road.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/taproad.html",
   },
   {
     id: "basket-random",
     title: "Basket Random",
-    url: "https://www.twoplayergames.org/embed/basket-random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/basketrandom.html",
   },
   {
     id: "soccer-random",
     title: "Soccer Random",
-    url: "https://www.twoplayergames.org/embed/soccer-random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/soccerrandom.htm",
   },
+  {
+    id: "boxing-random",
+    title: "Boxing Random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/boxingrandom.htm",
+  },  
   {
     id: "slope-3",
     title: "Slope 3",
@@ -76,12 +81,12 @@ const GAMES = [
   {
     id: "escape-road",
     title: "Escape Road",
-    url: "https://yoplay.io/escape-road.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad.html",
   },
   {
     id: "escape-road-2",
     title: "Escape Road 2",
-    url: "https://game.azgame.io/escape-road-2",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad2.html",
   },
   {
     id: "escape-road-3",
@@ -91,7 +96,7 @@ const GAMES = [
   {
     id: "og-slope",
     title: "OG Slope",
-    url: "https://y8.com/embed/slope",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope.html",
   },
   {
     id: "fnf",
