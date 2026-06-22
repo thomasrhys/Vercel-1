@@ -81,12 +81,34 @@ export default function GamePortal() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base sm:text-lg truncate">{game.title}</CardTitle>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                  <div className="text-center p-3 sm:p-4">
-                    <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-xs sm:text-sm text-muted-foreground">Tap to play</p>
-                  </div>
+              <CardContent className="p-0">
+                <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
+                  {game.image ? (
+                    <>
+                      <img 
+                        src={game.image} 
+                        alt={game.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Button 
+                          variant="secondary" 
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          Play
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20">
+                      <div className="text-center p-3 sm:p-4">
+                        <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-xs sm:text-sm text-muted-foreground">Tap to play</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
