@@ -1,147 +1,23 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Maximize2, Minimize2, X, Gamepad2 } from "lucide-react"
-
-// =====================================================
-// CONFIGURE YOUR GAMES HERE
-// Add your game iframe URLs below. Each game needs:
-// - id: unique identifier
-// - title: display name
-// - url: the iframe src URL
-// =====================================================
-const GAMES = [
-  {
-    id: "geometry-dash",
-    title: "Geometry Dash",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/geometrydashlite.html",
-  },
-  {
-    id: "monkey-mart",
-    title: "Monkey Mart",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/monkeymart.htm",
-  },
-  {
-    id: "slope",
-    title: "Slope",
-    url: "https://yoplay.io/slope.embed",
-  },
-  {
-    id: "escape-road-city-2",
-    title: "Escape Road City 2",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoadcity2.html",
-  },
-  {
-    id: "slope-2",
-    title: "Slope 2",
-    url: "https://game.azgame.io/slope-2",
-  },
-  {
-    id: "drift-boss",
-    title: "Drift Boss",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/driftboss.htm",
-  },
-  {
-    id: "tap-road",
-    title: "Tap Road",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/taproad.html",
-  },
-  {
-    id: "basket-random",
-    title: "Basket Random",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/basketrandom.html",
-  },
-  {
-    id: "soccer-random",
-    title: "Soccer Random",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/soccerrandom.htm",
-  },
-  {
-    id: "boxing-random",
-    title: "Boxing Random",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/boxingrandom.htm",
-  },
-  {
-    id: "slope-3",
-    title: "Slope 3",
-    url: "https://game.azgame.io/slope-3",
-  },
-  {
-    id: "slide-down",
-    title: "Slide Down",
-    url: "https://gamea.azgame.io/slide-down",
-  },
-  {
-    id: "paper-io",
-    title: "Paper.io",
-    url: "https://thomasrhys.github.io/angry-games/paperio2",
-  },
-  {
-    id: "escape-road",
-    title: "Escape Road",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad.html",
-  },
-  {
-    id: "escape-road-2",
-    title: "Escape Road 2",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad2.html",
-  },
-  {
-    id: "escape-road-3",
-    title: "Escape Road 3",
-    url: "https://thomasrhys.github.io/escape-road-3/game.html",
-  },
-  {
-    id: "og-slope",
-    title: "OG Slope",
-    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope.html",
-  },
-  {
-    id: "fnf",
-    title: "Friday Night Funkin'",
-    url: "https://thomasrhysfnf.netlify.app",
-  },
-  {
-    id: "cherry-pickr",
-    title: "Cherry Pickr",
-    url: "https://thomasrhys.github.io/cherry-pickr",
-  },
-  {
-    id: "cherry-picker-2",
-    title: "Cherry Picker 2",
-    url: "https://thomasrhys.github.io/cherry-picker-by-at12",
-  },
-  {
-    id: "gunspin",
-    title: "GunSpin",
-    url: "https://thomasrhys.github.io/angry-games/gunspin",
-  },
-  {
-    id: "bitlife",
-    title: "BitLife",
-    url: "https://thomasrhys.github.io/angry-games/bitlife",
-  },
-  // Add more games here:
-  // {
-  //   id: "my-game",
-  //   title: "My Game",
-  //   url: "https://example.com/game",
-  // },
-]
-// =====================================================
-
-interface Game {
-  id: string
-  title: string
-  url: string
-}
+import { Input } from "@/components/ui/input"
+import { Maximize2, Minimize2, X, Gamepad2, Search } from "lucide-react"
+import { games, type Game } from "@/lib/games"
 
 export default function GamePortal() {
   const [activeGame, setActiveGame] = useState<Game | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [query, setQuery] = useState("")
   const gameContainerRef = useRef<HTMLDivElement>(null)
+
+  const filteredGames = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return games
+    return games.filter((game) => game.title.toLowerCase().includes(q))
+  }, [query])
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -168,24 +44,42 @@ export default function GamePortal() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
-          <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Game Portal</h1>
+      <header className="border-b border-border bg-card sticky top-0 z-40">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Game Portal</h1>
+          </div>
+          <div className="relative sm:ml-auto w-full sm:max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search games..."
+              className="pl-9"
+              aria-label="Search games"
+            />
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <p className="text-sm text-muted-foreground mb-4">
+          {filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}
+          {query ? " found" : " available"}
+        </p>
+
         {/* Game Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-          {GAMES.map((game) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+          {filteredGames.map((game) => (
             <Card
               key={game.id}
               className="group hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => setActiveGame(game)}
             >
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{game.title}</CardTitle>
+                <CardTitle className="text-base sm:text-lg truncate">{game.title}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
@@ -199,12 +93,12 @@ export default function GamePortal() {
           ))}
         </div>
 
-        {GAMES.length === 0 && (
+        {filteredGames.length === 0 && (
           <div className="text-center py-8 sm:py-16">
             <Gamepad2 className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-3 sm:mb-4" />
-            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No games configured</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No games found</h2>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Add games to the GAMES array in page.tsx
+              Try a different search term.
             </p>
           </div>
         )}
@@ -233,11 +127,7 @@ export default function GamePortal() {
                   className="h-8 w-8 sm:h-10 sm:w-10"
                   onClick={toggleFullscreen}
                 >
-                  {isFullscreen ? (
-                    <Minimize2 className="h-4 w-4" />
-                  ) : (
-                    <Maximize2 className="h-4 w-4" />
-                  )}
+                  {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                 </Button>
                 <Button
                   variant="ghost"
