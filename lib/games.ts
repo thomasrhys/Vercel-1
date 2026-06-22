@@ -14,7 +14,7 @@ export const games: Game[] = [
   { id: "bitlife-online", title: "BitLife", url: "https://thomasrhys.github.io/angry-games/bitlife" },
   { id: "cherry-pickr", title: "Cherry Pickr", url: "https://thomasrhys.github.io/cherry-pickr" },
   { id: "cherry-picker-2", title: "Cherry Picker 2", url: "https://thomasrhys.github.io/cherry-picker-by-at12" },
-  { id: "fnf", title: "Friday Night Funkin'", url: "https://thomasrhysfnf.netlify.app" },
+  { id: "fnf", title: "Friday Night Funkin'", url: "https://thomasrhysfnf.netlify.app", image: "/images/friday-night-funkin.jpg" },
   { id: "slide-down", title: "Slide Down", url: "https://gamea.azgame.io/slide-down", image: "/images/slidedown.png" },
   { id: "slope-2-az", title: "Slope 2", url: "https://game.azgame.io/slope-2", image: "/images/slope-2.png" },
   { id: "slope-az", title: "Slope", url: "https://azgames.io/slope.embed" },
