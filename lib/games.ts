@@ -243,7 +243,7 @@ export const games: Game[] = [
   { id: "run3", title: "Run 3", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/run3.html" },
   { id: "sandgame", title: "Sand Game", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/sandgame.html" },
   { id: "shortlife", title: "Short Life", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/shortlife.html" },
-  { id: "slope", title: "Slope", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope.html" },
+  { id: "ogslope", title: "OG Slope", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope.html" },
   { id: "slope2player", title: "Slope 2 Player", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope2player.html" },
   { id: "ogslope3", title: "OG Slope 3", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope3.html" },
   { id: "slope3", title: "Slope 3", url: "https://game.azgame.io/slope-3/" },
