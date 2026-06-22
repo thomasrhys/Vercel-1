@@ -95,7 +95,7 @@ export default function GamePortal() {
                         <Button 
                           variant="secondary" 
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="opacity-100 group-hover:opacity-100 transition-opacity"
                         >
                           Play
                         </Button>
