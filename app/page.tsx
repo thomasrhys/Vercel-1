@@ -16,12 +16,12 @@ const GAMES = [
   {
     id: "geometry-dash",
     title: "Geometry Dash",
-    url: "https://yoplay.io/geometry-dash.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/geometrydashlite.html",
   },
   {
     id: "monkey-mart",
     title: "Monkey Mart",
-    url: "https://yoplay.io/monkey-mart.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/monkeymart.htm",
   },
   {
     id: "slope",
@@ -31,67 +31,72 @@ const GAMES = [
   {
     id: "escape-road-city-2",
     title: "Escape Road City 2",
-    url: "https://yoplay.io/escape-road-city-2.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoadcity2.html",
   },
   {
     id: "slope-2",
     title: "Slope 2",
-    url: "https://yoplay.io/slope-2.embed",
+    url: "https://game.azgame.io/slope-2",
   },
   {
     id: "drift-boss",
     title: "Drift Boss",
-    url: "https://azgames.io/drift-boss.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/driftboss.htm",
   },
   {
     id: "tap-road",
     title: "Tap Road",
-    url: "https://azgames.io/tap-road.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/taproad.html",
   },
   {
     id: "basket-random",
     title: "Basket Random",
-    url: "https://www.twoplayergames.org/embed/basket-random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/basketrandom.html",
   },
   {
     id: "soccer-random",
     title: "Soccer Random",
-    url: "https://www.twoplayergames.org/embed/soccer-random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/soccerrandom.htm",
+  },
+  {
+    id: "boxing-random",
+    title: "Boxing Random",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/boxingrandom.htm",
   },
   {
     id: "slope-3",
     title: "Slope 3",
-    url: "https://game.azgame.io/slope-3/",
+    url: "https://game.azgame.io/slope-3",
   },
   {
     id: "slide-down",
     title: "Slide Down",
-    url: "https://gamea.azgame.io/slide-down/",
+    url: "https://gamea.azgame.io/slide-down",
   },
   {
     id: "paper-io",
     title: "Paper.io",
-    url: "https://www.paperio.site",
+    url: "https://thomasrhys.github.io/angry-games/paperio2",
   },
   {
     id: "escape-road",
     title: "Escape Road",
-    url: "https://yoplay.io/escape-road.embed",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad.html",
   },
   {
     id: "escape-road-2",
     title: "Escape Road 2",
-    url: "https://game.azgame.io/escape-road-2/",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/escaperoad2.html",
   },
   {
     id: "escape-road-3",
     title: "Escape Road 3",
-    url: "https://gamea.azgame.io/escape-road-3/",
+    url: "https://thomasrhys.github.io/escape-road-3/game.html",
   },
   {
     id: "og-slope",
     title: "OG Slope",
-    url: "https://y8.com/embed/slope",
+    url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/slope.html",
   },
   {
     id: "fnf",
@@ -104,9 +109,19 @@ const GAMES = [
     url: "https://thomasrhys.github.io/cherry-pickr",
   },
   {
+    id: "cherry-picker-2",
+    title: "Cherry Picker 2",
+    url: "https://thomasrhys.github.io/cherry-picker-by-at12",
+  },
+  {
     id: "gunspin",
-    title: "Gunspin",
-    url: "https://thomasrhys.github.io/gunspin/",
+    title: "GunSpin",
+    url: "https://thomasrhys.github.io/angry-games/gunspin",
+  },
+  {
+    id: "bitlife",
+    title: "BitLife",
+    url: "https://thomasrhys.github.io/angry-games/bitlife",
   },
   // Add more games here:
   // {
