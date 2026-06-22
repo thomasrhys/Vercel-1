@@ -6,6 +6,7 @@ export interface Game {
   id: string
   title: string
   url: string
+  image?: string
 }
 
 export const games: Game[] = [
@@ -16,9 +17,9 @@ export const games: Game[] = [
   { id: "fnf", title: "Friday Night Funkin'", url: "https://thomasrhysfnf.netlify.app" },
   { id: "slide-down", title: "Slide Down", url: "https://gamea.azgame.io/slide-down" },
   { id: "slope-2-az", title: "Slope 2", url: "https://game.azgame.io/slope-2" },
-  { id: "1-12", title: "Minecraft 1.12", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.12.html" },
-  { id: "1-5", title: "Minecraft 1.5", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.5.html" },
-  { id: "1-8", title: "Minecraft 1.8", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.8.html" },
+  { id: "1-12", title: "Minecraft 1.12", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.12.html", image: "/images/minecraft-cover-1.jpg" },
+  { id: "1-5", title: "Minecraft 1.5", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.5.html", image: "/images/minecraft-cover-2.png" },
+  { id: "1-8", title: "Minecraft 1.8", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.8.html", image: "/images/minecraft-cover-1.jpg" },
   { id: "10minutestilldawn", title: "10 Minutes Till Dawn", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/10minutestilldawn.html" },
   { id: "12minibattles", title: "12 MiniBattles", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/12minibattles.html" },
   { id: "1on1soccer", title: "1 on 1 Soccer", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1on1soccer.html" },
@@ -28,9 +29,9 @@ export const games: Game[] = [
   { id: "2048cupcakes", title: "2048 Cupcakes", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/2048cupcakes.html" },
   { id: "3dflightsimulator", title: "3D Flight Simulator", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/3Dflightsimulator.html" },
   { id: "8ballclassic", title: "8 Ball Classic", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/8ballclassic.html" },
-  { id: "alpha-1-2-6", title: "Minecraft Alpha 1.2.6", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Alpha_1.2.6.html" },
-  { id: "beta-1-3", title: "Minecraft Beta 1.3", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Beta_1.3.html" },
-  { id: "indev", title: "Minecraft Indev", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Indev.html" },
+  { id: "alpha-1-2-6", title: "Minecraft Alpha 1.2.6", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Alpha_1.2.6.html", image: "/images/minecraft-cover-2.png" },
+  { id: "beta-1-3", title: "Minecraft Beta 1.3", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Beta_1.3.html", image: "/images/minecraft-cover-1.jpg" },
+  { id: "indev", title: "Minecraft Indev", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Indev.html", image: "/images/minecraft-cover-2.png" },
   { id: "agariolite", title: "Agar.io Lite", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/agariolite.html" },
   { id: "ageofwar", title: "Age of War", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/ageofwar.html" },
   { id: "ageofwar2", title: "Age of War 2", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/ageofwar2.html" },
