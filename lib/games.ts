@@ -11,7 +11,7 @@ export interface Game {
 
 export const games: Game[] = [
   { id: "gunspin", title: "GunSpin", url: "https://thomasrhys.github.io/angry-games/gunspin" },
-  { id: "bitlife-online", title: "BitLife", url: "https://thomasrhys.github.io/angry-games/bitlife" },
+  { id: "bitlife-online", title: "BitLife", url: "https://thomasrhys.github.io/angry-games/bitlife", image: "/images/bitlife.webp" },
   { id: "cherry-pickr", title: "Cherry Pickr", url: "https://thomasrhys.github.io/cherry-pickr" },
   { id: "cherry-picker-2", title: "Cherry Picker 2", url: "https://thomasrhys.github.io/cherry-picker-by-at12" },
   { id: "fnf", title: "Friday Night Funkin'", url: "https://thomasrhysfnf.netlify.app", image: "/images/friday-night-funkin.jpg" },
