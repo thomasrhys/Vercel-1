@@ -33,7 +33,7 @@ export const games: Game[] = [
   { id: "alpha-1-2-6", title: "Minecraft Alpha 1.2.6", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Alpha_1.2.6.html", image: "/images/minecraft-cover-2.png" },
   { id: "beta-1-3", title: "Minecraft Beta 1.3", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Beta_1.3.html", image: "/images/minecraft-cover-2.png" },
   { id: "indev", title: "Minecraft Indev", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/Indev.html", image: "/images/minecraft-cover-2.png" },
-  { id: "agariolite", title: "Agar.io Lite", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/agariolite.html" },
+  { id: "agariolite", title: "Agar.io Lite", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/agariolite.html", image: "/images/agario.jpg" },
   { id: "ageofwar", title: "Age of War", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/ageofwar.html" },
   { id: "ageofwar2", title: "Age of War 2", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/ageofwar2.html" },
   { id: "agesofconflict", title: "Ages of Conflict", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/agesofconflict.html" },
