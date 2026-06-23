@@ -17,7 +17,7 @@ export const games: Game[] = [
   { id: "fnf", title: "Friday Night Funkin'", url: "https://thomasrhysfnf.netlify.app", image: "/images/friday-night-funkin.jpg" },
   { id: "slide-down", title: "Slide Down", url: "https://gamea.azgame.io/slide-down", image: "/images/slidedown.png" },
   { id: "slope-2-az", title: "Slope 2", url: "https://game.azgame.io/slope-2", image: "/images/slope-2.png" },
-  { id: "slope-az", title: "Slope", url: "https://azgames.io/slope.embed" },
+  { id: "slope-az", title: "Slope", url: "https://azgames.io/slope.embed", image: "/images/slope-az.webp" },
   { id: "1-12", title: "Minecraft 1.12", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.12.html", image: "/images/minecraft-cover-1.jpg" },
   { id: "1-5", title: "Minecraft 1.5", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.5.html", image: "/images/minecraft-cover-1.jpg" },
   { id: "1-8", title: "Minecraft 1.8", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.8.html", image: "/images/minecraft-cover-1.jpg" },
