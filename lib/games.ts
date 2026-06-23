@@ -21,7 +21,7 @@ export const games: Game[] = [
   { id: "1-12", title: "Minecraft 1.12", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.12.html", image: "/images/minecraft-cover-1.jpg" },
   { id: "1-5", title: "Minecraft 1.5", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.5.html", image: "/images/minecraft-cover-1.jpg" },
   { id: "1-8", title: "Minecraft 1.8", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1.8.html", image: "/images/minecraft-cover-1.jpg" },
-  { id: "10minutestilldawn", title: "10 Minutes Till Dawn", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/10minutestilldawn.html", image: "/images/10 Minutes Till Dawn.jpg" },
+  { id: "10minutestilldawn", title: "10 Minutes Till Dawn", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/10minutestilldawn.html", image: "/images/10mtd.png" },
   { id: "12minibattles", title: "12 MiniBattles", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/12minibattles.html", image: "/images/12mb.jpg" },
   { id: "1on1soccer", title: "1 on 1 Soccer", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1on1soccer.html", image: "/images/11soccer.jpg" },
   { id: "1on1tennis", title: "1 on 1 Tennis", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1on1tennis.html", image: "/images/11tennis.png" },
