@@ -25,7 +25,7 @@ export const games: Game[] = [
   { id: "12minibattles", title: "12 MiniBattles", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/12minibattles.html", image: "/images/12mb.jpg" },
   { id: "1on1soccer", title: "1 on 1 Soccer", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1on1soccer.html", image: "/images/11soccer.jpg" },
   { id: "1on1tennis", title: "1 on 1 Tennis", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1on1tennis.html", image: "/images/11tennis.png" },
-  { id: "1v1-lol", title: "1v1.LOL", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1v1.lol.html" },
+  { id: "1v1-lol", title: "1v1.LOL", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/1v1.lol.html", image: "/images/1v1lol.png" },
   { id: "2048", title: "2048", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/2048.html" },
   { id: "2048cupcakes", title: "2048 Cupcakes", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/2048cupcakes.html" },
   { id: "3dflightsimulator", title: "3D Flight Simulator", url: "https://thomasrhys.github.io/Offline-HTML-Games-Pack/offline/3Dflightsimulator.html" },
