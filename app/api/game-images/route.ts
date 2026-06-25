@@ -8,7 +8,8 @@ export async function GET() {
 
     for (const blob of blobs) {
       const filename = blob.pathname.replace("covers/", "");
-      const gameId = filename.split("-").slice(0, -2).join("-");
+      const gameId = filename.split("__")[0];
+
       images[gameId] = blob.url;
     }
 
