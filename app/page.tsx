@@ -11,7 +11,20 @@ export default function GamePortal() {
   const [activeGame, setActiveGame] = useState<Game | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const gameContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const storedAuth = localStorage.getItem("adminLoggedIn")
+    if (storedAuth === "true") {
+      setIsAdminLoggedIn(true)
+    }
+  }, [])
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false)
+    localStorage.removeItem("adminLoggedIn")
+  }
 
   const filteredGames = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -50,7 +63,7 @@ export default function GamePortal() {
             <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">Game Portal</h1>
           </div>
-          <div className="relative sm:ml-auto w-full sm:max-w-xs">
+          <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -60,6 +73,30 @@ export default function GamePortal() {
               className="pl-9"
               aria-label="Search games"
             />
+          </div>
+          <div className="sm:ml-auto flex gap-2">
+            {isAdminLoggedIn ? (
+              <>
+                <Button variant="outline" disabled className="cursor-default">
+                  admin
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleAdminLogout}
+                  className="text-xs"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => setIsAdminLoggedIn(true)}
+                className="text-xs"
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </header>

@@ -19,10 +19,17 @@ export default function AdminPage() {
   const handleLogin = () => {
     // Simple client-side auth check (real auth happens on server)
     if (password.length > 0) {
-      setIsAuthenticated(true);
-      setPassword("");
-      setMessage("Authenticated!");
+      setIsAuthenticated(true)
+      localStorage.setItem("adminLoggedIn", "true")
+      setPassword("")
+      setMessage("Authenticated!")
     }
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    localStorage.removeItem("adminLoggedIn")
+  }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,9 +112,38 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-2xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Upload and assign cover art to games</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <p className="text-muted-foreground mt-2">Upload and assign cover art to games</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className={`px-3 py-1 rounded-md text-sm font-medium ${
+              isAuthenticated
+                ? "bg-green-500/20 text-green-700"
+                : "bg-red-500/20 text-red-700"
+            }`}>
+              {isAuthenticated ? "✓ Authenticated" : "✗ Not Authenticated"}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = "/"}
+              >
+                Back to Games
+              </Button>
+              {isAuthenticated && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
         <Card>
