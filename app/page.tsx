@@ -77,9 +77,14 @@ export default function GamePortal() {
           <div className="sm:ml-auto flex gap-2">
             {isAdminLoggedIn ? (
               <>
-                <Button variant="outline" disabled className="cursor-default">
-                  admin
-                </Button>
+               <Button
+                 variant="outline"
+                 onClick={() => {
+                   window.location.href = "/admin"
+                 }}
+               >
+                 admin
+               </Button>
                 <Button
                   variant="outline"
                   onClick={handleAdminLogout}
