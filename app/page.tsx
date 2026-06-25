@@ -13,6 +13,7 @@ export default function GamePortal() {
   const [query, setQuery] = useState("")
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
+
   const gameContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,7 +39,9 @@ export default function GamePortal() {
   const filteredGames = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return games
-    return games.filter((game) => game.title.toLowerCase().includes(q))
+    return games.filter((game) =>
+      game.title.toLowerCase().includes(q)
+    )
   }, [query])
 
   const toggleFullscreen = async () => {
@@ -60,39 +63,50 @@ export default function GamePortal() {
       setIsFullscreen(!!document.fullscreenElement)
     }
 
-    document.addEventListener("fullscreenchange", handleFullscreenChange)
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    document.addEventListener(
+      "fullscreenchange",
+      handleFullscreenChange
+    )
+
+    return () =>
+      document.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange
+      )
   }, [])
 
   return (
     <div className="min-h-screen bg-background">
+
       <header className="border-b border-border bg-card sticky top-0 z-40">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+
           <div className="flex items-center gap-2 sm:gap-3">
             <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Game Portal</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+              Game Portal
+            </h1>
           </div>
 
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
             <Input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search games..."
               className="pl-9"
-              aria-label="Search games"
             />
           </div>
 
           <div className="sm:ml-auto flex gap-2">
+
             {isAdminLoggedIn ? (
               <>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    window.location.href = "/admin"
-                  }}
+                  onClick={() => (window.location.href = "/admin")}
                 >
                   Admin
                 </Button>
@@ -100,7 +114,6 @@ export default function GamePortal() {
                 <Button
                   variant="outline"
                   onClick={handleAdminLogout}
-                  className="text-xs"
                 >
                   Logout
                 </Button>
@@ -108,26 +121,26 @@ export default function GamePortal() {
             ) : (
               <Button
                 variant="outline"
-                onClick={() => {
-                  window.location.href = "/admin"
-                }}
-                className="text-xs"
+                onClick={() => (window.location.href = "/admin")}
               >
                 Login
               </Button>
             )}
+
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+
         <p className="text-sm text-muted-foreground mb-4">
-          {filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}
+          {filteredGames.length}{" "}
+          {filteredGames.length === 1 ? "game" : "games"}
           {query ? " found" : " available"}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-          {filteredGames.map((game) => {
+                    {filteredGames.map((game) => {
             const coverImage = blobImages[game.id] || getGameImage(game.id)
 
             return (
@@ -144,6 +157,7 @@ export default function GamePortal() {
 
                 <CardContent className="p-0">
                   <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
+
                     {coverImage ? (
                       <>
                         <img
@@ -174,6 +188,7 @@ export default function GamePortal() {
                         </div>
                       </div>
                     )}
+
                   </div>
                 </CardContent>
               </Card>
@@ -187,11 +202,13 @@ export default function GamePortal() {
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
               No games found
             </h2>
+
             <p className="text-sm sm:text-base text-muted-foreground">
               Try a different search term.
             </p>
           </div>
         )}
+
       </main>
 
       {activeGame && (
@@ -208,7 +225,7 @@ export default function GamePortal() {
                 : "w-full max-w-5xl h-[85vh] sm:h-[80vh]"
             }`}
           >
-            <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-border bg-muted">
+                        <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-border bg-muted">
               <h2 className="font-semibold text-sm sm:text-base text-foreground truncate mr-2">
                 {activeGame.title}
               </h2>
