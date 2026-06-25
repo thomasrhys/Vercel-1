@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,23 +9,33 @@ import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
 export default function AdminPage() {
-  const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedGameId, setSelectedGameId] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [preview, setPreview] = useState<string>("");
+  const [password, setPassword] = useState("")
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [selectedGameId, setSelectedGameId] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [preview, setPreview] = useState<string>("")
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("adminLoggedIn")
+
+    if (loggedIn === "true") {
+      setIsAuthenticated(true)
+    }
+  }, [])
 
   const handleLogin = () => {
     if (password === "trystan") {
-      setIsAuthenticated(true)
-      localStorage.setItem("adminLoggedIn", "true")
-      setPassword("")
-      setMessage("Authenticated!")
-      window.location.href = "/"
+      localStorage.setItem("adminLoggedIn", "true");
+      setIsAuthenticated(true);
+      setPassword("");
+      setMessage("Authenticated!");
+      window.location.href = "/";
+    } else {
+      setMessage("Incorrect password");
     }
-  }
+  };
 
   const handleLogout = () => {
     setIsAuthenticated(false)
