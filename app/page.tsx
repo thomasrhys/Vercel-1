@@ -91,7 +91,9 @@ export default function GamePortal() {
             ) : (
               <Button
                 variant="outline"
-                onClick={() => setIsAdminLoggedIn(true)}
+                onClick={() => {
+                  window.location.href = "/admin"
+                }}
                 className="text-xs"
               >
                 Login
