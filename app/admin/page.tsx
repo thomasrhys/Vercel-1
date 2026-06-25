@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
@@ -63,15 +69,23 @@ export default function AdminPage() {
       return;
     }
 
+    const adminPassword = localStorage.getItem("adminPassword") || "";
+
+    if (!adminPassword) {
+      setMessage("You need to log in again");
+      setIsAuthenticated(false);
+      localStorage.removeItem("adminLoggedIn");
+      return;
+    }
+
     setIsUploading(true);
+    setMessage("");
 
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("gameId", selectedGameId);
 
     try {
-      const adminPassword = localStorage.getItem("adminPassword") || "";
-
       const response = await fetch("/api/admin/upload", {
         method: "POST",
         headers: {
@@ -139,7 +153,9 @@ export default function AdminPage() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
             <p className="text-muted-foreground mt-2">
               Upload and assign cover art to games
             </p>
