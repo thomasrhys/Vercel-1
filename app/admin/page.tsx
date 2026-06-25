@@ -26,7 +26,7 @@ export default function AdminPage() {
   }, [])
 
   const handleLogin = () => {
-    if (password === "trystan") {
+    if (password === "admin") {
       localStorage.setItem("adminLoggedIn", "true");
       setIsAuthenticated(true);
       setPassword("");
