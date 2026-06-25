@@ -4,12 +4,16 @@ import { put } from "@vercel/blob";
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
   "user_3FdWs0pdbEHCG85yExuAaW700hE",
+  "user_3FdahY3hXmw7c589YMnDefAwOen",
 ];
 
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
 
+    console.log("Clerk upload userId:", userId);
+    console.log("Allowed admins:", ADMIN_USER_IDS);
+    
     if (!userId) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
