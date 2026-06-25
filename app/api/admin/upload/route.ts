@@ -43,7 +43,10 @@ export async function POST(request: Request) {
       message: `Assigned ${file.name} to game ${gameId}`
     });
   } catch (error) {
-    console.error("[v0] Upload error:", error);
-    return Response.json({ error: "Upload failed" }, { status: 500 });
+console.error("[v0] Upload error:", error);
+return Response.json(
+  { error: error instanceof Error ? error.message : "Upload failed" },
+  { status: 500 }
+);
   }
 }
