@@ -1,6 +1,4 @@
-import { put, head } from "@vercel/blob";
-
-type CoverMap = Record<string, string>;
+import { put } from "@vercel/blob";
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +19,7 @@ export async function POST(request: Request) {
 
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
 
-    const imageBlob = await put(
+    const blob = await put(
       `covers/${gameId}-${Date.now()}-${safeFileName}`,
       file,
       {
@@ -29,31 +27,10 @@ export async function POST(request: Request) {
       }
     );
 
-    let mappings: CoverMap = {};
-
-    try {
-      const mappingBlob = await head("game-images.json");
-      const mappingResponse = await fetch(mappingBlob.url);
-
-      if (mappingResponse.ok) {
-        mappings = await mappingResponse.json();
-      }
-    } catch {
-      mappings = {};
-    }
-
-    mappings[gameId] = imageBlob.url;
-
-    await put("game-images.json", JSON.stringify(mappings, null, 2), {
-      access: "public",
-      allowOverwrite: true,
-      contentType: "application/json",
-    });
-
     return Response.json({
       success: true,
-      imageUrl: imageBlob.url,
-      message: `Assigned ${file.name} to game ${gameId}`,
+      imageUrl: blob.url,
+      message: `Uploaded cover for ${gameId}`,
     });
   } catch (error) {
     console.error("[v0] Upload error:", error);
