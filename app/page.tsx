@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Maximize2, Minimize2, X, Gamepad2, Search } from "lucide-react"
-import { games, type Game } from "@/lib/games"
+import { games, type Game, getGameImage } from "@/lib/games"
 
 export default function GamePortal() {
   const [activeGame, setActiveGame] = useState<Game | null>(null)
@@ -83,10 +83,10 @@ export default function GamePortal() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
-                  {game.image ? (
+                  {getGameImage(game.id) ? (
                     <>
                       <img 
-                        src={game.image} 
+                        src={getGameImage(game.id)} 
                         alt={game.title}
                         className="w-full h-full object-cover"
                       />
