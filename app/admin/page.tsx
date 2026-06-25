@@ -17,12 +17,12 @@ export default function AdminPage() {
   const [preview, setPreview] = useState<string>("");
 
   const handleLogin = () => {
-    // Simple client-side auth check (real auth happens on server)
-    if (password.length > 0) {
+    if (password === "trystan") {
       setIsAuthenticated(true)
       localStorage.setItem("adminLoggedIn", "true")
       setPassword("")
       setMessage("Authenticated!")
+      window.location.href = "/"
     }
   }
 
