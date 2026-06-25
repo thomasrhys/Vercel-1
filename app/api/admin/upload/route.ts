@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { put } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -11,9 +11,6 @@ export async function POST(request: Request) {
   try {
     const { userId } = await auth();
 
-    console.log("Clerk upload userId:", userId);
-    console.log("Allowed admins:", ADMIN_USER_IDS);
-    
     if (!userId) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -35,6 +32,14 @@ export async function POST(request: Request) {
 
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
 
+    const existing = await list({
+      prefix: `covers/${gameId}__`,
+    });
+
+    if (existing.blobs.length > 0) {
+      await del(existing.blobs.map((blob) => blob.url));
+    }
+
     const blob = await put(
       `covers/${gameId}__${Date.now()}__${safeFileName}`,
       file,
@@ -46,7 +51,7 @@ export async function POST(request: Request) {
     return Response.json({
       success: true,
       imageUrl: blob.url,
-      message: `Uploaded cover for ${gameId}`,
+      message: `Replaced cover for ${gameId}`,
     });
   } catch (error) {
     console.error("[v0] Upload error:", error);
