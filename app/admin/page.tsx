@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { SignInButton, SignOutButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -14,40 +14,11 @@ import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
 export default function AdminPage() {
-  const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState<string>("");
-
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("adminLoggedIn");
-
-    if (loggedIn === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleLogin = () => {
-    if (password === "admin") {
-      localStorage.setItem("adminLoggedIn", "true");
-      localStorage.setItem("adminPassword", password);
-      setIsAuthenticated(true);
-      setPassword("");
-      window.location.href = "/";
-    } else {
-      setMessage("Incorrect password");
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("adminLoggedIn");
-    localStorage.removeItem("adminPassword");
-    window.location.href = "/";
-  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,15 +40,6 @@ export default function AdminPage() {
       return;
     }
 
-    const adminPassword = localStorage.getItem("adminPassword") || "";
-
-    if (!adminPassword) {
-      setMessage("You need to log in again");
-      setIsAuthenticated(false);
-      localStorage.removeItem("adminLoggedIn");
-      return;
-    }
-
     setIsUploading(true);
     setMessage("");
 
@@ -88,9 +50,6 @@ export default function AdminPage() {
     try {
       const response = await fetch("/api/admin/upload", {
         method: "POST",
-        headers: {
-          authorization: `Bearer ${adminPassword}`,
-        },
         body: formData,
       });
 
@@ -112,155 +71,158 @@ export default function AdminPage() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Admin Login
-            </CardTitle>
-            <CardDescription>Enter admin password to access</CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Admin password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            />
-
-            <Button onClick={handleLogin} className="w-full">
-              Login
-            </Button>
-
-            {message && (
-              <div className="p-3 rounded-md text-sm bg-red-500/20 text-red-700">
-                {message}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Admin Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Upload and assign cover art to games
-            </p>
-          </div>
+    <>
+      <SignedOut>
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                Admin Login
+              </CardTitle>
+              <CardDescription>Sign in with GitHub to access admin</CardDescription>
+            </CardHeader>
 
-          <div className="flex flex-col gap-2">
-            <div className="px-3 py-1 rounded-md text-sm font-medium bg-green-500/20 text-green-700">
-              ✓ Authenticated
-            </div>
+            <CardContent className="space-y-4">
+              <SignInButton mode="modal">
+                <Button className="w-full">Sign in</Button>
+              </SignInButton>
 
-            <div className="flex gap-2">
               <Button
                 variant="outline"
-                size="sm"
+                className="w-full"
                 onClick={() => {
                   window.location.href = "/";
                 }}
               >
                 Back to Games
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </SignedOut>
 
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+      <SignedIn>
+        <div className="min-h-screen bg-background p-4 sm:p-8">
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  Admin Dashboard
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  Upload and assign cover art to games
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 items-end">
+                <div className="flex items-center gap-2">
+                  <UserButton />
+                  <div className="px-3 py-1 rounded-md text-sm font-medium bg-green-500/20 text-green-700">
+                    ✓ Signed in
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      window.location.href = "/";
+                    }}
+                  >
+                    Back to Games
+                  </Button>
+
+                  <SignOutButton redirectUrl="/">
+                    <Button variant="outline" size="sm">
+                      Logout
+                    </Button>
+                  </SignOutButton>
+                </div>
+              </div>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Assign Cover Art</CardTitle>
+                <CardDescription>
+                  Select a game and upload a cover image
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Select Game
+                  </label>
+
+                  <select
+                    value={selectedGameId}
+                    onChange={(e) => setSelectedGameId(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                  >
+                    <option value="">-- Choose a game --</option>
+                    {games.map((game: typeof games[0]) => (
+                      <option key={game.id} value={game.id}>
+                        {game.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Upload Image
+                  </label>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="w-full px-3 py-2 border border-border rounded-md"
+                  />
+                </div>
+
+                {preview && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Preview
+                    </label>
+
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="w-full max-w-xs h-auto rounded-md border border-border"
+                    />
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleUpload}
+                  disabled={isUploading || !selectedFile || !selectedGameId}
+                  className="w-full"
+                >
+                  {isUploading ? "Uploading..." : "Upload & Assign"}
+                </Button>
+
+                {message && (
+                  <div
+                    className={`p-3 rounded-md text-sm ${
+                      message.startsWith("✓")
+                        ? "bg-green-500/20 text-green-700"
+                        : "bg-red-500/20 text-red-700"
+                    }`}
+                  >
+                    {message}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Assign Cover Art</CardTitle>
-            <CardDescription>
-              Select a game and upload a cover image
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Select Game
-              </label>
-
-              <select
-                value={selectedGameId}
-                onChange={(e) => setSelectedGameId(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
-              >
-                <option value="">-- Choose a game --</option>
-                {games.map((game: typeof games[0]) => (
-                  <option key={game.id} value={game.id}>
-                    {game.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Upload Image
-              </label>
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="w-full px-3 py-2 border border-border rounded-md"
-              />
-            </div>
-
-            {preview && (
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Preview
-                </label>
-
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full max-w-xs h-auto rounded-md border border-border"
-                />
-              </div>
-            )}
-
-            <Button
-              onClick={handleUpload}
-              disabled={isUploading || !selectedFile || !selectedGameId}
-              className="w-full"
-            >
-              {isUploading ? "Uploading..." : "Upload & Assign"}
-            </Button>
-
-            {message && (
-              <div
-                className={`p-3 rounded-md text-sm ${
-                  message.startsWith("✓")
-                    ? "bg-green-500/20 text-green-700"
-                    : "bg-red-500/20 text-red-700"
-                }`}
-              >
-                {message}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      </SignedIn>
+    </>
   );
 }
