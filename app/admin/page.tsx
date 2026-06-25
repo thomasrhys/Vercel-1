@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignOutButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,14 +18,21 @@ import {
 import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
+const ADMIN_USER_IDS = [
+  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
+  "user_3FdWs0pdbEHCG85yExuAaW700hE",
+];
+
 export default function AdminPage() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
   const [selectedGameId, setSelectedGameId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState<string>("");
+
+  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -105,6 +117,40 @@ export default function AdminPage() {
     );
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Access denied</CardTitle>
+            <CardDescription>
+              You are signed in, but this account does not have admin access.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <UserButton />
+
+            <SignOutButton redirectUrl="/">
+              <Button variant="outline" className="w-full">
+                Sign out
+              </Button>
+            </SignOutButton>
+
+            <Button
+              className="w-full"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Back to Games
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -122,7 +168,7 @@ export default function AdminPage() {
             <div className="flex items-center gap-2">
               <UserButton />
               <div className="px-3 py-1 rounded-md text-sm font-medium bg-green-500/20 text-green-700">
-                ✓ Signed in
+                ✓ Admin
               </div>
             </div>
 
