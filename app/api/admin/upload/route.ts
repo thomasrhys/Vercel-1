@@ -1,12 +1,21 @@
+import { auth } from "@clerk/nextjs/server";
 import { put } from "@vercel/blob";
+
+const ADMIN_USER_IDS = [
+  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
+  "user_3FdWs0pdbEHCG85yExuAaW700hE",
+];
 
 export async function POST(request: Request) {
   try {
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    const authHeader = request.headers.get("authorization");
+    const { userId } = await auth();
 
-    if (!authHeader || authHeader !== `Bearer ${adminPassword}`) {
+    if (!userId) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!ADMIN_USER_IDS.includes(userId)) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -14,7 +23,10 @@ export async function POST(request: Request) {
     const gameId = formData.get("gameId") as string | null;
 
     if (!file || !gameId) {
-      return Response.json({ error: "Missing file or gameId" }, { status: 400 });
+      return Response.json(
+        { error: "Missing file or gameId" },
+        { status: 400 }
+      );
     }
 
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
