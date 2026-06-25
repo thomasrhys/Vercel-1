@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SignInButton, SignOutButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
