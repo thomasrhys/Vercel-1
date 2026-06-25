@@ -21,6 +21,7 @@ import { Lock } from "lucide-react";
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
   "user_3FdWs0pdbEHCG85yExuAaW700hE",
+  "user_3FdahY3hXmw7c589YMnDefAwOen",
 ];
 
 export default function AdminPage() {
