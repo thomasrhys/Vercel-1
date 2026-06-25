@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GAMES } from "@/lib/games";
+import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
 export default function AdminPage() {
@@ -127,7 +127,7 @@ export default function AdminPage() {
                 className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
               >
                 <option value="">-- Choose a game --</option>
-                {GAMES.map((game) => (
+                {games.map((game: typeof games[0]) => (
                   <option key={game.id} value={game.id}>
                     {game.title}
                   </option>
