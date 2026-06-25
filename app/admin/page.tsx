@@ -37,9 +37,10 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    localStorage.removeItem("adminLoggedIn")
+ const handleLogout = () => {
+   setIsAuthenticated(false)
+   localStorage.removeItem("adminLoggedIn")
+   window.location.href = "/"
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
