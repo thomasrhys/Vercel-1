@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
 
     const blob = await put(
-      `covers/${gameId}-${Date.now()}-${safeFileName}`,
+      `covers/${gameId}__${Date.now()}__${safeFileName}`,
       file,
       {
         access: "public",
