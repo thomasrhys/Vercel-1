@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,44 +8,47 @@ import { games } from "@/lib/games";
 import { Lock } from "lucide-react";
 
 export default function AdminPage() {
-  const [password, setPassword] = useState("")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [selectedGameId, setSelectedGameId] = useState("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [preview, setPreview] = useState<string>("")
+  const [password, setPassword] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedGameId, setSelectedGameId] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [preview, setPreview] = useState<string>("");
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("adminLoggedIn")
+    const loggedIn = localStorage.getItem("adminLoggedIn");
 
     if (loggedIn === "true") {
-      setIsAuthenticated(true)
+      setIsAuthenticated(true);
     }
-  }, [])
+  }, []);
 
   const handleLogin = () => {
     if (password === "admin") {
       localStorage.setItem("adminLoggedIn", "true");
+      localStorage.setItem("adminPassword", password);
       setIsAuthenticated(true);
       setPassword("");
-      setMessage("Authenticated!");
       window.location.href = "/";
     } else {
       setMessage("Incorrect password");
     }
   };
 
- const handleLogout = () => {
-   setIsAuthenticated(false)
-   localStorage.removeItem("adminLoggedIn")
-   window.location.href = "/"
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminPassword");
+    window.location.href = "/";
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       setSelectedFile(file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
@@ -62,20 +64,24 @@ export default function AdminPage() {
     }
 
     setIsUploading(true);
+
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("gameId", selectedGameId);
 
     try {
+      const adminPassword = localStorage.getItem("adminPassword") || "";
+
       const response = await fetch("/api/admin/upload", {
         method: "POST",
         headers: {
-          authorization: `Bearer ${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || password}`,
+          authorization: `Bearer ${adminPassword}`,
         },
         body: formData,
       });
 
       const data = await response.json();
+
       if (response.ok) {
         setMessage(`✓ ${data.message}`);
         setSelectedFile(null);
@@ -103,6 +109,7 @@ export default function AdminPage() {
             </CardTitle>
             <CardDescription>Enter admin password to access</CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-4">
             <Input
               type="password"
@@ -111,9 +118,16 @@ export default function AdminPage() {
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
             />
+
             <Button onClick={handleLogin} className="w-full">
               Login
             </Button>
+
+            {message && (
+              <div className="p-3 rounded-md text-sm bg-red-500/20 text-red-700">
+                {message}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -126,33 +140,30 @@ export default function AdminPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Upload and assign cover art to games</p>
+            <p className="text-muted-foreground mt-2">
+              Upload and assign cover art to games
+            </p>
           </div>
+
           <div className="flex flex-col gap-2">
-            <div className={`px-3 py-1 rounded-md text-sm font-medium ${
-              isAuthenticated
-                ? "bg-green-500/20 text-green-700"
-                : "bg-red-500/20 text-red-700"
-            }`}>
-              {isAuthenticated ? "✓ Authenticated" : "✗ Not Authenticated"}
+            <div className="px-3 py-1 rounded-md text-sm font-medium bg-green-500/20 text-green-700">
+              ✓ Authenticated
             </div>
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.href = "/"}
+                onClick={() => {
+                  window.location.href = "/";
+                }}
               >
                 Back to Games
               </Button>
-              {isAuthenticated && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              )}
+
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -160,14 +171,17 @@ export default function AdminPage() {
         <Card>
           <CardHeader>
             <CardTitle>Assign Cover Art</CardTitle>
-            <CardDescription>Select a game and upload a cover image</CardDescription>
+            <CardDescription>
+              Select a game and upload a cover image
+            </CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-6">
-            {/* Game Selection */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Select Game
               </label>
+
               <select
                 value={selectedGameId}
                 onChange={(e) => setSelectedGameId(e.target.value)}
@@ -182,11 +196,11 @@ export default function AdminPage() {
               </select>
             </div>
 
-            {/* File Input */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Upload Image
               </label>
+
               <input
                 type="file"
                 accept="image/*"
@@ -195,12 +209,12 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* Preview */}
             {preview && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Preview
                 </label>
+
                 <img
                   src={preview}
                   alt="Preview"
@@ -209,7 +223,6 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Upload Button */}
             <Button
               onClick={handleUpload}
               disabled={isUploading || !selectedFile || !selectedGameId}
@@ -218,13 +231,14 @@ export default function AdminPage() {
               {isUploading ? "Uploading..." : "Upload & Assign"}
             </Button>
 
-            {/* Message */}
             {message && (
-              <div className={`p-3 rounded-md text-sm ${
-                message.startsWith("✓")
-                  ? "bg-green-500/20 text-green-700"
-                  : "bg-red-500/20 text-red-700"
-              }`}>
+              <div
+                className={`p-3 rounded-md text-sm ${
+                  message.startsWith("✓")
+                    ? "bg-green-500/20 text-green-700"
+                    : "bg-red-500/20 text-red-700"
+                }`}
+              >
                 {message}
               </div>
             )}
