@@ -40,11 +40,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <ClerkProvider>
-  <html lang="en">
-    <body>{children}</body>
-  </html>
-</ClerkProvider>
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -54,6 +49,20 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="font-sans antialiased">
+
+        export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
+  );
+}
         
         <noscript>
           <iframe
