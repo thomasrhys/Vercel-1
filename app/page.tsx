@@ -90,7 +90,7 @@ export default function GamePortal() {
                         alt={game.title}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Button 
                           variant="secondary" 
