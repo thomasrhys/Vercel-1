@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { games } from "@/lib/games";
-import { Lock } from "lucide-react";
+import { Lock, UploadCloud } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -32,20 +32,31 @@ export default function AdminPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
 
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+
+  const setCoverFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please select an image file");
+      return;
+    }
+
+    setSelectedFile(file);
+    setMessage("");
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (file) {
-      setSelectedFile(file);
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setCoverFile(file);
     }
   };
 
@@ -226,12 +237,62 @@ export default function AdminPage() {
                 Upload Image
               </label>
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="w-full px-3 py-2 border border-border rounded-md"
-              />
+              <div
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+
+                  const file = e.dataTransfer.files?.[0];
+
+                  if (file) {
+                    setCoverFile(file);
+                  }
+                }}
+                onClick={() => {
+                  document.getElementById("cover-upload")?.click();
+                }}
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
+                  isDragging
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <UploadCloud className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+
+                <p className="text-sm font-medium text-foreground">
+                  Drag cover image here
+                </p>
+
+                <p className="text-xs text-muted-foreground mt-1">
+                  or click to choose a JPG, PNG, or WebP file
+                </p>
+
+                {selectedFile && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+
+                <input
+                  id="cover-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </div>
             </div>
 
             {preview && (
