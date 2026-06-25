@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
+import { ClerkProvider } from "@clerk/nextjs"
 // Import the Script component for the Head snippet
 import Script from 'next/script'
 
@@ -39,7 +40,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        
+        <ClerkProvider>
+  <html lang="en">
+    <body>{children}</body>
+  </html>
+</ClerkProvider>
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
