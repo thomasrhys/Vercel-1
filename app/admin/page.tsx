@@ -29,7 +29,6 @@ export default function AdminPage() {
   const handleLogout = () => {
     setIsAuthenticated(false)
     localStorage.removeItem("adminLoggedIn")
-  }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
