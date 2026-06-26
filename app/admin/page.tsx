@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { games as fallbackGames, type Game } from "@/lib/games";
-import { Lock, Trash2, UploadCloud } from "lucide-react";
+import { Check, Lock, Pencil, Trash2, UploadCloud, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -51,6 +51,12 @@ export default function AdminPage() {
   const [managerSearch, setManagerSearch] = useState("");
   const [isLoadingGames, setIsLoadingGames] = useState(false);
   const [deletingGameId, setDeletingGameId] = useState<string | null>(null);
+
+  const [editingGameId, setEditingGameId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editUrl, setEditUrl] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [savingGameId, setSavingGameId] = useState<string | null>(null);
 
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
 
@@ -205,6 +211,67 @@ export default function AdminPage() {
     }
   };
 
+  const startEditingGame = (game: AdminGame) => {
+    setEditingGameId(game.id);
+    setEditTitle(game.title);
+    setEditUrl(game.url);
+    setEditCategory(game.category || "");
+    setMessage("");
+  };
+
+  const cancelEditingGame = () => {
+    setEditingGameId(null);
+    setEditTitle("");
+    setEditUrl("");
+    setEditCategory("");
+  };
+
+  const handleUpdateGame = async (game: AdminGame) => {
+    if (!editTitle || !editUrl) {
+      setMessage("Please enter a title and URL");
+      return;
+    }
+
+    setSavingGameId(game.id);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/games", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: game.id,
+          title: editTitle,
+          url: editUrl,
+          category: editCategory,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.game) {
+        setMessage(`✓ ${data.message}`);
+        setAdminGames((currentGames) =>
+          currentGames
+            .map((currentGame) =>
+              currentGame.id === game.id ? data.game : currentGame
+            )
+            .sort((a, b) => a.title.localeCompare(b.title))
+        );
+        cancelEditingGame();
+      } else {
+        setMessage(`✗ ${data.error || "Failed to update game"}`);
+      }
+    } catch (error) {
+      setMessage("Failed to update game");
+      console.error("[v0] Update game error:", error);
+    } finally {
+      setSavingGameId(null);
+    }
+  };
+
   const handleDeleteGame = async (game: AdminGame) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${game.title}"? This cannot be undone.`
@@ -236,6 +303,10 @@ export default function AdminPage() {
 
         if (selectedGameId === game.id) {
           setSelectedGameId("");
+        }
+
+        if (editingGameId === game.id) {
+          cancelEditingGame();
         }
       } else {
         setMessage(`✗ ${data.error || "Failed to delete game"}`);
@@ -531,7 +602,7 @@ export default function AdminPage() {
           <CardHeader>
             <CardTitle>Game Manager</CardTitle>
             <CardDescription>
-              Search your Supabase games and delete entries when needed.
+              Search your Supabase games, edit details, or delete entries when needed.
             </CardDescription>
           </CardHeader>
 
@@ -567,38 +638,112 @@ export default function AdminPage() {
             </div>
 
             <div className="space-y-3">
-              {filteredManagerGames.map((game) => (
-                <div
-                  key={game.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border border-border p-3"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground truncate">
-                      {game.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {game.id}
-                    </p>
-                    {game.category && (
-                      <p className="text-xs text-muted-foreground truncate">
-                        Category: {game.category}
-                      </p>
+              {filteredManagerGames.map((game) => {
+                const isEditing = editingGameId === game.id;
+
+                return (
+                  <div
+                    key={game.id}
+                    className="rounded-md border border-border p-3"
+                  >
+                    {isEditing ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                          placeholder="Game title"
+                        />
+
+                        <input
+                          type="url"
+                          value={editUrl}
+                          onChange={(e) => setEditUrl(e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                          placeholder="Game URL"
+                        />
+
+                        <input
+                          type="text"
+                          value={editCategory}
+                          onChange={(e) => setEditCategory(e.target.value)}
+                          className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                          placeholder="Category, optional"
+                        />
+
+                        <p className="text-xs text-muted-foreground truncate">
+                          ID: {game.id}
+                        </p>
+
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={cancelEditingGame}
+                            disabled={savingGameId === game.id}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
+
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => handleUpdateGame(game)}
+                            disabled={savingGameId === game.id || !editTitle || !editUrl}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            {savingGameId === game.id ? "Saving..." : "Save"}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-medium text-foreground truncate">
+                            {game.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {game.id}
+                          </p>
+                          {game.category && (
+                            <p className="text-xs text-muted-foreground truncate">
+                              Category: {game.category}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 shrink-0">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => startEditingGame(game)}
+                            className="h-8 w-8"
+                            title="Edit game"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => handleDeleteGame(game)}
+                            disabled={deletingGameId === game.id}
+                            className="h-8 w-8"
+                            title={deletingGameId === game.id ? "Deleting game" : "Delete game"}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     )}
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleDeleteGame(game)}
-                    disabled={deletingGameId === game.id}
-                    className="h-8 w-8 shrink-0"
-                    title={deletingGameId === game.id ? "Deleting game" : "Delete game"}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
 
               {filteredManagerGames.length === 0 && (
                 <div className="rounded-md border border-border p-4 text-sm text-muted-foreground text-center">
