@@ -5,22 +5,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Maximize2, Minimize2, X, Gamepad2, Search } from "lucide-react"
-import { games, type Game, getGameImage } from "@/lib/games"
+import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
 export default function GamePortal() {
+  const [games, setGames] = useState<Game[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<Game | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem("adminLoggedIn")
-    if (storedAuth === "true") {
-      setIsAdminLoggedIn(true)
-    }
+    fetch("/api/games")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setGames(data)
+        }
+      })
+      .catch(() => {
+        setGames(fallbackGames)
+      })
   }, [])
 
   useEffect(() => {
@@ -30,19 +36,14 @@ export default function GamePortal() {
       .catch(() => setBlobImages({}))
   }, [])
 
-  const handleAdminLogout = () => {
-    setIsAdminLoggedIn(false)
-    localStorage.removeItem("adminLoggedIn")
-    localStorage.removeItem("adminPassword")
-  }
-
   const filteredGames = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return games
+
     return games.filter((game) =>
       game.title.toLowerCase().includes(q)
     )
-  }, [query])
+  }, [games, query])
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -77,10 +78,8 @@ export default function GamePortal() {
 
   return (
     <div className="min-h-screen bg-background">
-
       <header className="border-b border-border bg-card sticky top-0 z-40">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-
           <div className="flex items-center gap-2 sm:gap-3">
             <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">
@@ -101,38 +100,17 @@ export default function GamePortal() {
           </div>
 
           <div className="sm:ml-auto flex gap-2">
-
-            {isAdminLoggedIn ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => (window.location.href = "/admin")}
-                >
-                  Admin
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={handleAdminLogout}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => (window.location.href = "/admin")}
-              >
-                Login
-              </Button>
-            )}
-
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/admin")}
+            >
+              Admin
+            </Button>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-
         <p className="text-sm text-muted-foreground mb-4">
           {filteredGames.length}{" "}
           {filteredGames.length === 1 ? "game" : "games"}
@@ -140,8 +118,9 @@ export default function GamePortal() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-                    {filteredGames.map((game) => {
-            const coverImage = blobImages[game.id] || getGameImage(game.id)
+          {filteredGames.map((game) => {
+            const coverImage =
+              blobImages[game.id] || game.image || getGameImage(game.id)
 
             return (
               <Card
@@ -157,7 +136,6 @@ export default function GamePortal() {
 
                 <CardContent className="p-0">
                   <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
-
                     {coverImage ? (
                       <>
                         <img
@@ -188,7 +166,6 @@ export default function GamePortal() {
                         </div>
                       </div>
                     )}
-
                   </div>
                 </CardContent>
               </Card>
@@ -208,7 +185,6 @@ export default function GamePortal() {
             </p>
           </div>
         )}
-
       </main>
 
       {activeGame && (
@@ -225,7 +201,7 @@ export default function GamePortal() {
                 : "w-full max-w-5xl h-[85vh] sm:h-[80vh]"
             }`}
           >
-                        <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-border bg-muted">
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-border bg-muted">
               <h2 className="font-semibold text-sm sm:text-base text-foreground truncate mr-2">
                 {activeGame.title}
               </h2>
