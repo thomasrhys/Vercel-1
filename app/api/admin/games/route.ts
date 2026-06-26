@@ -91,6 +91,47 @@ export async function POST(request: Request) {
   });
 }
 
+export async function PATCH(request: Request) {
+  if (!(await requireAdmin())) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await request.json();
+
+  const id = String(body.id || "").trim();
+  const title = String(body.title || "").trim();
+  const url = String(body.url || "").trim();
+  const category = String(body.category || "").trim() || null;
+
+  if (!id || !title || !url) {
+    return Response.json(
+      { error: "Game ID, title, and URL are required" },
+      { status: 400 }
+    );
+  }
+
+  const { data, error } = await supabase
+    .from("games")
+    .update({
+      title,
+      url,
+      category,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({
+    success: true,
+    game: data,
+    message: `Updated ${title}`,
+  });
+}
+
 export async function DELETE(request: Request) {
   if (!(await requireAdmin())) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
