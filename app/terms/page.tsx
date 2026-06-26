@@ -1,0 +1,70 @@
+export default function TermsPage() {
+  return (
+    <main className="min-h-screen bg-background p-4 sm:p-8">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Terms of Use</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            Last updated: 26 June 2026
+          </p>
+        </div>
+
+        <section className="space-y-3 text-sm text-muted-foreground leading-6">
+          <p>
+            By using Game Portal, you agree to these Terms of Use. If you do not agree, please do not use the site.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Use of the site</h2>
+          <p>
+            Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.
+            You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Game requests</h2>
+          <p>
+            You may request games using the Request a Game form. Submitting a request does not guarantee that the
+            game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Third-party content</h2>
+          <p>
+            Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim
+            ownership of third-party games, trademarks, artwork, or related content.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Availability</h2>
+          <p>
+            The site may change, break, go offline, or remove games at any time. No guarantee is made that every game
+            will work on every device, browser, or network.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Desktop-only games</h2>
+          <p>
+            Some games may be marked as desktop-only, especially games using technology that may not work properly on
+            phones or tablets. These games may be blocked or limited on mobile devices.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">No warranties</h2>
+          <p>
+            Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Changes to these terms</h2>
+          <p>
+            These terms may be updated from time to time. Continued use of the site after changes means you accept the
+            updated terms.
+          </p>
+        </section>
+
+        <button
+          className="px-4 py-2 rounded-md border border-border text-sm"
+          onClick={() => {
+            if (typeof window !== "undefined") window.location.href = "/";
+          }}
+        >
+          Back to Games
+        </button>
+      </div>
+    </main>
+  );
+}
