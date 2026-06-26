@@ -4,7 +4,16 @@ import { useState, useRef, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Maximize2, Minimize2, X, Gamepad2, Search, Star } from "lucide-react"
+import {
+  Maximize2,
+  Minimize2,
+  X,
+  Gamepad2,
+  Search,
+  Star,
+  Monitor,
+  Smartphone,
+} from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
 type PortalGame = Game & {
@@ -12,6 +21,7 @@ type PortalGame = Game & {
   category?: string | null
   featured?: boolean
   hidden?: boolean
+  desktop_only?: boolean
 }
 
 export default function GamePortal() {
@@ -20,6 +30,7 @@ export default function GamePortal() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
 
@@ -41,6 +52,19 @@ export default function GamePortal() {
       .then((res) => res.json())
       .then((data) => setBlobImages(data))
       .catch(() => setBlobImages({}))
+  }, [])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)")
+
+    const updateMobileState = () => {
+      setIsMobileDevice(mediaQuery.matches)
+    }
+
+    updateMobileState()
+    mediaQuery.addEventListener("change", updateMobileState)
+
+    return () => mediaQuery.removeEventListener("change", updateMobileState)
   }, [])
 
   const filteredGames = useMemo(() => {
@@ -88,12 +112,19 @@ export default function GamePortal() {
 
   const renderGameCard = (game: PortalGame) => {
     const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
+    const isDesktopOnlyOnPhone = isMobileDevice && game.desktop_only
 
     return (
       <Card
         key={game.id}
-        className="group hover:shadow-lg transition-shadow cursor-pointer"
-        onClick={() => setActiveGame(game)}
+        className={`group hover:shadow-lg transition-shadow ${
+          isDesktopOnlyOnPhone ? "cursor-default" : "cursor-pointer"
+        }`}
+        onClick={() => {
+          if (!isDesktopOnlyOnPhone) {
+            setActiveGame(game)
+          }
+        }}
       >
         <CardHeader className="pb-2">
           <CardTitle className="text-base sm:text-lg truncate flex items-center gap-2">
@@ -105,15 +136,37 @@ export default function GamePortal() {
         <CardContent className="p-0">
           <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
             {coverImage ? (
+              <img
+                src={coverImage}
+                alt={game.title}
+                className={`w-full h-full object-cover ${
+                  isDesktopOnlyOnPhone ? "opacity-45" : ""
+                }`}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20">
+                <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground" />
+              </div>
+            )}
+
+            {game.desktop_only && (
+              <div className="absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white flex items-center gap-1">
+                <Monitor className="h-3 w-3" />
+                Desktop Only
+              </div>
+            )}
+
+            {isDesktopOnlyOnPhone ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white">
+                <Smartphone className="h-8 w-8 mb-2" />
+                <p className="font-semibold">Desktop Only</p>
+                <p className="text-xs mt-1 max-w-[220px]">
+                  This game is not supported on mobile devices. Please use a desktop or laptop.
+                </p>
+              </div>
+            ) : (
               <>
-                <img
-                  src={coverImage}
-                  alt={game.title}
-                  className="w-full h-full object-cover"
-                />
-
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
-
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Button
                     variant="secondary"
@@ -124,15 +177,6 @@ export default function GamePortal() {
                   </Button>
                 </div>
               </>
-            ) : (
-              <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20">
-                <div className="text-center p-3 sm:p-4">
-                  <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Tap to play
-                  </p>
-                </div>
-              </div>
             )}
           </div>
         </CardContent>
