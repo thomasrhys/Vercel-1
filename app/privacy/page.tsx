@@ -1,4 +1,11 @@
-export default function PrivacyPage() {
+import { headers } from "next/headers";
+
+export default async function PrivacyPage() {
+  const headersList = await headers();
+  const host = headersList.get("x-forwarded-host") || headersList.get("host") || "this website";
+  const protocol = headersList.get("x-forwarded-proto") || "https";
+  const siteUrl = host === "this website" ? "this website" : `${protocol}://${host}`;
+
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -11,7 +18,7 @@ export default function PrivacyPage() {
 
         <section className="space-y-3 text-sm text-muted-foreground leading-6">
           <p>
-            This Privacy Policy explains how Game Portal handles information when you use this website.
+            This Privacy Policy applies to Game Portal at <strong className="text-foreground">{siteUrl}</strong> and explains how information is handled when you use this website.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Information we collect</h2>
