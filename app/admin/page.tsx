@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SignInButton,
   SignOutButton,
@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { games } from "@/lib/games";
-import { Lock, UploadCloud } from "lucide-react";
+import { games as fallbackGames, type Game } from "@/lib/games";
+import { Lock, Trash2, UploadCloud } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -24,9 +24,18 @@ const ADMIN_USER_IDS = [
   "user_3FdahY3hXmw7c589YMnDefAwOen",
 ];
 
+type AdminGame = Game & {
+  image?: string | null;
+  category?: string | null;
+  featured?: boolean;
+  hidden?: boolean;
+  created_at?: string;
+};
+
 export default function AdminPage() {
   const { isSignedIn, user } = useUser();
 
+  const [adminGames, setAdminGames] = useState<AdminGame[]>(fallbackGames);
   const [selectedGameId, setSelectedGameId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -39,7 +48,51 @@ export default function AdminPage() {
   const [newGameCategory, setNewGameCategory] = useState("");
   const [isAddingGame, setIsAddingGame] = useState(false);
 
+  const [managerSearch, setManagerSearch] = useState("");
+  const [isLoadingGames, setIsLoadingGames] = useState(false);
+  const [deletingGameId, setDeletingGameId] = useState<string | null>(null);
+
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+
+  const filteredManagerGames = useMemo(() => {
+    const query = managerSearch.trim().toLowerCase();
+
+    if (!query) {
+      return adminGames;
+    }
+
+    return adminGames.filter((game) =>
+      `${game.title} ${game.id} ${game.category || ""}`
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [adminGames, managerSearch]);
+
+  const loadAdminGames = async () => {
+    setIsLoadingGames(true);
+
+    try {
+      const response = await fetch("/api/admin/games");
+      const data = await response.json();
+
+      if (response.ok && Array.isArray(data)) {
+        setAdminGames(data);
+      } else if (!response.ok) {
+        setMessage(`✗ ${data.error || "Failed to load games"}`);
+      }
+    } catch (error) {
+      console.error("[v0] Load games error:", error);
+      setMessage("Failed to load games from Supabase");
+    } finally {
+      setIsLoadingGames(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadAdminGames();
+    }
+  }, [isAdmin]);
 
   const setCoverFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -94,6 +147,16 @@ export default function AdminPage() {
         setNewGameTitle("");
         setNewGameUrl("");
         setNewGameCategory("");
+
+        if (data.game) {
+          setAdminGames((currentGames) =>
+            [...currentGames, data.game].sort((a, b) =>
+              a.title.localeCompare(b.title)
+            )
+          );
+        } else {
+          loadAdminGames();
+        }
       } else {
         setMessage(`✗ ${data.error}`);
       }
@@ -139,6 +202,49 @@ export default function AdminPage() {
       console.error("[v0] Upload error:", error);
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleDeleteGame = async (game: AdminGame) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${game.title}"? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingGameId(game.id);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/games", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: game.id }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(`✓ Deleted ${game.title}`);
+        setAdminGames((currentGames) =>
+          currentGames.filter((currentGame) => currentGame.id !== game.id)
+        );
+
+        if (selectedGameId === game.id) {
+          setSelectedGameId("");
+        }
+      } else {
+        setMessage(`✗ ${data.error || "Failed to delete game"}`);
+      }
+    } catch (error) {
+      setMessage("Failed to delete game");
+      console.error("[v0] Delete game error:", error);
+    } finally {
+      setDeletingGameId(null);
     }
   };
 
@@ -251,6 +357,18 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {message && (
+          <div
+            className={`p-3 rounded-md text-sm ${
+              message.startsWith("✓")
+                ? "bg-green-500/20 text-green-700"
+                : "bg-red-500/20 text-red-700"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle>Add Game</CardTitle>
@@ -314,7 +432,7 @@ export default function AdminPage() {
                 className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
               >
                 <option value="">-- Choose a game --</option>
-                {games.map((game: typeof games[0]) => (
+                {adminGames.map((game) => (
                   <option key={game.id} value={game.id}>
                     {game.title}
                   </option>
@@ -406,18 +524,88 @@ export default function AdminPage() {
             >
               {isUploading ? "Uploading..." : "Upload & Assign"}
             </Button>
+          </CardContent>
+        </Card>
 
-            {message && (
-              <div
-                className={`p-3 rounded-md text-sm ${
-                  message.startsWith("✓")
-                    ? "bg-green-500/20 text-green-700"
-                    : "bg-red-500/20 text-red-700"
-                }`}
+        <Card>
+          <CardHeader>
+            <CardTitle>Game Manager</CardTitle>
+            <CardDescription>
+              Search your Supabase games and delete entries when needed.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Search Games
+              </label>
+
+              <input
+                type="text"
+                placeholder="Search by title, ID, or category..."
+                value={managerSearch}
+                onChange={(e) => setManagerSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+              <span>
+                Showing {filteredManagerGames.length} of {adminGames.length} games
+              </span>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={loadAdminGames}
+                disabled={isLoadingGames}
               >
-                {message}
-              </div>
-            )}
+                {isLoadingGames ? "Refreshing..." : "Refresh"}
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {filteredManagerGames.map((game) => (
+                <div
+                  key={game.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border border-border p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground truncate">
+                      {game.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {game.id}
+                    </p>
+                    {game.category && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        Category: {game.category}
+                      </p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteGame(game)}
+                    disabled={deletingGameId === game.id}
+                    className="shrink-0"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {deletingGameId === game.id ? "Deleting..." : "Delete"}
+                  </Button>
+                </div>
+              ))}
+
+              {filteredManagerGames.length === 0 && (
+                <div className="rounded-md border border-border p-4 text-sm text-muted-foreground text-center">
+                  No games found.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
