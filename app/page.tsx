@@ -13,6 +13,7 @@ import {
   Star,
   Monitor,
   Smartphone,
+  Send,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
@@ -32,6 +33,12 @@ export default function GamePortal() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
   const [isMobileDevice, setIsMobileDevice] = useState(false)
+
+  const [requestGameName, setRequestGameName] = useState("")
+  const [requestGameLink, setRequestGameLink] = useState("")
+  const [requestComments, setRequestComments] = useState("")
+  const [isSendingRequest, setIsSendingRequest] = useState(false)
+  const [requestMessage, setRequestMessage] = useState("")
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
 
@@ -102,7 +109,6 @@ export default function GamePortal() {
         selectedCategory === "All" || game.category === selectedCategory
 
       if (!matchesCategory) return false
-
       if (!q) return true
 
       return `${game.title} ${game.category || ""}`.toLowerCase().includes(q)
@@ -142,6 +148,46 @@ export default function GamePortal() {
     return () =>
       document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
+
+  const handleRequestGame = async () => {
+    if (!requestGameName.trim()) {
+      setRequestMessage("Please enter a game name")
+      return
+    }
+
+    setIsSendingRequest(true)
+    setRequestMessage("")
+
+    try {
+      const response = await fetch("/api/request-game", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameName: requestGameName,
+          gameLink: requestGameLink,
+          comments: requestComments,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setRequestMessage(`✓ ${data.message || "Request sent. Thanks!"}`)
+        setRequestGameName("")
+        setRequestGameLink("")
+        setRequestComments("")
+      } else {
+        setRequestMessage(`✗ ${data.error || "Request failed"}`)
+      }
+    } catch (error) {
+      setRequestMessage("Request failed")
+      console.error("[request-game] Error:", error)
+    } finally {
+      setIsSendingRequest(false)
+    }
+  }
 
   const renderGameCard = (game: PortalGame) => {
     const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
@@ -328,6 +374,66 @@ export default function GamePortal() {
           </div>
         )}
       </main>
+
+      <footer className="border-t border-border bg-card mt-8">
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="h-5 w-5" />
+                Request a Game
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Missing a game? Send a request and it can be reviewed for the portal.
+              </p>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <Input
+                value={requestGameName}
+                onChange={(e) => setRequestGameName(e.target.value)}
+                placeholder="Game name"
+                maxLength={120}
+              />
+
+              <Input
+                value={requestGameLink}
+                onChange={(e) => setRequestGameLink(e.target.value)}
+                placeholder="Optional link"
+                maxLength={500}
+              />
+
+              <textarea
+                value={requestComments}
+                onChange={(e) => setRequestComments(e.target.value)}
+                placeholder="Optional comments"
+                maxLength={1000}
+                className="w-full min-h-24 px-3 py-2 border border-border rounded-md bg-background text-foreground text-sm"
+              />
+
+              <Button
+                onClick={handleRequestGame}
+                disabled={isSendingRequest || !requestGameName.trim()}
+                className="w-full"
+              >
+                {isSendingRequest ? "Sending..." : "Send Request"}
+              </Button>
+
+              {requestMessage && (
+                <div
+                  className={`p-3 rounded-md text-sm ${
+                    requestMessage.startsWith("✓")
+                      ? "bg-green-500/20 text-green-700"
+                      : "bg-red-500/20 text-red-700"
+                  }`}
+                >
+                  {requestMessage}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </footer>
 
       {activeGame && (
         <div
