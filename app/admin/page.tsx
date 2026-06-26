@@ -1,57 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
 import { useState } from "react";
+import {
+  SignInButton,
+  SignOutButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { games } from "@/lib/games";
-import { Lock } from "lucide-react";
+import { Lock, UploadCloud } from "lucide-react";
+
+const ADMIN_USER_IDS = [
+  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
+  "user_3FdWs0pdbEHCG85yExuAaW700hE",
+  "user_3FdahY3hXmw7c589YMnDefAwOen",
+];
 
 export default function AdminPage() {
-  const [password, setPassword] = useState("")
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [selectedGameId, setSelectedGameId] = useState("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [preview, setPreview] = useState<string>("")
+  const { isSignedIn, user } = useUser();
 
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("adminLoggedIn")
+  const [selectedGameId, setSelectedGameId] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [preview, setPreview] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
 
-    if (loggedIn === "true") {
-      setIsAuthenticated(true)
+  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+
+  const setCoverFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please select an image file");
+      return;
     }
-  }, [])
 
-  const handleLogin = () => {
-    if (password === "admin") {
-      localStorage.setItem("adminLoggedIn", "true");
-      setIsAuthenticated(true);
-      setPassword("");
-      setMessage("Authenticated!");
-      window.location.href = "/";
-    } else {
-      setMessage("Incorrect password");
-    }
-  };
+    setSelectedFile(file);
+    setMessage("");
 
- const handleLogout = () => {
-   setIsAuthenticated(false)
-   localStorage.removeItem("adminLoggedIn")
-   window.location.href = "/"
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setCoverFile(file);
     }
   };
 
@@ -62,6 +67,8 @@ export default function AdminPage() {
     }
 
     setIsUploading(true);
+    setMessage("");
+
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("gameId", selectedGameId);
@@ -69,13 +76,11 @@ export default function AdminPage() {
     try {
       const response = await fetch("/api/admin/upload", {
         method: "POST",
-        headers: {
-          authorization: `Bearer ${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || password}`,
-        },
         body: formData,
       });
 
       const data = await response.json();
+
       if (response.ok) {
         setMessage(`✓ ${data.message}`);
         setSelectedFile(null);
@@ -92,7 +97,7 @@ export default function AdminPage() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -101,18 +106,56 @@ export default function AdminPage() {
               <Lock className="h-5 w-5" />
               Admin Login
             </CardTitle>
-            <CardDescription>Enter admin password to access</CardDescription>
+            <CardDescription>Sign in with GitHub to access admin</CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Admin password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            />
-            <Button onClick={handleLogin} className="w-full">
-              Login
+            <SignInButton mode="modal">
+              <Button className="w-full">Sign in</Button>
+            </SignInButton>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Back to Games
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Access denied</CardTitle>
+            <CardDescription>
+              You are signed in, but this account does not have admin access.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <UserButton />
+
+            <SignOutButton redirectUrl="/">
+              <Button variant="outline" className="w-full">
+                Sign out
+              </Button>
+            </SignOutButton>
+
+            <Button
+              className="w-full"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Back to Games
             </Button>
           </CardContent>
         </Card>
@@ -125,34 +168,38 @@ export default function AdminPage() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Upload and assign cover art to games</p>
+            <h1 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Upload and assign cover art to games
+            </p>
           </div>
-          <div className="flex flex-col gap-2">
-            <div className={`px-3 py-1 rounded-md text-sm font-medium ${
-              isAuthenticated
-                ? "bg-green-500/20 text-green-700"
-                : "bg-red-500/20 text-red-700"
-            }`}>
-              {isAuthenticated ? "✓ Authenticated" : "✗ Not Authenticated"}
+
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex items-center gap-2">
+              <UserButton />
+              <div className="px-3 py-1 rounded-md text-sm font-medium bg-green-500/20 text-green-700">
+                ✓ Admin
+              </div>
             </div>
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.href = "/"}
+                onClick={() => {
+                  window.location.href = "/";
+                }}
               >
                 Back to Games
               </Button>
-              {isAuthenticated && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                >
+
+              <SignOutButton redirectUrl="/">
+                <Button variant="outline" size="sm">
                   Logout
                 </Button>
-              )}
+              </SignOutButton>
             </div>
           </div>
         </div>
@@ -160,14 +207,17 @@ export default function AdminPage() {
         <Card>
           <CardHeader>
             <CardTitle>Assign Cover Art</CardTitle>
-            <CardDescription>Select a game and upload a cover image</CardDescription>
+            <CardDescription>
+              Select a game and upload a cover image
+            </CardDescription>
           </CardHeader>
+
           <CardContent className="space-y-6">
-            {/* Game Selection */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Select Game
               </label>
+
               <select
                 value={selectedGameId}
                 onChange={(e) => setSelectedGameId(e.target.value)}
@@ -182,25 +232,75 @@ export default function AdminPage() {
               </select>
             </div>
 
-            {/* File Input */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Upload Image
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="w-full px-3 py-2 border border-border rounded-md"
-              />
+
+              <div
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+
+                  const file = e.dataTransfer.files?.[0];
+
+                  if (file) {
+                    setCoverFile(file);
+                  }
+                }}
+                onClick={() => {
+                  document.getElementById("cover-upload")?.click();
+                }}
+                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
+                  isDragging
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <UploadCloud className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+
+                <p className="text-sm font-medium text-foreground">
+                  Drag cover image here
+                </p>
+
+                <p className="text-xs text-muted-foreground mt-1">
+                  or click to choose a JPG, PNG, or WebP file
+                </p>
+
+                {selectedFile && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+
+                <input
+                  id="cover-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </div>
             </div>
 
-            {/* Preview */}
             {preview && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Preview
                 </label>
+
                 <img
                   src={preview}
                   alt="Preview"
@@ -209,7 +309,6 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Upload Button */}
             <Button
               onClick={handleUpload}
               disabled={isUploading || !selectedFile || !selectedGameId}
@@ -218,13 +317,14 @@ export default function AdminPage() {
               {isUploading ? "Uploading..." : "Upload & Assign"}
             </Button>
 
-            {/* Message */}
             {message && (
-              <div className={`p-3 rounded-md text-sm ${
-                message.startsWith("✓")
-                  ? "bg-green-500/20 text-green-700"
-                  : "bg-red-500/20 text-red-700"
-              }`}>
+              <div
+                className={`p-3 rounded-md text-sm ${
+                  message.startsWith("✓")
+                    ? "bg-green-500/20 text-green-700"
+                    : "bg-red-500/20 text-red-700"
+                }`}
+              >
                 {message}
               </div>
             )}
