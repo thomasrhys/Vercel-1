@@ -298,7 +298,7 @@ export default function AdminPage() {
           <CardHeader>
             <CardTitle>Assign Cover Art</CardTitle>
             <CardDescription>
-              Select a game and upload a cover image
+              Select a game and upload a cover image to Vercel Blob
             </CardDescription>
           </CardHeader>
 
