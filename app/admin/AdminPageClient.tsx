@@ -5,7 +5,7 @@ import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { games as fallbackGames, type Game } from "@/lib/games";
-import { Check, Eye, EyeOff, Lock, Pencil, Smartphone, Star, Trash2, UploadCloud, X } from "lucide-react";
+import { Check, Eye, EyeOff, Inbox, Lock, Pencil, Smartphone, Star, Trash2, UploadCloud, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -334,6 +334,23 @@ export default function AdminPageClient() {
         </div>
 
         {message && <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>{message}</div>}
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Inbox className="h-5 w-5" />
+              Game Requests
+            </CardTitle>
+            <CardDescription>
+              Review requests submitted by players from the homepage.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button className="w-full" onClick={() => (window.location.href = "/admin/requests")}>
+              Open Requests
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader><CardTitle>Add Game</CardTitle><CardDescription>Add a new game to Supabase without editing games.ts</CardDescription></CardHeader>
