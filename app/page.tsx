@@ -55,16 +55,24 @@ export default function GamePortal() {
   }, [])
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)")
-
     const updateMobileState = () => {
-      setIsMobileDevice(mediaQuery.matches)
+      const smallScreen = window.matchMedia("(max-width: 900px)").matches
+      const coarsePointer = window.matchMedia("(pointer: coarse)").matches
+      const mobileUserAgent = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      )
+
+      setIsMobileDevice((smallScreen && coarsePointer) || mobileUserAgent)
     }
 
     updateMobileState()
-    mediaQuery.addEventListener("change", updateMobileState)
+    window.addEventListener("resize", updateMobileState)
+    window.addEventListener("orientationchange", updateMobileState)
 
-    return () => mediaQuery.removeEventListener("change", updateMobileState)
+    return () => {
+      window.removeEventListener("resize", updateMobileState)
+      window.removeEventListener("orientationchange", updateMobileState)
+    }
   }, [])
 
   const filteredGames = useMemo(() => {
@@ -112,18 +120,22 @@ export default function GamePortal() {
 
   const renderGameCard = (game: PortalGame) => {
     const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
-    const isDesktopOnlyOnPhone = isMobileDevice && game.desktop_only
+    const isDesktopOnlyOnMobile = isMobileDevice && game.desktop_only
 
     return (
       <Card
         key={game.id}
         className={`group hover:shadow-lg transition-shadow ${
-          isDesktopOnlyOnPhone ? "cursor-default" : "cursor-pointer"
+          isDesktopOnlyOnMobile ? "cursor-not-allowed" : "cursor-pointer"
         }`}
-        onClick={() => {
-          if (!isDesktopOnlyOnPhone) {
-            setActiveGame(game)
+        onClick={(event) => {
+          if (isDesktopOnlyOnMobile) {
+            event.preventDefault()
+            event.stopPropagation()
+            return
           }
+
+          setActiveGame(game)
         }}
       >
         <CardHeader className="pb-2">
@@ -140,7 +152,7 @@ export default function GamePortal() {
                 src={coverImage}
                 alt={game.title}
                 className={`w-full h-full object-cover ${
-                  isDesktopOnlyOnPhone ? "opacity-45" : ""
+                  isDesktopOnlyOnMobile ? "opacity-45" : ""
                 }`}
               />
             ) : (
@@ -149,15 +161,21 @@ export default function GamePortal() {
               </div>
             )}
 
-            {game.desktop_only && (
+            {isDesktopOnlyOnMobile && (
               <div className="absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white flex items-center gap-1">
                 <Monitor className="h-3 w-3" />
                 Desktop Only
               </div>
             )}
 
-            {isDesktopOnlyOnPhone ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white">
+            {isDesktopOnlyOnMobile ? (
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white"
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }}
+              >
                 <Smartphone className="h-8 w-8 mb-2" />
                 <p className="font-semibold">Desktop Only</p>
                 <p className="text-xs mt-1 max-w-[220px]">
