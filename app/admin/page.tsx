@@ -34,6 +34,11 @@ export default function AdminPage() {
   const [preview, setPreview] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
 
+  const [newGameTitle, setNewGameTitle] = useState("");
+  const [newGameUrl, setNewGameUrl] = useState("");
+  const [newGameCategory, setNewGameCategory] = useState("");
+  const [isAddingGame, setIsAddingGame] = useState(false);
+
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
 
   const setCoverFile = (file: File) => {
@@ -57,6 +62,46 @@ export default function AdminPage() {
 
     if (file) {
       setCoverFile(file);
+    }
+  };
+
+  const handleAddGame = async () => {
+    if (!newGameTitle || !newGameUrl) {
+      setMessage("Please enter a title and URL");
+      return;
+    }
+
+    setIsAddingGame(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/games", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newGameTitle,
+          url: newGameUrl,
+          category: newGameCategory,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(`✓ ${data.message}`);
+        setNewGameTitle("");
+        setNewGameUrl("");
+        setNewGameCategory("");
+      } else {
+        setMessage(`✗ ${data.error}`);
+      }
+    } catch (error) {
+      setMessage("Failed to add game");
+      console.error("[v0] Add game error:", error);
+    } finally {
+      setIsAddingGame(false);
     }
   };
 
@@ -106,7 +151,9 @@ export default function AdminPage() {
               <Lock className="h-5 w-5" />
               Admin Login
             </CardTitle>
-            <CardDescription>Sign in with GitHub to access admin</CardDescription>
+            <CardDescription>
+              Sign in with GitHub to access admin
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -172,7 +219,7 @@ export default function AdminPage() {
               Admin Dashboard
             </h1>
             <p className="text-muted-foreground mt-2">
-              Upload and assign cover art to games
+              Upload covers and manage games
             </p>
           </div>
 
@@ -203,6 +250,49 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Game</CardTitle>
+            <CardDescription>
+              Add a new game to Supabase without editing games.ts
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <input
+              type="text"
+              placeholder="Game title"
+              value={newGameTitle}
+              onChange={(e) => setNewGameTitle(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+            />
+
+            <input
+              type="url"
+              placeholder="Game URL"
+              value={newGameUrl}
+              onChange={(e) => setNewGameUrl(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+            />
+
+            <input
+              type="text"
+              placeholder="Category, optional"
+              value={newGameCategory}
+              onChange={(e) => setNewGameCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+            />
+
+            <Button
+              onClick={handleAddGame}
+              disabled={isAddingGame || !newGameTitle || !newGameUrl}
+              className="w-full"
+            >
+              {isAddingGame ? "Adding..." : "Add Game"}
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
