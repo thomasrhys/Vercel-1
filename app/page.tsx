@@ -29,6 +29,7 @@ export default function GamePortal() {
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
   const [isMobileDevice, setIsMobileDevice] = useState(false)
 
@@ -75,24 +76,48 @@ export default function GamePortal() {
     }
   }, [])
 
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(
+        games
+          .map((game) => game.category?.trim())
+          .filter((category): category is string => Boolean(category))
+      )
+    ).sort((a, b) => a.localeCompare(b))
+
+    return ["All", ...uniqueCategories]
+  }, [games])
+
+  useEffect(() => {
+    if (!categories.includes(selectedCategory)) {
+      setSelectedCategory("All")
+    }
+  }, [categories, selectedCategory])
+
   const filteredGames = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return games
 
-    return games.filter((game) =>
-      `${game.title} ${game.category || ""}`.toLowerCase().includes(q)
-    )
-  }, [games, query])
+    return games.filter((game) => {
+      const matchesCategory =
+        selectedCategory === "All" || game.category === selectedCategory
+
+      if (!matchesCategory) return false
+
+      if (!q) return true
+
+      return `${game.title} ${game.category || ""}`.toLowerCase().includes(q)
+    })
+  }, [games, query, selectedCategory])
 
   const featuredGames = useMemo(() => {
-    if (query.trim()) return []
+    if (query.trim() || selectedCategory !== "All") return []
     return filteredGames.filter((game) => game.featured)
-  }, [filteredGames, query])
+  }, [filteredGames, query, selectedCategory])
 
   const regularGames = useMemo(() => {
-    if (query.trim()) return filteredGames
+    if (query.trim() || selectedCategory !== "All") return filteredGames
     return filteredGames.filter((game) => !game.featured)
-  }, [filteredGames, query])
+  }, [filteredGames, query, selectedCategory])
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -236,9 +261,26 @@ export default function GamePortal() {
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {categories.length > 1 && (
+          <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className="shrink-0"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        )}
+
         <p className="text-sm text-muted-foreground mb-4">
           {filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}
-          {query ? " found" : " available"}
+          {query || selectedCategory !== "All" ? " found" : " available"}
+          {selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}
         </p>
 
         {featuredGames.length > 0 && (
@@ -257,9 +299,15 @@ export default function GamePortal() {
         )}
 
         <section>
-          {!query && featuredGames.length > 0 && regularGames.length > 0 && (
+          {!query && selectedCategory === "All" && featuredGames.length > 0 && regularGames.length > 0 && (
             <h2 className="text-xl font-bold text-foreground mb-3">
               All Games
+            </h2>
+          )}
+
+          {selectedCategory !== "All" && filteredGames.length > 0 && (
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              {selectedCategory}
             </h2>
           )}
 
@@ -275,7 +323,7 @@ export default function GamePortal() {
               No games found
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Try a different search term.
+              Try a different search term or category.
             </p>
           </div>
         )}
