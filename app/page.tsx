@@ -4,12 +4,19 @@ import { useState, useRef, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Maximize2, Minimize2, X, Gamepad2, Search } from "lucide-react"
+import { Maximize2, Minimize2, X, Gamepad2, Search, Star } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
+type PortalGame = Game & {
+  image?: string | null
+  category?: string | null
+  featured?: boolean
+  hidden?: boolean
+}
+
 export default function GamePortal() {
-  const [games, setGames] = useState<Game[]>(fallbackGames)
-  const [activeGame, setActiveGame] = useState<Game | null>(null)
+  const [games, setGames] = useState<PortalGame[]>(fallbackGames)
+  const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
@@ -41,9 +48,19 @@ export default function GamePortal() {
     if (!q) return games
 
     return games.filter((game) =>
-      game.title.toLowerCase().includes(q)
+      `${game.title} ${game.category || ""}`.toLowerCase().includes(q)
     )
   }, [games, query])
+
+  const featuredGames = useMemo(() => {
+    if (query.trim()) return []
+    return filteredGames.filter((game) => game.featured)
+  }, [filteredGames, query])
+
+  const regularGames = useMemo(() => {
+    if (query.trim()) return filteredGames
+    return filteredGames.filter((game) => !game.featured)
+  }, [filteredGames, query])
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -64,17 +81,64 @@ export default function GamePortal() {
       setIsFullscreen(!!document.fullscreenElement)
     }
 
-    document.addEventListener(
-      "fullscreenchange",
-      handleFullscreenChange
-    )
-
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
     return () =>
-      document.removeEventListener(
-        "fullscreenchange",
-        handleFullscreenChange
-      )
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
+
+  const renderGameCard = (game: PortalGame) => {
+    const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
+
+    return (
+      <Card
+        key={game.id}
+        className="group hover:shadow-lg transition-shadow cursor-pointer"
+        onClick={() => setActiveGame(game)}
+      >
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base sm:text-lg truncate flex items-center gap-2">
+            {game.featured && <Star className="h-4 w-4 shrink-0" />}
+            <span className="truncate">{game.title}</span>
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
+            {coverImage ? (
+              <>
+                <img
+                  src={coverImage}
+                  alt={game.title}
+                  className="w-full h-full object-cover"
+                />
+
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Play
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20">
+                <div className="text-center p-3 sm:p-4">
+                  <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Tap to play
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,7 +153,6 @@ export default function GamePortal() {
 
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-
             <Input
               type="search"
               value={query}
@@ -112,66 +175,36 @@ export default function GamePortal() {
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <p className="text-sm text-muted-foreground mb-4">
-          {filteredGames.length}{" "}
-          {filteredGames.length === 1 ? "game" : "games"}
+          {filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}
           {query ? " found" : " available"}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-          {filteredGames.map((game) => {
-            const coverImage =
-              blobImages[game.id] || game.image || getGameImage(game.id)
+        {featuredGames.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Star className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold text-foreground">
+                Featured Games
+              </h2>
+            </div>
 
-            return (
-              <Card
-                key={game.id}
-                className="group hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => setActiveGame(game)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base sm:text-lg truncate">
-                    {game.title}
-                  </CardTitle>
-                </CardHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {featuredGames.map(renderGameCard)}
+            </div>
+          </section>
+        )}
 
-                <CardContent className="p-0">
-                  <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
-                    {coverImage ? (
-                      <>
-                        <img
-                          src={coverImage}
-                          alt={game.title}
-                          className="w-full h-full object-cover"
-                        />
+        <section>
+          {!query && featuredGames.length > 0 && regularGames.length > 0 && (
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              All Games
+            </h2>
+          )}
 
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" />
-
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            Play
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20">
-                        <div className="text-center p-3 sm:p-4">
-                          <Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-2" />
-                          <p className="text-xs sm:text-sm text-muted-foreground">
-                            Tap to play
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+            {regularGames.map(renderGameCard)}
+          </div>
+        </section>
 
         {filteredGames.length === 0 && (
           <div className="text-center py-8 sm:py-16">
@@ -179,7 +212,6 @@ export default function GamePortal() {
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
               No games found
             </h2>
-
             <p className="text-sm sm:text-base text-muted-foreground">
               Try a different search term.
             </p>
@@ -205,7 +237,6 @@ export default function GamePortal() {
               <h2 className="font-semibold text-sm sm:text-base text-foreground truncate mr-2">
                 {activeGame.title}
               </h2>
-
               <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="ghost"
@@ -219,7 +250,6 @@ export default function GamePortal() {
                     <Maximize2 className="h-4 w-4" />
                   )}
                 </Button>
-
                 <Button
                   variant="ghost"
                   size="icon"
