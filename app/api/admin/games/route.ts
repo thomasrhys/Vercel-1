@@ -20,10 +20,35 @@ function makeId(title: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function POST(request: Request) {
+async function requireAdmin() {
   const { userId } = await auth();
 
   if (!userId || !ADMIN_USER_IDS.includes(userId)) {
+    return false;
+  }
+
+  return true;
+}
+
+export async function GET() {
+  if (!(await requireAdmin())) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { data, error } = await supabase
+    .from("games")
+    .select("*")
+    .order("title", { ascending: true });
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json(data);
+}
+
+export async function POST(request: Request) {
+  if (!(await requireAdmin())) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -63,5 +88,29 @@ export async function POST(request: Request) {
     success: true,
     game: data,
     message: `Added ${title}`,
+  });
+}
+
+export async function DELETE(request: Request) {
+  if (!(await requireAdmin())) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await request.json();
+  const id = String(body.id || "").trim();
+
+  if (!id) {
+    return Response.json({ error: "Game ID is required" }, { status: 400 });
+  }
+
+  const { error } = await supabase.from("games").delete().eq("id", id);
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({
+    success: true,
+    message: `Deleted ${id}`,
   });
 }
