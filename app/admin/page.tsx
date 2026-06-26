@@ -589,13 +589,13 @@ export default function AdminPage() {
                   <Button
                     type="button"
                     variant="destructive"
-                    size="sm"
+                    size="icon"
                     onClick={() => handleDeleteGame(game)}
                     disabled={deletingGameId === game.id}
-                    className="shrink-0"
+                    className="h-8 w-8 shrink-0"
+                    title={deletingGameId === game.id ? "Deleting game" : "Delete game"}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {deletingGameId === game.id ? "Deleting..." : "Delete"}
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
