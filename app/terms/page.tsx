@@ -56,14 +56,12 @@ export default function TermsPage() {
           </p>
         </section>
 
-        <button
-          className="px-4 py-2 rounded-md border border-border text-sm"
-          onClick={() => {
-            if (typeof window !== "undefined") window.location.href = "/";
-          }}
+        <a
+          href="/"
+          className="inline-block px-4 py-2 rounded-md border border-border text-sm"
         >
           Back to Games
-        </button>
+        </a>
       </div>
     </main>
   );
