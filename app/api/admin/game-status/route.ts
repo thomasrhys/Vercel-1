@@ -54,6 +54,19 @@ export async function PATCH(request: Request) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
+  const changes = [];
+  if (updates.featured !== undefined) {
+    changes.push(updates.featured ? "featured" : "unfeatured");
+  }
+  if (updates.hidden !== undefined) {
+    changes.push(updates.hidden ? "hidden" : "shown");
+  }
+
+  await supabase.from("activity_log").insert({
+    action: "game_status_updated",
+    details: `${data.title} marked ${changes.join(" and ")}`,
+  });
+
   return Response.json({
     success: true,
     game: data,
