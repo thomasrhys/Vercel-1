@@ -70,6 +70,23 @@ export async function POST(request: Request) {
     );
   }
 
+  const { data: existingGame, error: duplicateError } = await supabase
+    .from("games")
+    .select("id,title")
+    .or(`id.eq.${id},title.ilike.${title}`)
+    .maybeSingle();
+
+  if (duplicateError) {
+    return Response.json({ error: duplicateError.message }, { status: 500 });
+  }
+
+  if (existingGame) {
+    return Response.json(
+      { error: `A game called "${existingGame.title}" already exists.` },
+      { status: 409 }
+    );
+  }
+
   const { data, error } = await supabase
     .from("games")
     .insert({
@@ -113,6 +130,24 @@ export async function PATCH(request: Request) {
     return Response.json(
       { error: "Game ID, title, and URL are required" },
       { status: 400 }
+    );
+  }
+
+  const { data: duplicateGame, error: duplicateError } = await supabase
+    .from("games")
+    .select("id,title")
+    .ilike("title", title)
+    .neq("id", id)
+    .maybeSingle();
+
+  if (duplicateError) {
+    return Response.json({ error: duplicateError.message }, { status: 500 });
+  }
+
+  if (duplicateGame) {
+    return Response.json(
+      { error: `A game called "${duplicateGame.title}" already exists.` },
+      { status: 409 }
     );
   }
 
