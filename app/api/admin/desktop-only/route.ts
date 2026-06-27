@@ -9,7 +9,7 @@ const ADMIN_USER_IDS = [
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 async function requireAdmin() {
@@ -41,6 +41,13 @@ export async function PATCH(request: Request) {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
+
+  await supabase.from("activity_log").insert({
+    action: "desktop_only_updated",
+    details: desktopOnly
+      ? `${data.title} marked desktop only`
+      : `${data.title} allowed on mobile`,
+  });
 
   return Response.json({
     success: true,
