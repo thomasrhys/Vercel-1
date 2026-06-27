@@ -335,6 +335,9 @@ export default function GamePortal() {
             <a className="hover:text-foreground underline underline-offset-4" href="/requests">
               Request a Game
             </a>
+            <a className="hover:text-foreground underline underline-offset-4" href="/contact">
+              Contact
+            </a>
             <a className="hover:text-foreground underline underline-offset-4" href="/privacy">
               Privacy Policy
             </a>
