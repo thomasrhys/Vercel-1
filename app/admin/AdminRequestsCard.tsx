@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Inbox, RotateCcw, Trash2 } from "lucide-react";
+import { Check, Inbox, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -136,6 +136,18 @@ export default function AdminRequestsCard() {
     }
   };
 
+  const openAddGameForRequest = (request: GameRequest) => {
+    const params = new URLSearchParams();
+    params.set("title", request.game_name);
+    params.set("requestId", request.id);
+
+    if (request.game_link) {
+      params.set("url", request.game_link);
+    }
+
+    window.location.href = `/admin?${params.toString()}`;
+  };
+
   if (!isSignedIn || !isAdmin) {
     return null;
   }
@@ -175,6 +187,20 @@ export default function AdminRequestsCard() {
         </div>
 
         <div className="flex gap-2 shrink-0">
+          {request.status === "open" && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => openAddGameForRequest(request)}
+              disabled={workingId === request.id}
+              className="h-8 w-8"
+              title="Add game from request"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
+
           {request.status === "open" ? (
             <Button
               type="button"
