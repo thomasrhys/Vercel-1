@@ -22,6 +22,11 @@ type AdminGame = Game & {
   created_at?: string;
 };
 
+type GameRequest = {
+  id: string;
+  status: "open" | "completed";
+};
+
 export default function AdminPageClient() {
   const { isSignedIn, user } = useUser();
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
@@ -37,10 +42,14 @@ export default function AdminPageClient() {
   const [newGameTitle, setNewGameTitle] = useState("");
   const [newGameUrl, setNewGameUrl] = useState("");
   const [newGameCategory, setNewGameCategory] = useState("");
+  const [newGameCoverFile, setNewGameCoverFile] = useState<File | null>(null);
+  const [newGameCoverPreview, setNewGameCoverPreview] = useState("");
   const [isAddingGame, setIsAddingGame] = useState(false);
+  const [sourceRequestId, setSourceRequestId] = useState<string | null>(null);
 
   const [managerSearch, setManagerSearch] = useState("");
   const [isLoadingGames, setIsLoadingGames] = useState(false);
+  const [openRequestsCount, setOpenRequestsCount] = useState(0);
   const [deletingGameId, setDeletingGameId] = useState<string | null>(null);
   const [togglingGameId, setTogglingGameId] = useState<string | null>(null);
 
@@ -50,11 +59,15 @@ export default function AdminPageClient() {
   const [editCategory, setEditCategory] = useState("");
   const [savingGameId, setSavingGameId] = useState<string | null>(null);
 
+  const featuredCount = adminGames.filter((game) => game.featured).length;
+  const hiddenCount = adminGames.filter((game) => game.hidden).length;
+  const desktopOnlyCount = adminGames.filter((game) => game.desktop_only).length;
+
   const filteredManagerGames = useMemo(() => {
     const query = managerSearch.trim().toLowerCase();
     if (!query) return adminGames;
     return adminGames.filter((game) =>
-      `${game.title} ${game.id} ${game.category || ""}`.toLowerCase().includes(query)
+      `${game.title} ${game.category || ""}`.toLowerCase().includes(query)
     );
   }, [adminGames, managerSearch]);
 
@@ -73,8 +86,42 @@ export default function AdminPageClient() {
     }
   };
 
+  const loadOpenRequestsCount = async () => {
+    try {
+      const response = await fetch("/api/admin/requests");
+      const data = await response.json();
+      if (response.ok && Array.isArray(data)) {
+        setOpenRequestsCount(
+          data.filter((request: GameRequest) => request.status === "open").length
+        );
+      }
+    } catch (error) {
+      console.error("[v0] Request count error:", error);
+    }
+  };
+
   useEffect(() => {
-    if (isAdmin) loadAdminGames();
+    if (isAdmin) {
+      loadAdminGames();
+      loadOpenRequestsCount();
+    }
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedTitle = params.get("title");
+    const requestedUrl = params.get("url");
+    const requestId = params.get("requestId");
+
+    if (requestedTitle) setNewGameTitle(requestedTitle);
+    if (requestedUrl) setNewGameUrl(requestedUrl);
+    if (requestId) setSourceRequestId(requestId);
+
+    if (requestedTitle || requestedUrl || requestId) {
+      window.history.replaceState(null, "", "/admin");
+    }
   }, [isAdmin]);
 
   const replaceGameInList = (updatedGame: AdminGame) => {
@@ -85,6 +132,12 @@ export default function AdminPageClient() {
     );
   };
 
+  const readFilePreview = (file: File, setPreviewValue: (value: string) => void) => {
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewValue(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
   const setCoverFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
       setMessage("Please select an image file");
@@ -92,9 +145,44 @@ export default function AdminPageClient() {
     }
     setSelectedFile(file);
     setMessage("");
-    const reader = new FileReader();
-    reader.onloadend = () => setPreview(reader.result as string);
-    reader.readAsDataURL(file);
+    readFilePreview(file, setPreview);
+  };
+
+  const setNewGameCover = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please select an image file");
+      return;
+    }
+    setNewGameCoverFile(file);
+    setMessage("");
+    readFilePreview(file, setNewGameCoverPreview);
+  };
+
+  const uploadCoverForGame = async (gameId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("gameId", gameId);
+
+    const response = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Cover upload failed");
+    }
+
+    return data;
+  };
+
+  const markRequestCompleted = async (requestId: string) => {
+    await fetch("/api/admin/requests", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: requestId, status: "completed" }),
+    });
   };
 
   const handleAddGame = async () => {
@@ -111,21 +199,42 @@ export default function AdminPageClient() {
         body: JSON.stringify({ title: newGameTitle, url: newGameUrl, category: newGameCategory }),
       });
       const data = await response.json();
-      if (response.ok) {
-        setMessage(`✓ ${data.message}`);
-        setNewGameTitle("");
-        setNewGameUrl("");
-        setNewGameCategory("");
-        if (data.game) {
-          setAdminGames((currentGames) => [...currentGames, data.game].sort((a, b) => a.title.localeCompare(b.title)));
-        } else {
-          loadAdminGames();
-        }
-      } else {
+
+      if (!response.ok) {
         setMessage(`✗ ${data.error}`);
+        return;
       }
+
+      let messageText = `✓ ${data.message}`;
+
+      if (data.game) {
+        if (newGameCoverFile) {
+          await uploadCoverForGame(data.game.id, newGameCoverFile);
+          messageText += " and uploaded cover";
+        }
+
+        if (sourceRequestId) {
+          await markRequestCompleted(sourceRequestId);
+          setSourceRequestId(null);
+          loadOpenRequestsCount();
+          messageText += " and completed request";
+        }
+
+        setAdminGames((currentGames) =>
+          [...currentGames, data.game].sort((a, b) => a.title.localeCompare(b.title))
+        );
+      } else {
+        loadAdminGames();
+      }
+
+      setMessage(messageText);
+      setNewGameTitle("");
+      setNewGameUrl("");
+      setNewGameCategory("");
+      setNewGameCoverFile(null);
+      setNewGameCoverPreview("");
     } catch (error) {
-      setMessage("Failed to add game");
+      setMessage(error instanceof Error ? `✗ ${error.message}` : "Failed to add game");
       console.error("[v0] Add game error:", error);
     } finally {
       setIsAddingGame(false);
@@ -139,22 +248,14 @@ export default function AdminPageClient() {
     }
     setIsUploading(true);
     setMessage("");
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("gameId", selectedGameId);
     try {
-      const response = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const data = await response.json();
-      if (response.ok) {
-        setMessage(`✓ ${data.message}`);
-        setSelectedFile(null);
-        setPreview("");
-        setSelectedGameId("");
-      } else {
-        setMessage(`✗ ${data.error}`);
-      }
+      const data = await uploadCoverForGame(selectedGameId, selectedFile);
+      setMessage(`✓ ${data.message}`);
+      setSelectedFile(null);
+      setPreview("");
+      setSelectedGameId("");
     } catch (error) {
-      setMessage("Upload failed");
+      setMessage(error instanceof Error ? `✗ ${error.message}` : "Upload failed");
       console.error("[v0] Upload error:", error);
     } finally {
       setIsUploading(false);
@@ -335,35 +436,49 @@ export default function AdminPageClient() {
 
         {message && <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>{message}</div>}
 
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Games</p><p className="text-2xl font-bold">{adminGames.length}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Requests</p><p className="text-2xl font-bold">{openRequestsCount}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Featured</p><p className="text-2xl font-bold">{featuredCount}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Hidden</p><p className="text-2xl font-bold">{hiddenCount}</p></CardContent></Card>
+          <Card className="col-span-2 sm:col-span-1"><CardContent className="p-4"><p className="text-xs text-muted-foreground">Desktop Only</p><p className="text-2xl font-bold">{desktopOnlyCount}</p></CardContent></Card>
+        </div>
+
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Inbox className="h-5 w-5" />
-              Game Requests
-            </CardTitle>
-            <CardDescription>
-              Review requests submitted by players from the homepage.
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><Inbox className="h-5 w-5" />Game Requests</CardTitle>
+            <CardDescription>{openRequestsCount} open requests awaiting review.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" onClick={() => (window.location.href = "/admin/requests")}>
-              Open Requests
-            </Button>
+            <Button className="w-full" onClick={() => (window.location.href = "/admin/requests")}>Open Requests</Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Add Game</CardTitle><CardDescription>Add a new game to Supabase without editing games.ts</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Add Game</CardTitle><CardDescription>Add a game to Supabase. Cover image is optional and can still be uploaded separately later.</CardDescription></CardHeader>
           <CardContent className="space-y-4">
+            {sourceRequestId && <div className="p-3 rounded-md text-sm bg-primary/10 text-primary">Adding from a request. Saving this game will mark the request as completed.</div>}
             <input type="text" placeholder="Game title" value={newGameTitle} onChange={(e) => setNewGameTitle(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
             <input type="url" placeholder="Game URL" value={newGameUrl} onChange={(e) => setNewGameUrl(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
             <input type="text" placeholder="Category, optional" value={newGameCategory} onChange={(e) => setNewGameCategory(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+
+            <div className="rounded-md border border-border p-3 space-y-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Optional Cover Image</p>
+                <p className="text-xs text-muted-foreground">You can add a cover now, or leave this empty and use Assign Cover Art later.</p>
+              </div>
+              <input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; if (file) setNewGameCover(file); }} className="w-full px-3 py-2 border border-border rounded-md" />
+              {newGameCoverFile && <p className="text-xs text-muted-foreground">Selected: {newGameCoverFile.name}</p>}
+              {newGameCoverPreview && <img src={newGameCoverPreview} alt="New game cover preview" className="w-full max-w-xs h-auto rounded-md border border-border" />}
+              {newGameCoverFile && <Button type="button" variant="outline" size="sm" onClick={() => { setNewGameCoverFile(null); setNewGameCoverPreview(""); }}>Remove Cover</Button>}
+            </div>
+
             <Button onClick={handleAddGame} disabled={isAddingGame || !newGameTitle || !newGameUrl} className="w-full">{isAddingGame ? "Adding..." : "Add Game"}</Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Assign Cover Art</CardTitle><CardDescription>Select a game and upload a cover image to Vercel Blob</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Assign Cover Art</CardTitle><CardDescription>Select a game and upload or replace its cover image.</CardDescription></CardHeader>
           <CardContent className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">Select Game</label>
@@ -395,11 +510,11 @@ export default function AdminPageClient() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Game Manager</CardTitle><CardDescription>Search, edit, feature, hide, mark desktop-only, or delete games.</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Game Manager</CardTitle><CardDescription>Search by title or category, edit, feature, hide, mark desktop-only, or delete games.</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">Search Games</label>
-              <input type="text" placeholder="Search by title, ID, or category..." value={managerSearch} onChange={(e) => setManagerSearch(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+              <input type="text" placeholder="Search by title or category..." value={managerSearch} onChange={(e) => setManagerSearch(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
             </div>
             <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
               <span>Showing {filteredManagerGames.length} of {adminGames.length} games</span>
