@@ -47,7 +47,7 @@ async function checkGame(game: { id: string; title: string; url: string }) {
 
     const xFrameOptions = response.headers.get("x-frame-options");
     const contentSecurityPolicy = response.headers.get("content-security-policy");
-    const blocksIframe =
+    const iframeWarning =
       !!xFrameOptions ||
       !!contentSecurityPolicy?.toLowerCase().includes("frame-ancestors 'none'");
 
@@ -55,13 +55,12 @@ async function checkGame(game: { id: string; title: string; url: string }) {
       id: game.id,
       title: game.title,
       url: game.url,
-      ok: response.ok && !blocksIframe,
+      ok: response.ok,
       status: response.status,
-      statusText: blocksIframe
-        ? "May block iframe embedding"
-        : response.statusText || `Checked with ${checkedWith}`,
+      statusText: response.statusText || `Checked with ${checkedWith}`,
       checkedWith,
-      blocksIframe,
+      iframeWarning,
+      warning: iframeWarning ? "May block iframe embedding, but this can be a false positive" : null,
     };
   } catch (error) {
     return {
@@ -72,7 +71,8 @@ async function checkGame(game: { id: string; title: string; url: string }) {
       status: 0,
       statusText: error instanceof Error ? error.message : "Failed to check",
       checkedWith: "GET",
-      blocksIframe: false,
+      iframeWarning: false,
+      warning: null,
     };
   }
 }
@@ -97,9 +97,12 @@ export async function POST() {
     results.push(await checkGame(game));
   }
 
+  const brokenCount = results.filter((result) => !result.ok).length;
+  const warningCount = results.filter((result) => result.iframeWarning).length;
+
   await supabase.from("activity_log").insert({
     action: "games_checked",
-    details: `Checked ${results.length} games; ${results.filter((result) => !result.ok).length} possible issues`,
+    details: `Checked ${results.length} games; ${brokenCount} possible broken links; ${warningCount} iframe warnings`,
   });
 
   return Response.json({ success: true, results });
