@@ -31,6 +31,12 @@ type PublicSettings = {
   maintenance_mode: boolean
 }
 
+type Category = {
+  id: string
+  name: string
+  emoji: string
+}
+
 export default function GamePortal() {
   const [games, setGames] = useState<PortalGame[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
@@ -40,6 +46,7 @@ export default function GamePortal() {
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
   const [isMobileDevice, setIsMobileDevice] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [categoriesFromApi, setCategoriesFromApi] = useState<Category[]>([])
   const [settings, setSettings] = useState<PublicSettings>({
     site_name: "Game Portal",
     footer_text: "© 2026 Game Portal",
@@ -72,6 +79,17 @@ export default function GamePortal() {
       .catch(() => {
         setGames(fallbackGames)
       })
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategoriesFromApi(data)
+        }
+      })
+      .catch(() => setCategoriesFromApi([]))
   }, [])
 
   useEffect(() => {
@@ -113,17 +131,32 @@ export default function GamePortal() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const categories = useMemo(() => {
-    const uniqueCategories = Array.from(
+  const gameCategoryNames = useMemo(() => {
+    return Array.from(
       new Set(
         games
           .map((game) => game.category?.trim())
           .filter((category): category is string => Boolean(category))
       )
     ).sort((a, b) => a.localeCompare(b))
-
-    return ["All", ...uniqueCategories]
   }, [games])
+
+  const categoryCards = useMemo(() => {
+    const apiByName = new Map(categoriesFromApi.map((category) => [category.name, category]))
+
+    return gameCategoryNames.map((name) => {
+      const configuredCategory = apiByName.get(name)
+      const gameCount = games.filter((game) => game.category === name).length
+
+      return {
+        name,
+        emoji: configuredCategory?.emoji || "🎮",
+        gameCount,
+      }
+    })
+  }, [categoriesFromApi, gameCategoryNames, games])
+
+  const categories = useMemo(() => ["All", ...gameCategoryNames], [gameCategoryNames])
 
   useEffect(() => {
     if (!categories.includes(selectedCategory)) {
@@ -319,6 +352,40 @@ export default function GamePortal() {
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {categoryCards.length > 0 && !query.trim() && (
+          <section className="mb-6">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h2 className="text-xl font-bold text-foreground">Categories</h2>
+              {selectedCategory !== "All" && (
+                <Button variant="outline" size="sm" onClick={() => setSelectedCategory("All")}>
+                  Show All
+                </Button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {categoryCards.map((category) => (
+                <button
+                  key={category.name}
+                  type="button"
+                  onClick={() => setSelectedCategory(category.name)}
+                  className={`rounded-lg border p-4 text-left transition hover:shadow-md ${
+                    selectedCategory === category.name
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-card hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="text-2xl mb-2">{category.emoji}</div>
+                  <div className="font-semibold text-foreground truncate">{category.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {category.gameCount} {category.gameCount === 1 ? "game" : "games"}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         {categories.length > 1 && (
           <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
             {categories.map((category) => (
