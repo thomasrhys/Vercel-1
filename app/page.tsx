@@ -13,6 +13,7 @@ import {
   Star,
   Monitor,
   Smartphone,
+  ArrowUp,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
@@ -24,6 +25,12 @@ type PortalGame = Game & {
   desktop_only?: boolean
 }
 
+type PublicSettings = {
+  site_name: string
+  footer_text: string
+  maintenance_mode: boolean
+}
+
 export default function GamePortal() {
   const [games, setGames] = useState<PortalGame[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
@@ -32,8 +39,27 @@ export default function GamePortal() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [blobImages, setBlobImages] = useState<Record<string, string>>({})
   const [isMobileDevice, setIsMobileDevice] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const [settings, setSettings] = useState<PublicSettings>({
+    site_name: "Game Portal",
+    footer_text: "© 2026 Game Portal",
+    maintenance_mode: false,
+  })
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    fetch("/api/site-settings")
+      .then((res) => res.json())
+      .then((data) => {
+        setSettings({
+          site_name: data.site_name || "Game Portal",
+          footer_text: data.footer_text || "© 2026 Game Portal",
+          maintenance_mode: data.maintenance_mode === true,
+        })
+      })
+      .catch(() => undefined)
+  }, [])
 
   useEffect(() => {
     fetch("/api/games")
@@ -74,6 +100,17 @@ export default function GamePortal() {
       window.removeEventListener("resize", updateMobileState)
       window.removeEventListener("orientationchange", updateMobileState)
     }
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500)
+    }
+
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
+
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const categories = useMemo(() => {
@@ -226,6 +263,28 @@ export default function GamePortal() {
     )
   }
 
+  if (settings.maintenance_mode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle>{settings.site_name}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Gamepad2 className="h-12 w-12 mx-auto text-muted-foreground" />
+            <h1 className="text-2xl font-bold text-foreground">We&apos;ll be back soon</h1>
+            <p className="text-sm text-muted-foreground">
+              The games portal is currently under maintenance. Please check back later.
+            </p>
+            <Button variant="outline" onClick={() => (window.location.href = "/admin")}>
+              Admin Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card sticky top-0 z-40">
@@ -233,7 +292,7 @@ export default function GamePortal() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" />
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-              Game Portal
+              {settings.site_name}
             </h1>
           </div>
 
@@ -330,7 +389,7 @@ export default function GamePortal() {
 
       <footer className="border-t border-border bg-card">
         <div className="container mx-auto px-3 sm:px-4 py-6 text-center text-sm text-muted-foreground space-y-3">
-          <p>© 2026 Game Portal</p>
+          <p>{settings.footer_text}</p>
           <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2">
             <a className="hover:text-foreground underline underline-offset-4" href="/requests">
               Request a Game
@@ -347,6 +406,16 @@ export default function GamePortal() {
           </nav>
         </div>
       </footer>
+
+      {showBackToTop && (
+        <Button
+          className="fixed bottom-4 right-4 z-40 shadow-lg"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          <ArrowUp className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Back to Top</span>
+        </Button>
+      )}
 
       {activeGame && (
         <div
