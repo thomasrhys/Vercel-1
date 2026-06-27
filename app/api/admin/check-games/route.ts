@@ -17,24 +17,51 @@ async function requireAdmin() {
   return !!userId && ADMIN_USER_IDS.includes(userId);
 }
 
-async function checkGame(game: { id: string; title: string; url: string }) {
+async function fetchWithTimeout(url: string, method: "HEAD" | "GET") {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
+  const timeout = setTimeout(() => controller.abort(), 9000);
 
   try {
-    const response = await fetch(game.url, {
-      method: "HEAD",
+    return await fetch(url, {
+      method,
       signal: controller.signal,
       redirect: "follow",
+      headers: {
+        "User-Agent": "GamePortal-LinkChecker/1.0",
+      },
     });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function checkGame(game: { id: string; title: string; url: string }) {
+  try {
+    let response = await fetchWithTimeout(game.url, "HEAD");
+    let checkedWith: "HEAD" | "GET" = "HEAD";
+
+    if ([405, 403, 404, 0].includes(response.status)) {
+      response = await fetchWithTimeout(game.url, "GET");
+      checkedWith = "GET";
+    }
+
+    const xFrameOptions = response.headers.get("x-frame-options");
+    const contentSecurityPolicy = response.headers.get("content-security-policy");
+    const blocksIframe =
+      !!xFrameOptions ||
+      !!contentSecurityPolicy?.toLowerCase().includes("frame-ancestors 'none'");
 
     return {
       id: game.id,
       title: game.title,
       url: game.url,
-      ok: response.ok,
+      ok: response.ok && !blocksIframe,
       status: response.status,
-      statusText: response.statusText,
+      statusText: blocksIframe
+        ? "May block iframe embedding"
+        : response.statusText || `Checked with ${checkedWith}`,
+      checkedWith,
+      blocksIframe,
     };
   } catch (error) {
     return {
@@ -44,9 +71,9 @@ async function checkGame(game: { id: string; title: string; url: string }) {
       ok: false,
       status: 0,
       statusText: error instanceof Error ? error.message : "Failed to check",
+      checkedWith: "GET",
+      blocksIframe: false,
     };
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
@@ -72,7 +99,7 @@ export async function POST() {
 
   await supabase.from("activity_log").insert({
     action: "games_checked",
-    details: `Checked ${results.length} games`,
+    details: `Checked ${results.length} games; ${results.filter((result) => !result.ok).length} possible issues`,
   });
 
   return Response.json({ success: true, results });
