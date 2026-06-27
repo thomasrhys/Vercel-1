@@ -30,6 +30,10 @@ async function requireAdmin() {
   return true;
 }
 
+async function logActivity(action: string, details: string) {
+  await supabase.from("activity_log").insert({ action, details });
+}
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
@@ -84,6 +88,8 @@ export async function POST(request: Request) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
+  await logActivity("game_added", `Added ${title}`);
+
   return Response.json({
     success: true,
     game: data,
@@ -125,6 +131,8 @@ export async function PATCH(request: Request) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
+  await logActivity("game_updated", `Updated ${title}`);
+
   return Response.json({
     success: true,
     game: data,
@@ -149,6 +157,8 @@ export async function DELETE(request: Request) {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
+
+  await logActivity("game_deleted", `Deleted ${id}`);
 
   return Response.json({
     success: true,
