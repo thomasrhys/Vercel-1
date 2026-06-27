@@ -5,7 +5,7 @@ import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { games as fallbackGames, type Game } from "@/lib/games";
-import { Check, Eye, EyeOff, Inbox, Lock, Pencil, Smartphone, Star, Trash2, UploadCloud, X } from "lucide-react";
+import { Check, Eye, EyeOff, Folder, Inbox, Lock, Pencil, Smartphone, Star, Trash2, UploadCloud, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -27,11 +27,19 @@ type GameRequest = {
   status: "open" | "completed";
 };
 
+type Category = {
+  id: string;
+  name: string;
+  emoji: string;
+  game_count?: number;
+};
+
 export default function AdminPageClient() {
   const { isSignedIn, user } = useUser();
   const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
 
   const [adminGames, setAdminGames] = useState<AdminGame[]>(fallbackGames);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedGameId, setSelectedGameId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -86,14 +94,22 @@ export default function AdminPageClient() {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const response = await fetch("/api/admin/categories");
+      const data = await response.json();
+      if (response.ok && Array.isArray(data)) setCategories(data);
+    } catch (error) {
+      console.error("[v0] Load categories error:", error);
+    }
+  };
+
   const loadOpenRequestsCount = async () => {
     try {
       const response = await fetch("/api/admin/requests");
       const data = await response.json();
       if (response.ok && Array.isArray(data)) {
-        setOpenRequestsCount(
-          data.filter((request: GameRequest) => request.status === "open").length
-        );
+        setOpenRequestsCount(data.filter((request: GameRequest) => request.status === "open").length);
       }
     } catch (error) {
       console.error("[v0] Request count error:", error);
@@ -103,6 +119,7 @@ export default function AdminPageClient() {
   useEffect(() => {
     if (isAdmin) {
       loadAdminGames();
+      loadCategories();
       loadOpenRequestsCount();
     }
   }, [isAdmin]);
@@ -127,7 +144,7 @@ export default function AdminPageClient() {
   const replaceGameInList = (updatedGame: AdminGame) => {
     setAdminGames((currentGames) =>
       currentGames
-        .map((currentGame) => currentGame.id === updatedGame.id ? updatedGame : currentGame)
+        .map((currentGame) => (currentGame.id === updatedGame.id ? updatedGame : currentGame))
         .sort((a, b) => a.title.localeCompare(b.title))
     );
   };
@@ -382,6 +399,38 @@ export default function AdminPageClient() {
     }
   };
 
+  const categorySelect = (
+    value: string,
+    onChange: (value: string) => void,
+    label = "Category"
+  ) => (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-foreground">{label}</label>
+      <div className="flex gap-2">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground"
+        >
+          <option value="">Uncategorized</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.name}>
+              {category.emoji || "🎮"} {category.name}
+            </option>
+          ))}
+        </select>
+        <Button type="button" variant="outline" onClick={() => (window.location.href = "/admin/categories")}>
+          New
+        </Button>
+      </div>
+      {categories.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          No categories yet. Use Category Manager to create one.
+        </p>
+      )}
+    </div>
+  );
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -455,12 +504,22 @@ export default function AdminPageClient() {
         </Card>
 
         <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Folder className="h-5 w-5" />Categories</CardTitle>
+            <CardDescription>{categories.length} categories available for Add/Edit Game dropdowns.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin/categories")}>Open Category Manager</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
           <CardHeader><CardTitle>Add Game</CardTitle><CardDescription>Add a game to Supabase. Cover image is optional and can still be uploaded separately later.</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             {sourceRequestId && <div className="p-3 rounded-md text-sm bg-primary/10 text-primary">Adding from a request. Saving this game will mark the request as completed.</div>}
             <input type="text" placeholder="Game title" value={newGameTitle} onChange={(e) => setNewGameTitle(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
             <input type="url" placeholder="Game URL" value={newGameUrl} onChange={(e) => setNewGameUrl(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
-            <input type="text" placeholder="Category, optional" value={newGameCategory} onChange={(e) => setNewGameCategory(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+            {categorySelect(newGameCategory, setNewGameCategory, "Category, optional")}
 
             <div className="rounded-md border border-border p-3 space-y-3">
               <div>
@@ -518,7 +577,7 @@ export default function AdminPageClient() {
             </div>
             <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
               <span>Showing {filteredManagerGames.length} of {adminGames.length} games</span>
-              <Button type="button" variant="outline" size="sm" onClick={loadAdminGames} disabled={isLoadingGames}>{isLoadingGames ? "Refreshing..." : "Refresh"}</Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => { loadAdminGames(); loadCategories(); }} disabled={isLoadingGames}>{isLoadingGames ? "Refreshing..." : "Refresh"}</Button>
             </div>
             <div className="space-y-3">
               {filteredManagerGames.map((game) => {
@@ -529,7 +588,7 @@ export default function AdminPageClient() {
                       <div className="space-y-3">
                         <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" placeholder="Game title" />
                         <input type="url" value={editUrl} onChange={(e) => setEditUrl(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" placeholder="Game URL" />
-                        <input type="text" value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" placeholder="Category, optional" />
+                        {categorySelect(editCategory, setEditCategory, "Category, optional")}
                         <p className="text-xs text-muted-foreground truncate">ID: {game.id}</p>
                         <div className="flex gap-2 justify-end">
                           <Button type="button" variant="outline" size="sm" onClick={cancelEditingGame} disabled={savingGameId === game.id}><X className="h-4 w-4 mr-1" />Cancel</Button>
