@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity, DatabaseBackup, SearchCheck, Settings } from "lucide-react";
+import { Activity, DatabaseBackup, Lock, SearchCheck, Settings } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -159,7 +159,49 @@ export default function AdminUtilitiesCard() {
     }
   };
 
-  if (!isSignedIn || !isAdmin) return null;
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Admin Utilities Login
+            </CardTitle>
+            <CardDescription>Sign in with GitHub to access utilities.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SignInButton mode="modal">
+              <Button className="w-full">Sign in</Button>
+            </SignInButton>
+            <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin")}>
+              Back to Admin
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Access denied</CardTitle>
+            <CardDescription>You are signed in, but this account does not have admin access.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <UserButton />
+            <SignOutButton redirectUrl="/">
+              <Button variant="outline" className="w-full">Sign out</Button>
+            </SignOutButton>
+            <Button className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const brokenGames = checkResults.filter((result) => !result.ok);
 
