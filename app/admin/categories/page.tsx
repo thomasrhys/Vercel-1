@@ -12,12 +12,53 @@ const ADMIN_USER_IDS = [
   "user_3FdahY3hXmw7c589YMnDefAwOen",
 ];
 
+const EMOJI_OPTIONS = [
+  { emoji: "🎮", label: "General" },
+  { emoji: "🕹️", label: "Arcade" },
+  { emoji: "🏎️", label: "Racing" },
+  { emoji: "⚽", label: "Sports" },
+  { emoji: "🧩", label: "Puzzle" },
+  { emoji: "🧠", label: "Strategy" },
+  { emoji: "👻", label: "Horror" },
+  { emoji: "⚔️", label: "Action" },
+  { emoji: "🎯", label: "Skill" },
+  { emoji: "🎵", label: "Music" },
+  { emoji: "🤖", label: "Robots" },
+  { emoji: "🚀", label: "Space" },
+  { emoji: "🐾", label: "Animals" },
+  { emoji: "🏰", label: "Adventure" },
+  { emoji: "🔥", label: "Popular" },
+  { emoji: "⭐", label: "Featured" },
+];
+
 type Category = {
   id: string;
   name: string;
   emoji: string;
   game_count: number;
 };
+
+function EmojiSelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
+    >
+      {EMOJI_OPTIONS.map((option) => (
+        <option key={`${option.emoji}-${option.label}`} value={option.emoji}>
+          {option.emoji} {option.label}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export default function AdminCategoriesPage() {
   const { isSignedIn, user } = useUser();
@@ -238,13 +279,8 @@ export default function AdminCategoriesPage() {
             <CardDescription>Add a category with an emoji that appears on the homepage.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="grid grid-cols-[80px_1fr] gap-2">
-              <input
-                value={newEmoji}
-                onChange={(e) => setNewEmoji(e.target.value)}
-                maxLength={4}
-                className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-center"
-              />
+            <div className="grid grid-cols-[140px_1fr] gap-2">
+              <EmojiSelect value={newEmoji} onChange={setNewEmoji} />
               <input
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
@@ -273,13 +309,8 @@ export default function AdminCategoriesPage() {
                 <div key={category.id} className="rounded-md border border-border p-3">
                   {isEditing ? (
                     <div className="space-y-3">
-                      <div className="grid grid-cols-[80px_1fr] gap-2">
-                        <input
-                          value={editEmoji}
-                          onChange={(e) => setEditEmoji(e.target.value)}
-                          maxLength={4}
-                          className="px-3 py-2 border border-border rounded-md bg-background text-foreground text-center"
-                        />
+                      <div className="grid grid-cols-[140px_1fr] gap-2">
+                        <EmojiSelect value={editEmoji} onChange={setEditEmoji} />
                         <input
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
