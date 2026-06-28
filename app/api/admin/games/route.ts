@@ -61,6 +61,7 @@ export async function POST(request: Request) {
   const title = String(body.title || "").trim();
   const url = String(body.url || "").trim();
   const category = String(body.category || "").trim() || null;
+  const description = String(body.description || "").trim() || null;
   const id = String(body.id || makeId(title)).trim();
 
   if (!title || !url || !id) {
@@ -95,6 +96,7 @@ export async function POST(request: Request) {
       url,
       image: null,
       category,
+      description,
       featured: false,
       hidden: false,
     })
@@ -121,10 +123,42 @@ export async function PATCH(request: Request) {
 
   const body = await request.json();
 
+  if (Array.isArray(body.ids) && body.ids.length > 0) {
+    const ids = body.ids.map((id: unknown) => String(id).trim()).filter(Boolean);
+    const updates: Record<string, boolean> = {};
+
+    if (body.featured !== undefined) updates.featured = body.featured === true;
+    if (body.hidden !== undefined) updates.hidden = body.hidden === true;
+    if (body.desktop_only !== undefined) updates.desktop_only = body.desktop_only === true;
+
+    if (ids.length === 0 || Object.keys(updates).length === 0) {
+      return Response.json({ error: "Selected games and updates are required" }, { status: 400 });
+    }
+
+    const { data, error } = await supabase
+      .from("games")
+      .update(updates)
+      .in("id", ids)
+      .select();
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    await logActivity("bulk_games_updated", `Updated ${ids.length} selected games`);
+
+    return Response.json({
+      success: true,
+      games: data || [],
+      message: `Updated ${ids.length} selected games`,
+    });
+  }
+
   const id = String(body.id || "").trim();
   const title = String(body.title || "").trim();
   const url = String(body.url || "").trim();
   const category = String(body.category || "").trim() || null;
+  const description = String(body.description || "").trim() || null;
 
   if (!id || !title || !url) {
     return Response.json(
@@ -157,6 +191,7 @@ export async function PATCH(request: Request) {
       title,
       url,
       category,
+      description,
     })
     .eq("id", id)
     .select()
@@ -181,6 +216,28 @@ export async function DELETE(request: Request) {
   }
 
   const body = await request.json();
+
+  if (Array.isArray(body.ids) && body.ids.length > 0) {
+    const ids = body.ids.map((id: unknown) => String(id).trim()).filter(Boolean);
+
+    if (ids.length === 0) {
+      return Response.json({ error: "Selected games are required" }, { status: 400 });
+    }
+
+    const { error } = await supabase.from("games").delete().in("id", ids);
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    await logActivity("bulk_games_deleted", `Deleted ${ids.length} selected games`);
+
+    return Response.json({
+      success: true,
+      message: `Deleted ${ids.length} selected games`,
+    });
+  }
+
   const id = String(body.id || "").trim();
 
   if (!id) {
