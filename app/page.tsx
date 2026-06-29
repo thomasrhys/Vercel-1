@@ -290,6 +290,18 @@ export default function GamePortal() {
                 </div>
               </>
             )}
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                window.location.href = `/game/${game.id}`
+              }}
+              className="absolute bottom-2 right-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground shadow hover:bg-background"
+            >
+              Details →
+            </button>
           </div>
         </CardContent>
       </Card>
