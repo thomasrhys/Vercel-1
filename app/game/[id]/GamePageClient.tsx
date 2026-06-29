@@ -134,7 +134,7 @@ export default function GamePageClient({ id }: { id: string }) {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">This game may have been removed or hidden.</p>
-            <Button onClick={() => (window.location.href = "/")}>Back to Games</Button>
+            <Button onClick={() => (window.location.href = "/")}>Back to All Games</Button>
           </CardContent>
         </Card>
       </main>
@@ -146,7 +146,7 @@ export default function GamePageClient({ id }: { id: string }) {
       <div className="container mx-auto px-4 py-6 sm:py-10 max-w-5xl">
         <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Games
+          Back to All Games
         </Button>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] mt-6">
