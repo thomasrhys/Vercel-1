@@ -5,7 +5,7 @@ import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { games as fallbackGames, type Game } from "@/lib/games";
-import { Check, Eye, EyeOff, FileText, Folder, Inbox, Lock, Package, Pencil, Smartphone, Star, Trash2, UploadCloud, Wrench, X } from "lucide-react";
+import { Activity, Check, Eye, EyeOff, FileText, Folder, Inbox, Lock, Package, Pencil, Smartphone, Star, Trash2, UploadCloud, Wrench, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -483,7 +483,7 @@ export default function AdminPageClient() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <a href="/admin/utilities" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Wrench className="h-4 w-4" />Utilities</div>
             <p className="text-xs text-muted-foreground mt-1">Maintenance, backups & tools</p>
@@ -499,6 +499,10 @@ export default function AdminPageClient() {
           <a href="/admin/categories" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
             <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Folder className="h-4 w-4" />Categories</div>
             <p className="text-xs text-muted-foreground mt-1">Manage category emojis</p>
+          </a>
+          <a href="/admin/health" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition col-span-2 sm:col-span-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Activity className="h-4 w-4" />Health</div>
+            <p className="text-xs text-muted-foreground mt-1">Game quality checks</p>
           </a>
         </div>
 
