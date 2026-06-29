@@ -5,7 +5,7 @@ import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { games as fallbackGames, type Game } from "@/lib/games";
-import { Check, Eye, EyeOff, Folder, Inbox, Lock, Pencil, Smartphone, Star, Trash2, UploadCloud, X } from "lucide-react";
+import { Check, Eye, EyeOff, FileText, Folder, Inbox, Lock, Package, Pencil, Smartphone, Star, Trash2, UploadCloud, Wrench, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
   "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
@@ -483,6 +483,25 @@ export default function AdminPageClient() {
           </div>
         </div>
 
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <a href="/admin/utilities" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Wrench className="h-4 w-4" />Utilities</div>
+            <p className="text-xs text-muted-foreground mt-1">Maintenance, backups & tools</p>
+          </a>
+          <a href="/admin/bulk" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Package className="h-4 w-4" />Bulk Actions</div>
+            <p className="text-xs text-muted-foreground mt-1">Update multiple games</p>
+          </a>
+          <a href="/admin/descriptions" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground"><FileText className="h-4 w-4" />Descriptions</div>
+            <p className="text-xs text-muted-foreground mt-1">Hidden description editor</p>
+          </a>
+          <a href="/admin/categories" className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground"><Folder className="h-4 w-4" />Categories</div>
+            <p className="text-xs text-muted-foreground mt-1">Manage category emojis</p>
+          </a>
+        </div>
+
         {message && <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>{message}</div>}
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -500,16 +519,6 @@ export default function AdminPageClient() {
           </CardHeader>
           <CardContent>
             <Button className="w-full" onClick={() => (window.location.href = "/admin/requests")}>Open Requests</Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Folder className="h-5 w-5" />Categories</CardTitle>
-            <CardDescription>{categories.length} categories available for Add/Edit Game dropdowns.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin/categories")}>Open Category Manager</Button>
           </CardContent>
         </Card>
 
