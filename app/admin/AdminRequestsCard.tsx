@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Check, Inbox, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 const ADMIN_USER_IDS = [
@@ -37,11 +38,10 @@ export default function AdminRequestsCard() {
   const [isLoading, setIsLoading] = useState(false);
   const [workingId, setWorkingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [requestToDelete, setRequestToDelete] = useState<GameRequest | null>(null);
 
   const openRequests = requests.filter((request) => request.status === "open");
-  const completedRequests = requests.filter(
-    (request) => request.status === "completed"
-  );
+  const completedRequests = requests.filter((request) => request.status === "completed");
 
   const loadRequests = async () => {
     setIsLoading(true);
@@ -101,29 +101,26 @@ export default function AdminRequestsCard() {
     }
   };
 
-  const deleteRequest = async (request: GameRequest) => {
-    const confirmed = window.confirm(
-      `Delete the request for "${request.game_name}"? This cannot be undone.`
-    );
+  const deleteRequest = async () => {
+    if (!requestToDelete) return;
 
-    if (!confirmed) return;
-
-    setWorkingId(request.id);
+    setWorkingId(requestToDelete.id);
     setMessage("");
 
     try {
       const response = await fetch("/api/admin/requests", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: request.id }),
+        body: JSON.stringify({ id: requestToDelete.id }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setRequests((currentRequests) =>
-          currentRequests.filter((currentRequest) => currentRequest.id !== request.id)
+          currentRequests.filter((currentRequest) => currentRequest.id !== requestToDelete.id)
         );
+        setRequestToDelete(null);
         setMessage("✓ Request deleted");
       } else {
         setMessage(`✗ ${data.error || "Failed to delete request"}`);
@@ -169,12 +166,7 @@ export default function AdminRequestsCard() {
           </div>
 
           {request.game_link && (
-            <a
-              href={request.game_link}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-primary underline break-all"
-            >
+            <a href={request.game_link} target="_blank" rel="noreferrer" className="text-xs text-primary underline break-all">
               {request.game_link}
             </a>
           )}
@@ -188,54 +180,22 @@ export default function AdminRequestsCard() {
 
         <div className="flex gap-2 shrink-0">
           {request.status === "open" && (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => openAddGameForRequest(request)}
-              disabled={workingId === request.id}
-              className="h-8 w-8"
-              title="Add game from request"
-            >
+            <Button type="button" variant="outline" size="icon" onClick={() => openAddGameForRequest(request)} disabled={workingId === request.id} className="h-8 w-8" title="Add game from request">
               <Plus className="h-4 w-4" />
             </Button>
           )}
 
           {request.status === "open" ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => updateRequestStatus(request, "completed")}
-              disabled={workingId === request.id}
-              className="h-8 w-8"
-              title="Mark completed"
-            >
+            <Button type="button" variant="outline" size="icon" onClick={() => updateRequestStatus(request, "completed")} disabled={workingId === request.id} className="h-8 w-8" title="Mark completed">
               <Check className="h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => updateRequestStatus(request, "open")}
-              disabled={workingId === request.id}
-              className="h-8 w-8"
-              title="Reopen request"
-            >
+            <Button type="button" variant="outline" size="icon" onClick={() => updateRequestStatus(request, "open")} disabled={workingId === request.id} className="h-8 w-8" title="Reopen request">
               <RotateCcw className="h-4 w-4" />
             </Button>
           )}
 
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            onClick={() => deleteRequest(request)}
-            disabled={workingId === request.id}
-            className="h-8 w-8"
-            title="Delete request"
-          >
+          <Button type="button" variant="destructive" size="icon" onClick={() => setRequestToDelete(request)} disabled={workingId === request.id} className="h-8 w-8" title="Delete request">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -254,18 +214,10 @@ export default function AdminRequestsCard() {
                   <Inbox className="h-5 w-5" />
                   Game Requests
                 </CardTitle>
-                <CardDescription>
-                  Review requests sent from the homepage form.
-                </CardDescription>
+                <CardDescription>Review requests sent from the homepage form.</CardDescription>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={loadRequests}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={loadRequests} disabled={isLoading}>
                 {isLoading ? "Refreshing..." : "Refresh"}
               </Button>
             </div>
@@ -277,13 +229,7 @@ export default function AdminRequestsCard() {
             </div>
 
             {message && (
-              <div
-                className={`p-3 rounded-md text-sm ${
-                  message.startsWith("✓")
-                    ? "bg-green-500/20 text-green-700"
-                    : "bg-red-500/20 text-red-700"
-                }`}
-              >
+              <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
                 {message}
               </div>
             )}
@@ -311,6 +257,17 @@ export default function AdminRequestsCard() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmDialog
+        open={!!requestToDelete}
+        title="Delete request?"
+        description={`Delete the request for "${requestToDelete?.game_name || "this game"}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        isWorking={!!workingId}
+        onCancel={() => setRequestToDelete(null)}
+        onConfirm={deleteRequest}
+      />
     </div>
   );
 }
