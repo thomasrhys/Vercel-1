@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { CheckSquare, Lock, Smartphone, Star, Trash2, EyeOff, X } from "lucide-react";
 
 const ADMIN_USER_IDS = [
@@ -32,6 +33,7 @@ export default function BulkActionsPage() {
   const [message, setMessage] = useState("");
   const [isWorking, setIsWorking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const filteredGames = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -40,8 +42,6 @@ export default function BulkActionsPage() {
       `${game.title} ${game.category || ""}`.toLowerCase().includes(query)
     );
   }, [games, search]);
-
-  const selectedVisibleCount = filteredGames.filter((game) => selectedIds.includes(game.id)).length;
 
   const loadGames = async () => {
     setIsLoading(true);
@@ -111,18 +111,16 @@ export default function BulkActionsPage() {
     }
   };
 
-  const deleteSelected = async () => {
+  const requestDeleteSelected = () => {
     if (selectedIds.length === 0) {
       setMessage("Select at least one game first");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Delete ${selectedIds.length} selected games? This cannot be undone.`
-    );
+    setShowDeleteDialog(true);
+  };
 
-    if (!confirmed) return;
-
+  const deleteSelected = async () => {
     setIsWorking(true);
     setMessage("");
 
@@ -136,6 +134,7 @@ export default function BulkActionsPage() {
 
       if (response.ok) {
         setMessage(`✓ ${data.message}`);
+        setShowDeleteDialog(false);
         clearSelection();
         loadGames();
       } else {
@@ -226,7 +225,7 @@ export default function BulkActionsPage() {
               <Button onClick={() => updateSelected({ featured: true })} disabled={isWorking || selectedIds.length === 0}><Star className="h-4 w-4 mr-1" />Feature Selected</Button>
               <Button onClick={() => updateSelected({ hidden: true })} disabled={isWorking || selectedIds.length === 0}><EyeOff className="h-4 w-4 mr-1" />Hide Selected</Button>
               <Button onClick={() => updateSelected({ desktop_only: true })} disabled={isWorking || selectedIds.length === 0}><Smartphone className="h-4 w-4 mr-1" />Desktop Only</Button>
-              <Button variant="destructive" onClick={deleteSelected} disabled={isWorking || selectedIds.length === 0}><Trash2 className="h-4 w-4 mr-1" />Delete Selected</Button>
+              <Button variant="destructive" onClick={requestDeleteSelected} disabled={isWorking || selectedIds.length === 0}><Trash2 className="h-4 w-4 mr-1" />Delete Selected</Button>
             </div>
           </CardContent>
         </Card>
@@ -265,6 +264,17 @@ export default function BulkActionsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Delete selected games?"
+        description={`You are about to delete ${selectedIds.length} selected games. This action cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        isWorking={isWorking}
+        onCancel={() => setShowDeleteDialog(false)}
+        onConfirm={deleteSelected}
+      />
     </main>
   );
 }
