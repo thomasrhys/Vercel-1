@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
-import { ArrowLeft, Gamepad2, Maximize2, Minimize2, Monitor, Play, Smartphone, X } from "lucide-react";
+import { ArrowLeft, Check, Copy, Gamepad2, Maximize2, Minimize2, Monitor, Play, Share2, Smartphone, X } from "lucide-react";
 
 type PortalGame = Game & {
   image?: string | null;
@@ -22,6 +22,7 @@ export default function GamePageClient({ id }: { id: string }) {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,6 +79,40 @@ export default function GamePageClient({ id }: { id: string }) {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
+  const showShareMessage = (message: string) => {
+    setShareMessage(message);
+    window.setTimeout(() => setShareMessage(""), 2200);
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showShareMessage("Link copied");
+    } catch (error) {
+      console.error("Copy link error:", error);
+      showShareMessage("Could not copy link");
+    }
+  };
+
+  const shareGame = async () => {
+    if (!game) return;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${game.title} | Game Portal`,
+          text: `Play ${game.title} online on Game Portal.`,
+          url: window.location.href,
+        });
+        return;
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") return;
+      }
+    }
+
+    copyLink();
+  };
+
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
       try {
@@ -104,8 +139,10 @@ export default function GamePageClient({ id }: { id: string }) {
   const game = useMemo(() => games.find((item) => item.id === id) || null, [games, id]);
   const relatedGames = useMemo(() => {
     if (!game?.category) return [];
+
     return games
-      .filter((item) => item.id !== game.id && item.category === game.category)
+      .filter((item) => item.id !== game.id && item.category === game.category && !item.hidden)
+      .sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || a.title.localeCompare(b.title))
       .slice(0, 4);
   }, [games, game]);
 
@@ -202,6 +239,24 @@ export default function GamePageClient({ id }: { id: string }) {
                   Play Game
                 </Button>
               )}
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={copyLink}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Link
+                </Button>
+                <Button type="button" variant="outline" onClick={shareGame}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+              </div>
+
+              {shareMessage && (
+                <div className={`rounded-md p-3 text-sm flex items-center gap-2 ${shareMessage.includes("copied") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
+                  {shareMessage.includes("copied") && <Check className="h-4 w-4" />}
+                  {shareMessage}
+                </div>
+              )}
             </CardContent>
           </Card>
         </section>
@@ -225,6 +280,7 @@ export default function GamePageClient({ id }: { id: string }) {
                     </div>
                     <div className="p-3">
                       <p className="font-medium text-foreground truncate">{relatedGame.title}</p>
+                      {relatedGame.featured && <p className="text-xs text-primary mt-1">Featured</p>}
                     </div>
                   </a>
                 );
