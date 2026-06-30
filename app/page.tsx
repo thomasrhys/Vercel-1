@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
+import { UserButton, useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,6 +17,12 @@ import {
   ArrowUp,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
+
+const ADMIN_USER_IDS = [
+  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
+  "user_3FdWs0pdbEHCG85yExuAaW700hE",
+  "user_3FdahY3hXmw7c589YMnDefAwOen",
+]
 
 type PortalGame = Game & {
   image?: string | null
@@ -38,6 +45,8 @@ type Category = {
 }
 
 export default function GamePortal() {
+  const { isSignedIn, user } = useUser()
+  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id)
   const [games, setGames] = useState<PortalGame[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -321,9 +330,7 @@ export default function GamePortal() {
             <p className="text-sm text-muted-foreground">
               The games portal is currently under maintenance. Please check back later.
             </p>
-            <Button variant="outline" onClick={() => (window.location.href = "/admin")}>
-              Admin Login
-            </Button>
+            <Button variant="outline" onClick={() => (window.location.href = "/login")}>Login</Button>
           </CardContent>
         </Card>
       </div>
@@ -352,13 +359,17 @@ export default function GamePortal() {
             />
           </div>
 
-          <div className="sm:ml-auto flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/admin")}
-            >
-              Admin
-            </Button>
+          <div className="sm:ml-auto flex items-center gap-2">
+            {isSignedIn ? (
+              <>
+                {isAdmin && (
+                  <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Admin</Button>
+                )}
+                <UserButton />
+              </>
+            ) : (
+              <Button variant="outline" onClick={() => (window.location.href = "/login")}>Login</Button>
+            )}
           </div>
         </div>
       </header>
