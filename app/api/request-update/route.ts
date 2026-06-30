@@ -16,6 +16,39 @@ function getSupabase() {
   });
 }
 
+async function notifyUpdateRequest(request: Record<string, string | null>) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.REQUEST_EMAIL_FROM;
+  const to = process.env.UPDATE_REQUEST_EMAIL_TO || "gameupdates@requests.fnfaw.es";
+
+  if (!apiKey || !from) return;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to,
+      subject: `Game update request: ${request.game_name}`,
+      text: [
+        "New game update request",
+        "",
+        `Reference: ${request.id}`,
+        `Game: ${request.game_name}`,
+        `Game ID: ${request.game_id || "not provided"}`,
+        `Current URL: ${request.current_url || "not provided"}`,
+        `Update type: ${request.update_type}`,
+        `Suggested URL: ${request.new_url || "not provided"}`,
+        `Details: ${request.details || "not provided"}`,
+        `User email: ${request.email || "not provided"}`,
+      ].join("\n"),
+    }),
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -56,6 +89,10 @@ export async function POST(request: Request) {
       .single();
 
     if (error) return Response.json({ error: error.message }, { status: 500 });
+
+    await notifyUpdateRequest(data).catch((emailError) => {
+      console.error("[request-update] Email failed:", emailError);
+    });
 
     return Response.json({ success: true, message: "Update request submitted. Thanks!", request: data });
   } catch (error) {
