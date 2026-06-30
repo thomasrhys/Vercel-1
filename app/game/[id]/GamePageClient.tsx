@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
-import { ArrowLeft, Check, Copy, Gamepad2, Maximize2, Minimize2, Monitor, Play, Share2, Smartphone, X } from "lucide-react";
+import { ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, Share2, Smartphone, X } from "lucide-react";
 
 type PortalGame = Game & {
   image?: string | null;
@@ -16,6 +17,7 @@ type PortalGame = Game & {
 };
 
 export default function GamePageClient({ id }: { id: string }) {
+  const { isSignedIn } = useUser();
   const [games, setGames] = useState<PortalGame[]>([]);
   const [blobImages, setBlobImages] = useState<Record<string, string>>({});
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null);
@@ -23,6 +25,8 @@ export default function GamePageClient({ id }: { id: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
+  const [isFavouriteWorking, setIsFavouriteWorking] = useState(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +55,22 @@ export default function GamePageClient({ id }: { id: string }) {
 
     loadGameData();
   }, []);
+
+  useEffect(() => {
+    if (!isSignedIn) {
+      setFavouriteIds([]);
+      return;
+    }
+
+    fetch("/api/favourites")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data.favourites)) {
+          setFavouriteIds(data.favourites);
+        }
+      })
+      .catch(() => setFavouriteIds([]));
+  }, [isSignedIn]);
 
   useEffect(() => {
     const updateMobileState = () => {
@@ -113,6 +133,38 @@ export default function GamePageClient({ id }: { id: string }) {
     copyLink();
   };
 
+  const toggleFavourite = async () => {
+    if (!game || !isSignedIn) return;
+
+    const isFavourite = favouriteIds.includes(game.id);
+    setIsFavouriteWorking(true);
+
+    try {
+      const response = await fetch("/api/favourites", {
+        method: isFavourite ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId: game.id }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setFavouriteIds((currentIds) =>
+          isFavourite
+            ? currentIds.filter((currentId) => currentId !== game.id)
+            : Array.from(new Set([...currentIds, game.id]))
+        );
+        showShareMessage(data.message || (isFavourite ? "Removed from favourites" : "Added to favourites"));
+      } else {
+        showShareMessage(data.error || "Could not update favourites");
+      }
+    } catch (error) {
+      console.error("Favourite error:", error);
+      showShareMessage("Could not update favourites");
+    } finally {
+      setIsFavouriteWorking(false);
+    }
+  };
+
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
       try {
@@ -148,6 +200,7 @@ export default function GamePageClient({ id }: { id: string }) {
 
   const coverImage = game ? blobImages[game.id] || game.image || getGameImage(game.id) : "";
   const isDesktopOnlyOnMobile = !!game?.desktop_only && isMobileDevice;
+  const isFavourite = game ? favouriteIds.includes(game.id) : false;
 
   if (isLoading) {
     return (
@@ -181,10 +234,13 @@ export default function GamePageClient({ id }: { id: string }) {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 sm:py-10 max-w-5xl">
-        <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to All Games
-        </Button>
+        <div className="flex items-center justify-between gap-3">
+          <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to All Games
+          </Button>
+          {isSignedIn && <UserButton />}
+        </div>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] mt-6">
           <Card className="overflow-hidden">
@@ -240,6 +296,20 @@ export default function GamePageClient({ id }: { id: string }) {
                 </Button>
               )}
 
+              {isSignedIn ? (
+                <Button type="button" variant={isFavourite ? "default" : "outline"} className="w-full" onClick={toggleFavourite} disabled={isFavouriteWorking}>
+                  <Heart className={`h-4 w-4 mr-2 ${isFavourite ? "fill-current" : ""}`} />
+                  {isFavourite ? "Favourited" : "Add to Favourites"}
+                </Button>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button type="button" variant="outline" className="w-full">
+                    <Heart className="h-4 w-4 mr-2" />
+                    Sign in to Favourite
+                  </Button>
+                </SignInButton>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 <Button type="button" variant="outline" onClick={copyLink}>
                   <Copy className="h-4 w-4 mr-2" />
@@ -252,8 +322,8 @@ export default function GamePageClient({ id }: { id: string }) {
               </div>
 
               {shareMessage && (
-                <div className={`rounded-md p-3 text-sm flex items-center gap-2 ${shareMessage.includes("copied") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
-                  {shareMessage.includes("copied") && <Check className="h-4 w-4" />}
+                <div className={`rounded-md p-3 text-sm flex items-center gap-2 ${shareMessage.includes("copied") || shareMessage.includes("favourites") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
+                  {(shareMessage.includes("copied") || shareMessage.includes("favourites")) && <Check className="h-4 w-4" />}
                   {shareMessage}
                 </div>
               )}
