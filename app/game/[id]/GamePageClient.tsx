@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
-import { ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, Share2, Smartphone, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, RefreshCcw, Share2, Smartphone, X } from "lucide-react";
 
 type PortalGame = Game & {
   image?: string | null;
@@ -28,6 +28,7 @@ export default function GamePageClient({ id }: { id: string }) {
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [isFavouriteWorking, setIsFavouriteWorking] = useState(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
+  const loginUrl = `/login?redirect_url=${encodeURIComponent(`/game/${id}`)}`;
 
   useEffect(() => {
     const loadGameData = async () => {
@@ -134,7 +135,12 @@ export default function GamePageClient({ id }: { id: string }) {
   };
 
   const toggleFavourite = async () => {
-    if (!game || !isSignedIn) return;
+    if (!game) return;
+
+    if (!isSignedIn) {
+      window.location.href = loginUrl;
+      return;
+    }
 
     const isFavourite = favouriteIds.includes(game.id);
     setIsFavouriteWorking(true);
@@ -163,6 +169,18 @@ export default function GamePageClient({ id }: { id: string }) {
     } finally {
       setIsFavouriteWorking(false);
     }
+  };
+
+  const openRequestForm = (type: "broken" | "update") => {
+    if (!game) return;
+
+    const params = new URLSearchParams();
+    params.set("type", type);
+    params.set("game", game.title);
+    params.set("gameId", game.id);
+    params.set("url", game.url);
+
+    window.location.href = `/requests?${params.toString()}`;
   };
 
   const toggleFullscreen = async () => {
@@ -239,7 +257,11 @@ export default function GamePageClient({ id }: { id: string }) {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to All Games
           </Button>
-          {isSignedIn && <UserButton />}
+          {isSignedIn ? (
+            <UserButton />
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>Login</Button>
+          )}
         </div>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] mt-6">
@@ -264,6 +286,11 @@ export default function GamePageClient({ id }: { id: string }) {
                 {game.category && (
                   <span className="rounded-md bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                     {game.category}
+                  </span>
+                )}
+                {game.featured && (
+                  <span className="rounded-md bg-yellow-500/20 px-3 py-1 text-sm font-medium text-yellow-700">
+                    Featured
                   </span>
                 )}
                 {game.desktop_only ? (
@@ -296,19 +323,10 @@ export default function GamePageClient({ id }: { id: string }) {
                 </Button>
               )}
 
-              {isSignedIn ? (
-                <Button type="button" variant={isFavourite ? "default" : "outline"} className="w-full" onClick={toggleFavourite} disabled={isFavouriteWorking}>
-                  <Heart className={`h-4 w-4 mr-2 ${isFavourite ? "fill-current" : ""}`} />
-                  {isFavourite ? "Favourited" : "Add to Favourites"}
-                </Button>
-              ) : (
-                <SignInButton mode="modal">
-                  <Button type="button" variant="outline" className="w-full">
-                    <Heart className="h-4 w-4 mr-2" />
-                    Sign in to Favourite
-                  </Button>
-                </SignInButton>
-              )}
+              <Button type="button" variant={isFavourite ? "default" : "outline"} className="w-full" onClick={toggleFavourite} disabled={isFavouriteWorking}>
+                <Heart className={`h-4 w-4 mr-2 ${isFavourite ? "fill-current" : ""}`} />
+                {isSignedIn ? (isFavourite ? "Favourited" : "Add to Favourites") : "Login to Favourite"}
+              </Button>
 
               <div className="grid grid-cols-2 gap-2">
                 <Button type="button" variant="outline" onClick={copyLink}>
@@ -318,6 +336,17 @@ export default function GamePageClient({ id }: { id: string }) {
                 <Button type="button" variant="outline" onClick={shareGame}>
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={() => openRequestForm("broken")}>
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Report Problem
+                </Button>
+                <Button type="button" variant="outline" onClick={() => openRequestForm("update")}>
+                  <RefreshCcw className="h-4 w-4 mr-2" />
+                  Request Update
                 </Button>
               </div>
 
