@@ -15,6 +15,7 @@ import {
   Monitor,
   Smartphone,
   ArrowUp,
+  Heart,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
@@ -362,6 +363,10 @@ export default function GamePortal() {
           <div className="sm:ml-auto flex items-center gap-2">
             {isSignedIn ? (
               <>
+                <Button variant="outline" onClick={() => (window.location.href = "/favourites")}>
+                  <Heart className="h-4 w-4 mr-2" />
+                  Favourites
+                </Button>
                 {isAdmin && (
                   <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Admin</Button>
                 )}
