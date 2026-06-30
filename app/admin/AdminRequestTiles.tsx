@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useUser } from "@clerk/nextjs";
 import { AlertTriangle, Gamepad2, RefreshCcw } from "lucide-react";
 
@@ -20,6 +21,31 @@ export default function AdminRequestTiles() {
   const [gameRequests, setGameRequests] = useState(0);
   const [problemReports, setProblemReports] = useState(0);
   const [updateRequests, setUpdateRequests] = useState(0);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isSignedIn || !isAdmin) return;
+
+    const insertTarget = () => {
+      const heading = Array.from(document.querySelectorAll("h1")).find((item) => item.textContent?.trim() === "Admin Dashboard");
+      const headerBlock = heading?.parentElement?.parentElement;
+      const dashboardContainer = headerBlock?.parentElement;
+
+      if (!headerBlock || !dashboardContainer) return;
+
+      let target = document.getElementById("admin-request-tiles-slot");
+      if (!target) {
+        target = document.createElement("div");
+        target.id = "admin-request-tiles-slot";
+        headerBlock.insertAdjacentElement("afterend", target);
+      }
+
+      setPortalTarget(target);
+    };
+
+    const timeout = window.setTimeout(insertTarget, 0);
+    return () => window.clearTimeout(timeout);
+  }, [isSignedIn, isAdmin]);
 
   useEffect(() => {
     if (!isSignedIn || !isAdmin) return;
@@ -47,7 +73,7 @@ export default function AdminRequestTiles() {
     loadCounts();
   }, [isSignedIn, isAdmin]);
 
-  if (!isSignedIn || !isAdmin) return null;
+  if (!isSignedIn || !isAdmin || !portalTarget) return null;
 
   const tiles = [
     {
@@ -73,23 +99,22 @@ export default function AdminRequestTiles() {
     },
   ];
 
-  return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-8 pt-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {tiles.map((tile) => {
-          const Icon = tile.icon;
-          return (
-            <a key={tile.href} href={tile.href} className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <Icon className="h-4 w-4" />
-                {tile.title}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">{tile.count} open</p>
-              <p className="text-xs text-muted-foreground mt-1">{tile.description}</p>
-            </a>
-          );
-        })}
-      </div>
-    </div>
+  return createPortal(
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {tiles.map((tile) => {
+        const Icon = tile.icon;
+        return (
+          <a key={tile.href} href={tile.href} className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Icon className="h-4 w-4" />
+              {tile.title}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{tile.count} open</p>
+            <p className="text-xs text-muted-foreground mt-1">{tile.description}</p>
+          </a>
+        );
+      })}
+    </div>,
+    portalTarget
   );
 }
