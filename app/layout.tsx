@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
+import V13Enhancer from "./V13Enhancer";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -60,6 +61,7 @@ export default function RootLayout({
           </noscript>
 
           {children}
+          <V13Enhancer />
           {process.env.NODE_ENV === "production" && <Analytics />}
         </body>
       </html>
