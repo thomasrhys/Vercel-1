@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { SignIn, useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ function safeRedirectUrl(value: string | null) {
   return value;
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { isSignedIn } = useUser();
   const searchParams = useSearchParams();
   const redirectUrl = useMemo(() => safeRedirectUrl(searchParams.get("redirect_url")), [searchParams]);
@@ -46,5 +46,13 @@ export default function LoginPage() {
         <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-background flex items-center justify-center p-4">Loading login...</main>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
