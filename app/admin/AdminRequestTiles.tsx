@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, Gamepad2, RefreshCcw } from "lucide-react";
 
 const ADMIN_USER_IDS = [
@@ -75,29 +74,21 @@ export default function AdminRequestTiles() {
   ];
 
   return (
-    <div className="border-b border-border bg-background">
-      <div className="max-w-2xl mx-auto px-4 pt-4 sm:pt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {tiles.map((tile) => {
-            const Icon = tile.icon;
-            return (
-              <a key={tile.href} href={tile.href} className="block">
-                <Card className="hover:bg-muted/50 transition h-full">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <Icon className="h-5 w-5 text-primary" />
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        {tile.count} open
-                      </span>
-                    </div>
-                    <p className="font-semibold text-foreground mt-3">{tile.title}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{tile.description}</p>
-                  </CardContent>
-                </Card>
-              </a>
-            );
-          })}
-        </div>
+    <div className="max-w-2xl mx-auto px-4 sm:px-8 pt-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {tiles.map((tile) => {
+          const Icon = tile.icon;
+          return (
+            <a key={tile.href} href={tile.href} className="rounded-lg border border-border bg-card p-4 hover:bg-muted/50 transition">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Icon className="h-4 w-4" />
+                {tile.title}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{tile.count} open</p>
+              <p className="text-xs text-muted-foreground mt-1">{tile.description}</p>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
