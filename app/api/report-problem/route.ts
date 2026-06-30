@@ -16,6 +16,39 @@ function getSupabase() {
   });
 }
 
+async function notifyProblemReport(report: Record<string, string | null>) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.REQUEST_EMAIL_FROM;
+  const to = process.env.PROBLEM_REPORT_EMAIL_TO || "reportproblems@requests.fnfaw.es";
+
+  if (!apiKey || !from) return;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to,
+      subject: `Problem report: ${report.game_name}`,
+      text: [
+        "New problem report",
+        "",
+        `Reference: ${report.id}`,
+        `Game: ${report.game_name}`,
+        `Game ID: ${report.game_id || "not provided"}`,
+        `Game URL: ${report.game_url || "not provided"}`,
+        `Problem type: ${report.problem_type}`,
+        `Details: ${report.details || "not provided"}`,
+        `Device/browser: ${report.device || "not provided"}`,
+        `User email: ${report.email || "not provided"}`,
+      ].join("\n"),
+    }),
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -56,6 +89,10 @@ export async function POST(request: Request) {
       .single();
 
     if (error) return Response.json({ error: error.message }, { status: 500 });
+
+    await notifyProblemReport(data).catch((emailError) => {
+      console.error("[report-problem] Email failed:", emailError);
+    });
 
     return Response.json({ success: true, message: "Problem report submitted. Thanks!", report: data });
   } catch (error) {
