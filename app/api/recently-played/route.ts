@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseUserId } from "@/lib/supabase-server-auth";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,13 +12,8 @@ const supabase = createClient(
   }
 );
 
-async function getUserId() {
-  const authResult = await auth();
-  return authResult.userId;
-}
-
-export async function GET() {
-  const userId = await getUserId();
+export async function GET(request: Request) {
+  const userId = await getSupabaseUserId(request);
 
   if (!userId) {
     return Response.json({ recent: [] });
@@ -39,7 +34,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const userId = await getUserId();
+  const userId = await getSupabaseUserId(request);
 
   if (!userId) {
     return Response.json({ ok: true });
