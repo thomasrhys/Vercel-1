@@ -13,6 +13,18 @@ function safeRedirectUrl(value: string | null) {
   return value;
 }
 
+function readableError(error: unknown) {
+  if (error instanceof Error && error.message && error.message !== "{}") return error.message;
+  if (typeof error === "object" && error !== null) {
+    const value = error as { message?: unknown; error_description?: unknown; error?: unknown };
+    if (typeof value.message === "string" && value.message && value.message !== "{}") return value.message;
+    if (typeof value.error_description === "string" && value.error_description) return value.error_description;
+    if (typeof value.error === "string" && value.error) return value.error;
+  }
+  if (typeof error === "string" && error && error !== "{}") return error;
+  return "Something went wrong. Please check your details and try again.";
+}
+
 type AuthMode = "login" | "signup";
 type AuthMethod = "email" | "phone";
 type OAuthProvider = "google" | "github";
@@ -72,7 +84,7 @@ function LoginPageContent() {
             : await supabaseAuthClient.auth.signUp({ phone: phone.trim(), password });
 
       if (result.error) {
-        setMessage(result.error.message);
+        setMessage(readableError(result.error));
         return;
       }
 
@@ -82,6 +94,8 @@ function LoginPageContent() {
       }
 
       window.location.href = redirectUrl;
+    } catch (error) {
+      setMessage(readableError(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -91,13 +105,18 @@ function LoginPageContent() {
     setMessage("");
     setOauthLoading(provider);
 
-    const { error } = await supabaseAuthClient.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: getRedirectTo() },
-    });
+    try {
+      const { error } = await supabaseAuthClient.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: getRedirectTo() },
+      });
 
-    if (error) {
-      setMessage(error.message);
+      if (error) {
+        setMessage(readableError(error));
+        setOauthLoading(null);
+      }
+    } catch (error) {
+      setMessage(readableError(error));
       setOauthLoading(null);
     }
   };
