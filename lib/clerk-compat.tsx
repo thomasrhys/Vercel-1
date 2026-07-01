@@ -3,6 +3,8 @@
 import { type ReactNode } from "react";
 import { UserButton as SupabaseUserButton, useSupabaseAuth } from "@/lib/supabase-auth";
 
+const LEGACY_ADMIN_USER_ID = "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR";
+
 export function useUser() {
   const { user, isLoaded, isSignedIn, isAdmin } = useSupabaseAuth();
 
@@ -11,7 +13,7 @@ export function useUser() {
     isSignedIn,
     user: user
       ? {
-          id: user.id,
+          id: isAdmin ? LEGACY_ADMIN_USER_ID : user.id,
           primaryEmailAddress: { emailAddress: user.email || "" },
           emailAddresses: user.email ? [{ emailAddress: user.email }] : [],
           publicMetadata: { isAdmin },
@@ -26,6 +28,23 @@ export function UserButton() {
 
 export function SignInButton({ children }: { children: ReactNode; mode?: string }) {
   return <button type="button" onClick={() => (window.location.href = "/login")}>{children}</button>;
+}
+
+export function SignOutButton({ children, redirectUrl = "/" }: { children: ReactNode; redirectUrl?: string }) {
+  const { signOut } = useSupabaseAuth();
+
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        await signOut();
+        window.location.href = redirectUrl;
+      }}
+      className="w-full"
+    >
+      {children}
+    </button>
+  );
 }
 
 export function SignIn() {
