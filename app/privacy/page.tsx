@@ -13,13 +13,8 @@ const thirdPartyServices = [
   },
   {
     name: "Supabase",
-    purpose: "Database and backend services",
+    purpose: "Database, login, sign up, authentication, and backend services",
     href: "https://supabase.com/privacy",
-  },
-  {
-    name: "Clerk",
-    purpose: "Administrator authentication",
-    href: "https://clerk.com/privacy",
   },
   {
     name: "Resend",
@@ -42,7 +37,7 @@ export default async function PrivacyPage() {
           <p className="text-sm text-muted-foreground mt-2">
             Effective Date: 27 June 2026
             <br />
-            Last Updated: 27 June 2026
+            Last Updated: 1 July 2026
           </p>
         </div>
 
@@ -63,9 +58,10 @@ export default async function PrivacyPage() {
             has been requested, and send a notification email to the site administrator.
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Admin Login</h2>
+          <h2 className="text-xl font-semibold text-foreground">Account Login</h2>
           <p>
-            Admin access is protected using Clerk. Regular players do not need to create an account or sign in.
+            Account login, sign up, and authentication are provided using Supabase. You may sign in using an email and password,
+            a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Third-Party Games</h2>
@@ -113,12 +109,7 @@ export default async function PrivacyPage() {
                     <td className="p-3 text-foreground">{service.name}</td>
                     <td className="p-3">{service.purpose}</td>
                     <td className="p-3">
-                      <a
-                        href={service.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary underline underline-offset-4"
-                      >
+                      <a href={service.href} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4">
                         View policy
                       </a>
                     </td>
@@ -143,10 +134,7 @@ export default async function PrivacyPage() {
           </p>
         </section>
 
-        <a
-          href="/"
-          className="inline-block px-4 py-2 rounded-md border border-border text-sm"
-        >
+        <a href="/" className="inline-block px-4 py-2 rounded-md border border-border text-sm">
           Back to Games
         </a>
       </div>
