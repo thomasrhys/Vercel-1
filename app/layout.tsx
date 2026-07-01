@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import V13Enhancer from "./V13Enhancer";
+import AuthFetchPatch from "./AuthFetchPatch";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -59,6 +60,7 @@ export default function RootLayout({
         </noscript>
 
         {children}
+        <AuthFetchPatch />
         <V13Enhancer />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
