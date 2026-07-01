@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useUser } from "@clerk/nextjs";
+import { useSupabaseAuth } from "@/lib/supabase-auth";
 import { Heart } from "lucide-react";
 import { getGameImage, type Game } from "@/lib/games";
 
@@ -19,7 +19,7 @@ type RecentItem = {
 };
 
 export default function V13Enhancer() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn } = useSupabaseAuth();
   const [games, setGames] = useState<PortalGame[]>([]);
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
