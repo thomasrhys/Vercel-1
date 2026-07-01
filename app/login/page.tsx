@@ -43,8 +43,11 @@ function LoginPageContent() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [smsCode, setSmsCode] = useState("");
+  const [needsSmsCode, setNeedsSmsCode] = useState(false);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerifyingSms, setIsVerifyingSms] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
 
   const getRedirectTo = () => `${window.location.origin}/login?redirect_url=${encodeURIComponent(redirectUrl)}`;
@@ -88,8 +91,14 @@ function LoginPageContent() {
         return;
       }
 
+      if (mode === "signup" && method === "phone" && !result.data.session) {
+        setNeedsSmsCode(true);
+        setMessage("Enter the 6-digit code sent to your phone.");
+        return;
+      }
+
       if (mode === "signup" && !result.data.session) {
-        setMessage(method === "email" ? "Account created. Check your email to confirm your account, then log in." : "Account created. Check your phone for a verification code if SMS confirmation is enabled.");
+        setMessage("Account created. Check your email to confirm your account, then log in.");
         return;
       }
 
@@ -98,6 +107,36 @@ function LoginPageContent() {
       setMessage(readableError(error));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const verifySmsCode = async () => {
+    setMessage("");
+
+    if (!phone.trim() || !smsCode.trim()) {
+      setMessage("Enter your phone number and the SMS code.");
+      return;
+    }
+
+    setIsVerifyingSms(true);
+
+    try {
+      const { error } = await supabaseAuthClient.auth.verifyOtp({
+        phone: phone.trim(),
+        token: smsCode.trim(),
+        type: "sms",
+      });
+
+      if (error) {
+        setMessage(readableError(error));
+        return;
+      }
+
+      window.location.href = redirectUrl;
+    } catch (error) {
+      setMessage(readableError(error));
+    } finally {
+      setIsVerifyingSms(false);
     }
   };
 
@@ -153,7 +192,7 @@ function LoginPageContent() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <Button variant={method === "email" ? "secondary" : "outline"} onClick={() => setMethod("email")}>Email</Button>
+            <Button variant={method === "email" ? "secondary" : "outline"} onClick={() => { setMethod("email"); setNeedsSmsCode(false); }}>Email</Button>
             <Button variant={method === "phone" ? "secondary" : "outline"} onClick={() => setMethod("phone")}>Phone</Button>
           </div>
 
@@ -170,16 +209,31 @@ function LoginPageContent() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Password</label>
-            <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" />
-          </div>
+          {!needsSmsCode && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Password</label>
+              <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" />
+            </div>
+          )}
+
+          {needsSmsCode && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">SMS verification code</label>
+              <Input inputMode="numeric" value={smsCode} onChange={(event) => setSmsCode(event.target.value)} placeholder="123456" />
+            </div>
+          )}
 
           {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
 
-          <Button className="w-full" onClick={submit} disabled={isSubmitting}>
-            {isSubmitting ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
-          </Button>
+          {needsSmsCode ? (
+            <Button className="w-full" onClick={verifySmsCode} disabled={isVerifyingSms}>
+              {isVerifyingSms ? "Verifying..." : "Verify Phone"}
+            </Button>
+          ) : (
+            <Button className="w-full" onClick={submit} disabled={isSubmitting}>
+              {isSubmitting ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
+            </Button>
+          )}
 
           <div className="relative py-1">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
