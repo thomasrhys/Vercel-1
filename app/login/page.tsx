@@ -23,6 +23,8 @@ function LoginPageContent() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getRedirectTo = () => `${window.location.origin}/login?redirect_url=${encodeURIComponent(redirectUrl)}`;
+
   const submit = async () => {
     setMessage("");
 
@@ -37,7 +39,13 @@ function LoginPageContent() {
       const result =
         mode === "login"
           ? await supabaseAuthClient.auth.signInWithPassword({ email: email.trim(), password })
-          : await supabaseAuthClient.auth.signUp({ email: email.trim(), password });
+          : await supabaseAuthClient.auth.signUp({
+              email: email.trim(),
+              password,
+              options: {
+                emailRedirectTo: getRedirectTo(),
+              },
+            });
 
       if (result.error) {
         setMessage(result.error.message);
