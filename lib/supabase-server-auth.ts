@@ -1,5 +1,7 @@
 import { createClient, type User } from "@supabase/supabase-js";
 
+const DEFAULT_ADMIN_EMAILS = "pitstopyt1@gmail.com,thomasrhyshughes29@gmail.com";
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -12,7 +14,7 @@ const supabase = createClient(
 );
 
 function getAdminEmails() {
-  return (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
+  return (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || DEFAULT_ADMIN_EMAILS)
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
