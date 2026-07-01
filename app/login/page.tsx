@@ -13,23 +13,45 @@ function safeRedirectUrl(value: string | null) {
   return value;
 }
 
+type AuthMode = "login" | "signup";
+type AuthMethod = "email" | "phone";
+type OAuthProvider = "google" | "github";
+
+const oauthProviders: { id: OAuthProvider; label: string }[] = [
+  { id: "google", label: "Google" },
+  { id: "github", label: "GitHub" },
+];
+
 function LoginPageContent() {
   const { isSignedIn } = useSupabaseAuth();
   const searchParams = useSearchParams();
   const redirectUrl = useMemo(() => safeRedirectUrl(searchParams.get("redirect_url")), [searchParams]);
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [method, setMethod] = useState<AuthMethod>("email");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
 
   const getRedirectTo = () => `${window.location.origin}/login?redirect_url=${encodeURIComponent(redirectUrl)}`;
 
   const submit = async () => {
     setMessage("");
 
-    if (!email.trim() || !password) {
-      setMessage("Enter your email and password.");
+    if (!password) {
+      setMessage("Enter your password.");
+      return;
+    }
+
+    if (method === "email" && !email.trim()) {
+      setMessage("Enter your email address.");
+      return;
+    }
+
+    if (method === "phone" && !phone.trim()) {
+      setMessage("Enter your phone number, including the country code.");
       return;
     }
 
@@ -38,14 +60,16 @@ function LoginPageContent() {
     try {
       const result =
         mode === "login"
-          ? await supabaseAuthClient.auth.signInWithPassword({ email: email.trim(), password })
-          : await supabaseAuthClient.auth.signUp({
-              email: email.trim(),
-              password,
-              options: {
-                emailRedirectTo: getRedirectTo(),
-              },
-            });
+          ? method === "email"
+            ? await supabaseAuthClient.auth.signInWithPassword({ email: email.trim(), password })
+            : await supabaseAuthClient.auth.signInWithPassword({ phone: phone.trim(), password })
+          : method === "email"
+            ? await supabaseAuthClient.auth.signUp({
+                email: email.trim(),
+                password,
+                options: { emailRedirectTo: getRedirectTo() },
+              })
+            : await supabaseAuthClient.auth.signUp({ phone: phone.trim(), password });
 
       if (result.error) {
         setMessage(result.error.message);
@@ -53,13 +77,28 @@ function LoginPageContent() {
       }
 
       if (mode === "signup" && !result.data.session) {
-        setMessage("Account created. Check your email to confirm your account, then log in.");
+        setMessage(method === "email" ? "Account created. Check your email to confirm your account, then log in." : "Account created. Check your phone for a verification code if SMS confirmation is enabled.");
         return;
       }
 
       window.location.href = redirectUrl;
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const signInWithOAuth = async (provider: OAuthProvider) => {
+    setMessage("");
+    setOauthLoading(provider);
+
+    const { error } = await supabaseAuthClient.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: getRedirectTo() },
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setOauthLoading(null);
     }
   };
 
@@ -94,10 +133,23 @@ function LoginPageContent() {
             <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>Sign Up</Button>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Email</label>
-            <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant={method === "email" ? "secondary" : "outline"} onClick={() => setMethod("email")}>Email</Button>
+            <Button variant={method === "phone" ? "secondary" : "outline"} onClick={() => setMethod("phone")}>Phone</Button>
           </div>
+
+          {method === "email" ? (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Email</label>
+              <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Phone</label>
+              <Input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+447700900123" />
+              <p className="text-xs text-muted-foreground">Use the full number with country code.</p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Password</label>
@@ -109,6 +161,20 @@ function LoginPageContent() {
           <Button className="w-full" onClick={submit} disabled={isSubmitting}>
             {isSubmitting ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
           </Button>
+
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or continue with</span></div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {oauthProviders.map((provider) => (
+              <Button key={provider.id} variant="outline" onClick={() => signInWithOAuth(provider.id)} disabled={!!oauthLoading}>
+                {oauthLoading === provider.id ? "Opening..." : provider.label}
+              </Button>
+            ))}
+          </div>
+
           <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
         </CardContent>
       </Card>
