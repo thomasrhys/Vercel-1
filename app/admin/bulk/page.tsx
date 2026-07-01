@@ -1,17 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { CheckSquare, Lock, Smartphone, Star, Trash2, EyeOff, X } from "lucide-react";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 type AdminGame = {
   id: string;
@@ -24,8 +18,7 @@ type AdminGame = {
 };
 
 export default function BulkActionsPage() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+  const { isSignedIn, isAdmin, signOut } = useSupabaseAuth();
 
   const [games, setGames] = useState<AdminGame[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -154,10 +147,10 @@ export default function BulkActionsPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Lock className="h-5 w-5" />Bulk Actions Login</CardTitle>
-            <CardDescription>Sign in with GitHub to manage games.</CardDescription>
+            <CardDescription>Sign in to manage games.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <SignInButton mode="modal"><Button className="w-full">Sign in</Button></SignInButton>
+            <Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/admin/bulk")}>Sign in</Button>
             <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
           </CardContent>
         </Card>
@@ -175,7 +168,7 @@ export default function BulkActionsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <UserButton />
-            <SignOutButton redirectUrl="/"><Button variant="outline" className="w-full">Sign out</Button></SignOutButton>
+            <Button variant="outline" className="w-full" onClick={signOut}>Sign out</Button>
           </CardContent>
         </Card>
       </div>
