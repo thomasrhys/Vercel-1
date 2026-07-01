@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, UserButton, useUser } from "@/lib/clerk-compat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Lock } from "lucide-react";
@@ -118,7 +118,7 @@ export default function DescriptionsPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Lock className="h-5 w-5" />Descriptions Login</CardTitle>
-            <CardDescription>Sign in with GitHub to edit hidden game descriptions.</CardDescription>
+            <CardDescription>Sign in to edit hidden game descriptions.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <SignInButton mode="modal"><Button className="w-full">Sign in</Button></SignInButton>
