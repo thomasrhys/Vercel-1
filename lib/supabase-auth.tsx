@@ -1,14 +1,15 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createClient, type Session, type User } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const DEFAULT_ADMIN_EMAILS = "pitstopyt1@gmail.com,thomasrhyshughes29@gmail.com";
 
 export const supabaseAuthClient = createClient(supabaseUrl, supabaseAnonKey);
 
-type AuthContextValue = {
+type AuthValue = {
   user: User | null;
   session: Session | null;
   isLoaded: boolean;
@@ -17,23 +18,18 @@ type AuthContextValue = {
   signOut: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue>({
-  user: null,
-  session: null,
-  isLoaded: false,
-  isSignedIn: false,
-  isAdmin: false,
-  signOut: async () => undefined,
-});
-
 function getAdminEmails() {
-  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS || DEFAULT_ADMIN_EMAILS)
     .split(",")
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 }
 
 export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
+export function useSupabaseAuth(): AuthValue {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -51,7 +47,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const value = useMemo<AuthContextValue>(() => {
+  return useMemo(() => {
     const user = session?.user || null;
     const email = user?.email?.toLowerCase() || "";
     const adminEmails = getAdminEmails();
@@ -68,12 +64,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       },
     };
   }, [session, isLoaded]);
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useSupabaseAuth() {
-  return useContext(AuthContext);
 }
 
 export function UserButton() {
