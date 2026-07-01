@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/clerk-compat";
 import { AlertTriangle, Gamepad2, RefreshCcw } from "lucide-react";
 
 const ADMIN_USER_IDS = [
