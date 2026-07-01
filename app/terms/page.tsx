@@ -11,13 +11,8 @@ const thirdPartyServices = [
   },
   {
     name: "Supabase",
-    purpose: "Database and backend services",
+    purpose: "Database, login, sign up, authentication, and backend services",
     href: "https://supabase.com/terms",
-  },
-  {
-    name: "Clerk",
-    purpose: "Administrator authentication",
-    href: "https://clerk.com/terms",
   },
   {
     name: "Resend",
@@ -35,7 +30,7 @@ export default function TermsPage() {
           <p className="text-sm text-muted-foreground mt-2">
             Effective Date: 27 June 2026
             <br />
-            Last Updated: 27 June 2026
+            Last Updated: 1 July 2026
           </p>
         </div>
 
@@ -48,6 +43,12 @@ export default function TermsPage() {
           <p>
             Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.
             You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.
+          </p>
+
+          <h2 className="text-xl font-semibold text-foreground">Accounts and Sign In</h2>
+          <p>
+            You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other
+            authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Game Requests</h2>
@@ -103,12 +104,7 @@ export default function TermsPage() {
                     <td className="p-3 text-foreground">{service.name}</td>
                     <td className="p-3">{service.purpose}</td>
                     <td className="p-3">
-                      <a
-                        href={service.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary underline underline-offset-4"
-                      >
+                      <a href={service.href} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4">
                         View terms
                       </a>
                     </td>
@@ -144,10 +140,7 @@ export default function TermsPage() {
           </p>
         </section>
 
-        <a
-          href="/"
-          className="inline-block px-4 py-2 rounded-md border border-border text-sm"
-        >
+        <a href="/" className="inline-block px-4 py-2 rounded-md border border-border text-sm">
           Back to Games
         </a>
       </div>
