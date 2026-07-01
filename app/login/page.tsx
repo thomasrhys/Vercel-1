@@ -13,7 +13,7 @@ function safeRedirectUrl(value: string | null) {
   return value;
 }
 
-function readableError(error: unknown) {
+function messageFrom(error: unknown) {
   if (error instanceof Error && error.message && error.message !== "{}") return error.message;
   if (typeof error === "object" && error !== null) {
     const value = error as { message?: unknown; error_description?: unknown; error?: unknown };
@@ -21,142 +21,50 @@ function readableError(error: unknown) {
     if (typeof value.error_description === "string" && value.error_description) return value.error_description;
     if (typeof value.error === "string" && value.error) return value.error;
   }
-  if (typeof error === "string" && error && error !== "{}") return error;
   return "Something went wrong. Please check your details and try again.";
 }
 
 type AuthMode = "login" | "signup";
-type AuthMethod = "email" | "phone";
 type OAuthProvider = "google" | "github";
-
-const oauthProviders: { id: OAuthProvider; label: string }[] = [
-  { id: "google", label: "Google" },
-  { id: "github", label: "GitHub" },
-];
 
 function LoginPageContent() {
   const { isSignedIn } = useSupabaseAuth();
   const searchParams = useSearchParams();
   const redirectUrl = useMemo(() => safeRedirectUrl(searchParams.get("redirect_url")), [searchParams]);
   const [mode, setMode] = useState<AuthMode>("login");
-  const [method, setMethod] = useState<AuthMethod>("email");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [smsCode, setSmsCode] = useState("");
-  const [needsSmsCode, setNeedsSmsCode] = useState(false);
   const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVerifyingSms, setIsVerifyingSms] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const getRedirectTo = () => `${window.location.origin}/login?redirect_url=${encodeURIComponent(redirectUrl)}`;
+  const redirectTo = () => `${window.location.origin}/login?redirect_url=${encodeURIComponent(redirectUrl)}`;
 
   const submit = async () => {
     setMessage("");
-
-    if (!password) {
-      setMessage("Enter your password.");
-      return;
-    }
-
-    if (method === "email" && !email.trim()) {
-      setMessage("Enter your email address.");
-      return;
-    }
-
-    if (method === "phone" && !phone.trim()) {
-      setMessage("Enter your phone number, including the country code.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
+    if (!email.trim()) return setMessage("Enter your email address.");
+    if (!password) return setMessage("Enter your password.");
+    setBusy(true);
     try {
-      const result =
-        mode === "login"
-          ? method === "email"
-            ? await supabaseAuthClient.auth.signInWithPassword({ email: email.trim(), password })
-            : await supabaseAuthClient.auth.signInWithPassword({ phone: phone.trim(), password })
-          : method === "email"
-            ? await supabaseAuthClient.auth.signUp({
-                email: email.trim(),
-                password,
-                options: { emailRedirectTo: getRedirectTo() },
-              })
-            : await supabaseAuthClient.auth.signUp({ phone: phone.trim(), password });
-
-      if (result.error) {
-        setMessage(readableError(result.error));
-        return;
-      }
-
-      if (mode === "signup" && method === "phone" && !result.data.session) {
-        setNeedsSmsCode(true);
-        setMessage("Enter the 6-digit code sent to your phone.");
-        return;
-      }
-
-      if (mode === "signup" && !result.data.session) {
-        setMessage("Account created. Check your email to confirm your account, then log in.");
-        return;
-      }
-
+      const result = mode === "login"
+        ? await supabaseAuthClient.auth.signInWithPassword({ email: email.trim(), password })
+        : await supabaseAuthClient.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: redirectTo() } });
+      if (result.error) return setMessage(messageFrom(result.error));
+      if (mode === "signup" && !result.data.session) return setMessage("Account created. Check your email to confirm your account, then log in.");
       window.location.href = redirectUrl;
     } catch (error) {
-      setMessage(readableError(error));
+      setMessage(messageFrom(error));
     } finally {
-      setIsSubmitting(false);
+      setBusy(false);
     }
   };
 
-  const verifySmsCode = async () => {
+  const oauth = async (provider: OAuthProvider) => {
     setMessage("");
-
-    if (!phone.trim() || !smsCode.trim()) {
-      setMessage("Enter your phone number and the SMS code.");
-      return;
-    }
-
-    setIsVerifyingSms(true);
-
-    try {
-      const { error } = await supabaseAuthClient.auth.verifyOtp({
-        phone: phone.trim(),
-        token: smsCode.trim(),
-        type: "sms",
-      });
-
-      if (error) {
-        setMessage(readableError(error));
-        return;
-      }
-
-      window.location.href = redirectUrl;
-    } catch (error) {
-      setMessage(readableError(error));
-    } finally {
-      setIsVerifyingSms(false);
-    }
-  };
-
-  const signInWithOAuth = async (provider: OAuthProvider) => {
-    setMessage("");
-    setOauthLoading(provider);
-
-    try {
-      const { error } = await supabaseAuthClient.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: getRedirectTo() },
-      });
-
-      if (error) {
-        setMessage(readableError(error));
-        setOauthLoading(null);
-      }
-    } catch (error) {
-      setMessage(readableError(error));
-      setOauthLoading(null);
+    setBusy(true);
+    const { error } = await supabaseAuthClient.auth.signInWithOAuth({ provider, options: { redirectTo: redirectTo() } });
+    if (error) {
+      setMessage(messageFrom(error));
+      setBusy(false);
     }
   };
 
@@ -190,64 +98,14 @@ function LoginPageContent() {
             <Button variant={mode === "login" ? "default" : "outline"} onClick={() => setMode("login")}>Login</Button>
             <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>Sign Up</Button>
           </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant={method === "email" ? "secondary" : "outline"} onClick={() => { setMethod("email"); setNeedsSmsCode(false); }}>Email</Button>
-            <Button variant={method === "phone" ? "secondary" : "outline"} onClick={() => setMethod("phone")}>Phone</Button>
-          </div>
-
-          {method === "email" ? (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Email</label>
-              <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Phone</label>
-              <Input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+447700900123" />
-              <p className="text-xs text-muted-foreground">Use the full number with country code.</p>
-            </div>
-          )}
-
-          {!needsSmsCode && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Password</label>
-              <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" />
-            </div>
-          )}
-
-          {needsSmsCode && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">SMS verification code</label>
-              <Input inputMode="numeric" value={smsCode} onChange={(event) => setSmsCode(event.target.value)} placeholder="123456" />
-            </div>
-          )}
-
+          <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
+          <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" />
           {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
-
-          {needsSmsCode ? (
-            <Button className="w-full" onClick={verifySmsCode} disabled={isVerifyingSms}>
-              {isVerifyingSms ? "Verifying..." : "Verify Phone"}
-            </Button>
-          ) : (
-            <Button className="w-full" onClick={submit} disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
-            </Button>
-          )}
-
-          <div className="relative py-1">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or continue with</span></div>
-          </div>
-
+          <Button className="w-full" onClick={submit} disabled={busy}>{busy ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}</Button>
           <div className="grid grid-cols-2 gap-2">
-            {oauthProviders.map((provider) => (
-              <Button key={provider.id} variant="outline" onClick={() => signInWithOAuth(provider.id)} disabled={!!oauthLoading}>
-                {oauthLoading === provider.id ? "Opening..." : provider.label}
-              </Button>
-            ))}
+            <Button variant="outline" onClick={() => oauth("google")} disabled={busy}>Google</Button>
+            <Button variant="outline" onClick={() => oauth("github")} disabled={busy}>GitHub</Button>
           </div>
-
           <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
         </CardContent>
       </Card>
