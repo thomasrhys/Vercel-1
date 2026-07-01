@@ -1,3 +1,5 @@
+import path from "node:path";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -8,8 +10,8 @@ const nextConfig = {
   },
   turbopack: {
     resolveAlias: {
-      "@clerk/nextjs": "./lib/clerk-compat.tsx",
-      "@clerk/nextjs/server": "./lib/clerk-server-compat.ts",
+      "@clerk/nextjs": path.resolve(process.cwd(), "lib/clerk-compat.tsx"),
+      "@clerk/nextjs/server": path.resolve(process.cwd(), "lib/clerk-server-compat.ts"),
     },
   },
 }
