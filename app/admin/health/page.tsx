@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, CheckCircle2, ImageOff, Layers, Link2, Lock, Monitor, Star, Tag, Text } from "lucide-react";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 type AdminGame = {
   id: string;
@@ -33,8 +27,7 @@ type HealthIssue = {
 };
 
 export default function AdminHealthPage() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+  const { isLoaded, isSignedIn, isAdmin, signOut } = useSupabaseAuth();
 
   const [games, setGames] = useState<AdminGame[]>([]);
   const [blobImages, setBlobImages] = useState<Record<string, string>>({});
@@ -90,78 +83,25 @@ export default function AdminHealthPage() {
       urlCounts.set(normalisedUrl, [...(urlCounts.get(normalisedUrl) || []), game]);
     }
 
-    const duplicateUrlGames = Array.from(urlCounts.values())
-      .filter((group) => group.length > 1)
-      .flat();
+    const duplicateUrlGames = Array.from(urlCounts.values()).filter((group) => group.length > 1).flat();
 
     const issues: HealthIssue[] = [
-      {
-        title: "Missing Covers",
-        description: "Games without uploaded cover art.",
-        count: missingCovers.length,
-        games: missingCovers,
-        icon: <ImageOff className="h-5 w-5" />,
-      },
-      {
-        title: "Uncategorised",
-        description: "Games that are not assigned to a category.",
-        count: missingCategories.length,
-        games: missingCategories,
-        icon: <Tag className="h-5 w-5" />,
-      },
-      {
-        title: "Missing Descriptions",
-        description: "Optional hidden descriptions still not filled in.",
-        count: missingDescriptions.length,
-        games: missingDescriptions,
-        icon: <Text className="h-5 w-5" />,
-      },
-      {
-        title: "Featured Without Covers",
-        description: "Featured games should ideally have cover art.",
-        count: featuredWithoutCovers.length,
-        games: featuredWithoutCovers,
-        icon: <Star className="h-5 w-5" />,
-      },
-      {
-        title: "Duplicate URLs",
-        description: "Multiple games using the same URL.",
-        count: duplicateUrlGames.length,
-        games: duplicateUrlGames,
-        icon: <Link2 className="h-5 w-5" />,
-      },
-      {
-        title: "Desktop Only",
-        description: "Games currently blocked on mobile devices.",
-        count: desktopOnlyGames.length,
-        games: desktopOnlyGames,
-        icon: <Monitor className="h-5 w-5" />,
-      },
-      {
-        title: "Hidden Games",
-        description: "Games currently hidden from the public homepage.",
-        count: hiddenGames.length,
-        games: hiddenGames,
-        icon: <Layers className="h-5 w-5" />,
-      },
+      { title: "Missing Covers", description: "Games without uploaded cover art.", count: missingCovers.length, games: missingCovers, icon: <ImageOff className="h-5 w-5" /> },
+      { title: "Uncategorised", description: "Games that are not assigned to a category.", count: missingCategories.length, games: missingCategories, icon: <Tag className="h-5 w-5" /> },
+      { title: "Missing Descriptions", description: "Optional hidden descriptions still not filled in.", count: missingDescriptions.length, games: missingDescriptions, icon: <Text className="h-5 w-5" /> },
+      { title: "Featured Without Covers", description: "Featured games should ideally have cover art.", count: featuredWithoutCovers.length, games: featuredWithoutCovers, icon: <Star className="h-5 w-5" /> },
+      { title: "Duplicate URLs", description: "Multiple games using the same URL.", count: duplicateUrlGames.length, games: duplicateUrlGames, icon: <Link2 className="h-5 w-5" /> },
+      { title: "Desktop Only", description: "Games currently blocked on mobile devices.", count: desktopOnlyGames.length, games: desktopOnlyGames, icon: <Monitor className="h-5 w-5" /> },
+      { title: "Hidden Games", description: "Games currently hidden from the public homepage.", count: hiddenGames.length, games: hiddenGames, icon: <Layers className="h-5 w-5" /> },
     ];
 
     const seriousIssues = missingCovers.length + missingCategories.length + featuredWithoutCovers.length + duplicateUrlGames.length;
     const readyCount = games.length - new Set([...missingCovers, ...missingCategories, ...duplicateUrlGames]).size;
 
-    return {
-      issues,
-      missingCovers,
-      missingCategories,
-      missingDescriptions,
-      featuredWithoutCovers,
-      duplicateUrlGames,
-      desktopOnlyGames,
-      hiddenGames,
-      seriousIssues,
-      readyCount,
-    };
+    return { issues, missingDescriptions, seriousIssues, readyCount };
   }, [games, blobImages]);
+
+  if (!isLoaded) return <main className="min-h-screen bg-background flex items-center justify-center p-4">Loading health...</main>;
 
   if (!isSignedIn) {
     return (
@@ -169,10 +109,10 @@ export default function AdminHealthPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Lock className="h-5 w-5" />Game Health Login</CardTitle>
-            <CardDescription>Sign in with GitHub to view game health.</CardDescription>
+            <CardDescription>Sign in to view game health.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <SignInButton mode="modal"><Button className="w-full">Sign in</Button></SignInButton>
+            <Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/admin/health")}>Sign in</Button>
             <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
           </CardContent>
         </Card>
@@ -190,7 +130,7 @@ export default function AdminHealthPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <UserButton />
-            <SignOutButton redirectUrl="/"><Button variant="outline" className="w-full">Sign out</Button></SignOutButton>
+            <Button variant="outline" className="w-full" onClick={signOut}>Sign out</Button>
           </CardContent>
         </Card>
       </div>
@@ -211,11 +151,7 @@ export default function AdminHealthPage() {
           <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
         </div>
 
-        {message && (
-          <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
-            {message}
-          </div>
-        )}
+        {message && <div className={`p-3 rounded-md text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>{message}</div>}
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Games</p><p className="text-2xl font-bold">{games.length}</p></CardContent></Card>
@@ -226,19 +162,11 @@ export default function AdminHealthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5" />
-              Health Report
-            </CardTitle>
-            <CardDescription>
-              These checks help keep the public game portal tidy as it grows.
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5" />Health Report</CardTitle>
+            <CardDescription>These checks help keep the public game portal tidy as it grows.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button variant="outline" size="sm" onClick={loadHealthData} disabled={isLoading}>
-              {isLoading ? "Refreshing..." : "Refresh"}
-            </Button>
-
+            <Button variant="outline" size="sm" onClick={loadHealthData} disabled={isLoading}>{isLoading ? "Refreshing..." : "Refresh"}</Button>
             {health.issues.map((issue) => (
               <details key={issue.title} className="rounded-md border border-border p-3">
                 <summary className="cursor-pointer list-none">
@@ -250,12 +178,9 @@ export default function AdminHealthPage() {
                         <p className="text-xs text-muted-foreground">{issue.description}</p>
                       </div>
                     </div>
-                    <span className={`rounded px-2 py-1 text-xs font-medium ${issue.count === 0 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>
-                      {issue.count}
-                    </span>
+                    <span className={`rounded px-2 py-1 text-xs font-medium ${issue.count === 0 ? "bg-green-500/20 text-green-700" : "bg-yellow-500/20 text-yellow-700"}`}>{issue.count}</span>
                   </div>
                 </summary>
-
                 {issue.games.length > 0 && (
                   <div className="mt-3 space-y-2 border-t border-border pt-3">
                     {issue.games.slice(0, 25).map((game) => (
@@ -264,9 +189,7 @@ export default function AdminHealthPage() {
                         <p className="text-xs text-muted-foreground break-all">{game.url}</p>
                       </div>
                     ))}
-                    {issue.games.length > 25 && (
-                      <p className="text-xs text-muted-foreground">Showing first 25 of {issue.games.length}.</p>
-                    )}
+                    {issue.games.length > 25 && <p className="text-xs text-muted-foreground">Showing first 25 of {issue.games.length}.</p>}
                   </div>
                 )}
               </details>
