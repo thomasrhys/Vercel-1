@@ -24,6 +24,7 @@ export default function V13Enhancer() {
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
   const [recentSlot, setRecentSlot] = useState<HTMLElement | null>(null);
+  const [randomTarget, setRandomTarget] = useState<HTMLElement | null>(null);
 
   const isHomePage = typeof window !== "undefined" && window.location.pathname === "/";
 
@@ -80,6 +81,20 @@ export default function V13Enhancer() {
 
     const timeout = window.setTimeout(ensureSlot, 0);
     return () => window.clearTimeout(timeout);
+  }, [isHomePage]);
+
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const findTarget = () => {
+      const headerActions = document.querySelector("header .sm\\:ml-auto") as HTMLElement | null;
+      if (headerActions) setRandomTarget(headerActions);
+    };
+
+    findTarget();
+    const observer = new MutationObserver(findTarget);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
   }, [isHomePage]);
 
   const visibleGamesByTitle = useMemo(() => {
@@ -192,38 +207,62 @@ export default function V13Enhancer() {
     return () => observer.disconnect();
   }, [isHomePage, isSignedIn, games, visibleGamesByTitle]);
 
-  if (!isHomePage || !isSignedIn || !recentSlot || recentGames.length === 0) return null;
+  const visibleGames = games.filter((game) => !game.hidden);
+  const randomButton = isHomePage && randomTarget && visibleGames.length > 0
+    ? createPortal(
+        <button
+          type="button"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+          onClick={() => {
+            const game = visibleGames[Math.floor(Math.random() * visibleGames.length)];
+            window.location.href = `/game/${game.id}`;
+          }}
+        >
+          🎲 Random
+        </button>,
+        randomTarget
+      )
+    : null;
 
-  return createPortal(
-    <div>
-      <div className="flex items-center gap-2 mb-3">
-        <Gamepad2Icon />
-        <h2 className="text-xl font-bold text-foreground">Continue Playing</h2>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {recentGames.map(({ game, play_count }) => {
-          const coverImage = game.image || getGameImage(game.id);
-          return (
-            <a key={game.id} href={`/game/${game.id}`} className="rounded-lg border border-border bg-card overflow-hidden hover:bg-muted/50 transition">
-              <div className="aspect-video bg-muted">
-                {coverImage ? (
-                  <img src={coverImage} alt={game.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Heart className="h-8 w-8 text-muted-foreground" />
+  const recentSection = isHomePage && isSignedIn && recentSlot && recentGames.length > 0
+    ? createPortal(
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Gamepad2Icon />
+            <h2 className="text-xl font-bold text-foreground">Continue Playing</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {recentGames.map(({ game, play_count }) => {
+              const coverImage = game.image || getGameImage(game.id);
+              return (
+                <a key={game.id} href={`/game/${game.id}`} className="rounded-lg border border-border bg-card overflow-hidden hover:bg-muted/50 transition">
+                  <div className="aspect-video bg-muted">
+                    {coverImage ? (
+                      <img src={coverImage} alt={game.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Heart className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="font-medium text-foreground truncate">{game.title}</p>
-                <p className="text-xs text-muted-foreground mt-1">Played {play_count} {play_count === 1 ? "time" : "times"}</p>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    </div>,
-    recentSlot
+                  <div className="p-3">
+                    <p className="font-medium text-foreground truncate">{game.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Played {play_count} {play_count === 1 ? "time" : "times"}</p>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>,
+        recentSlot
+      )
+    : null;
+
+  return (
+    <>
+      {randomButton}
+      {recentSection}
+    </>
   );
 }
 
