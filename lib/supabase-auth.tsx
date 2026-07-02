@@ -68,18 +68,53 @@ export function useSupabaseAuth(): AuthValue {
 
 export function UserButton() {
   const { user, signOut } = useSupabaseAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
 
+  const label = user.email || user.phone || "Account";
+
   return (
-    <button
-      type="button"
-      onClick={signOut}
-      title="Sign out"
-      className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center"
-    >
-      {(user.email || "U").slice(0, 1).toUpperCase()}
-    </button>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        title="Account menu"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center"
+      >
+        {label.slice(0, 1).toUpperCase()}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 rounded-md border border-border bg-card shadow-lg z-50 overflow-hidden" role="menu">
+          <div className="px-3 py-2 border-b border-border">
+            <p className="text-xs text-muted-foreground">Signed in as</p>
+            <p className="text-sm font-medium text-foreground truncate">{label}</p>
+          </div>
+          <button
+            type="button"
+            className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted"
+            onClick={() => {
+              setIsOpen(false);
+              window.location.href = "/account";
+            }}
+            role="menuitem"
+          >
+            Manage account
+          </button>
+          <button
+            type="button"
+            className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-muted"
+            onClick={signOut}
+            role="menuitem"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
