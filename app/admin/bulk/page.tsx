@@ -5,7 +5,7 @@ import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { CheckSquare, Lock, Smartphone, Star, Trash2, EyeOff, X } from "lucide-react";
+import { CheckSquare, Lock, Smartphone, Star, Trash2, EyeOff, X, Sparkles } from "lucide-react";
 
 type AdminGame = {
   id: string;
@@ -15,6 +15,7 @@ type AdminGame = {
   featured?: boolean;
   hidden?: boolean;
   desktop_only?: boolean;
+  is_new?: boolean;
 };
 
 export default function BulkActionsPage() {
@@ -72,7 +73,7 @@ export default function BulkActionsPage() {
 
   const clearSelection = () => setSelectedIds([]);
 
-  const updateSelected = async (updates: { featured?: boolean; hidden?: boolean; desktop_only?: boolean }) => {
+  const updateSelected = async (updates: { featured?: boolean; hidden?: boolean; desktop_only?: boolean; is_new?: boolean }) => {
     if (selectedIds.length === 0) {
       setMessage("Select at least one game first");
       return;
@@ -216,8 +217,13 @@ export default function BulkActionsPage() {
 
             <div className="grid gap-2 sm:grid-cols-2">
               <Button onClick={() => updateSelected({ featured: true })} disabled={isWorking || selectedIds.length === 0}><Star className="h-4 w-4 mr-1" />Feature Selected</Button>
+              <Button variant="outline" onClick={() => updateSelected({ featured: false })} disabled={isWorking || selectedIds.length === 0}>Unfeature Selected</Button>
+              <Button onClick={() => updateSelected({ is_new: true })} disabled={isWorking || selectedIds.length === 0}><Sparkles className="h-4 w-4 mr-1" />Mark New</Button>
+              <Button variant="outline" onClick={() => updateSelected({ is_new: false })} disabled={isWorking || selectedIds.length === 0}>Unmark New</Button>
               <Button onClick={() => updateSelected({ hidden: true })} disabled={isWorking || selectedIds.length === 0}><EyeOff className="h-4 w-4 mr-1" />Hide Selected</Button>
+              <Button variant="outline" onClick={() => updateSelected({ hidden: false })} disabled={isWorking || selectedIds.length === 0}>Unhide Selected</Button>
               <Button onClick={() => updateSelected({ desktop_only: true })} disabled={isWorking || selectedIds.length === 0}><Smartphone className="h-4 w-4 mr-1" />Desktop Only</Button>
+              <Button variant="outline" onClick={() => updateSelected({ desktop_only: false })} disabled={isWorking || selectedIds.length === 0}>Allow Mobile</Button>
               <Button variant="destructive" onClick={requestDeleteSelected} disabled={isWorking || selectedIds.length === 0}><Trash2 className="h-4 w-4 mr-1" />Delete Selected</Button>
             </div>
           </CardContent>
@@ -242,6 +248,7 @@ export default function BulkActionsPage() {
                   <p className="text-xs text-muted-foreground truncate">
                     {game.category || "Uncategorized"}
                     {game.featured ? " · Featured" : ""}
+                    {game.is_new ? " · New" : ""}
                     {game.hidden ? " · Hidden" : ""}
                     {game.desktop_only ? " · Desktop Only" : ""}
                   </p>
