@@ -22,12 +22,7 @@ function makeId(title: string) {
 
 async function requireAdmin() {
   const { userId } = await auth();
-
-  if (!userId || !ADMIN_USER_IDS.includes(userId)) {
-    return false;
-  }
-
-  return true;
+  return !!userId && ADMIN_USER_IDS.includes(userId);
 }
 
 async function logActivity(action: string, details: string) {
@@ -65,10 +60,7 @@ export async function POST(request: Request) {
   const id = String(body.id || makeId(title)).trim();
 
   if (!title || !url || !id) {
-    return Response.json(
-      { error: "Title, URL, and ID are required" },
-      { status: 400 }
-    );
+    return Response.json({ error: "Title, URL, and ID are required" }, { status: 400 });
   }
 
   const { data: existingGame, error: duplicateError } = await supabase
@@ -82,10 +74,7 @@ export async function POST(request: Request) {
   }
 
   if (existingGame) {
-    return Response.json(
-      { error: `A game called "${existingGame.title}" already exists.` },
-      { status: 409 }
-    );
+    return Response.json({ error: `A game called "${existingGame.title}" already exists.` }, { status: 409 });
   }
 
   const { data, error } = await supabase
@@ -99,6 +88,7 @@ export async function POST(request: Request) {
       description,
       featured: false,
       hidden: false,
+      is_new: false,
     })
     .select()
     .single();
@@ -109,11 +99,7 @@ export async function POST(request: Request) {
 
   await logActivity("game_added", `Added ${title}`);
 
-  return Response.json({
-    success: true,
-    game: data,
-    message: `Added ${title}`,
-  });
+  return Response.json({ success: true, game: data, message: `Added ${title}` });
 }
 
 export async function PATCH(request: Request) {
@@ -130,6 +116,7 @@ export async function PATCH(request: Request) {
     if (body.featured !== undefined) updates.featured = body.featured === true;
     if (body.hidden !== undefined) updates.hidden = body.hidden === true;
     if (body.desktop_only !== undefined) updates.desktop_only = body.desktop_only === true;
+    if (body.is_new !== undefined) updates.is_new = body.is_new === true;
 
     if (ids.length === 0 || Object.keys(updates).length === 0) {
       return Response.json({ error: "Selected games and updates are required" }, { status: 400 });
@@ -147,11 +134,7 @@ export async function PATCH(request: Request) {
 
     await logActivity("bulk_games_updated", `Updated ${ids.length} selected games`);
 
-    return Response.json({
-      success: true,
-      games: data || [],
-      message: `Updated ${ids.length} selected games`,
-    });
+    return Response.json({ success: true, games: data || [], message: `Updated ${ids.length} selected games` });
   }
 
   const id = String(body.id || "").trim();
@@ -161,10 +144,7 @@ export async function PATCH(request: Request) {
   const description = String(body.description || "").trim() || null;
 
   if (!id || !title || !url) {
-    return Response.json(
-      { error: "Game ID, title, and URL are required" },
-      { status: 400 }
-    );
+    return Response.json({ error: "Game ID, title, and URL are required" }, { status: 400 });
   }
 
   const { data: duplicateGame, error: duplicateError } = await supabase
@@ -179,20 +159,12 @@ export async function PATCH(request: Request) {
   }
 
   if (duplicateGame) {
-    return Response.json(
-      { error: `A game called "${duplicateGame.title}" already exists.` },
-      { status: 409 }
-    );
+    return Response.json({ error: `A game called "${duplicateGame.title}" already exists.` }, { status: 409 });
   }
 
   const { data, error } = await supabase
     .from("games")
-    .update({
-      title,
-      url,
-      category,
-      description,
-    })
+    .update({ title, url, category, description })
     .eq("id", id)
     .select()
     .single();
@@ -203,11 +175,7 @@ export async function PATCH(request: Request) {
 
   await logActivity("game_updated", `Updated ${title}`);
 
-  return Response.json({
-    success: true,
-    game: data,
-    message: `Updated ${title}`,
-  });
+  return Response.json({ success: true, game: data, message: `Updated ${title}` });
 }
 
 export async function DELETE(request: Request) {
@@ -232,10 +200,7 @@ export async function DELETE(request: Request) {
 
     await logActivity("bulk_games_deleted", `Deleted ${ids.length} selected games`);
 
-    return Response.json({
-      success: true,
-      message: `Deleted ${ids.length} selected games`,
-    });
+    return Response.json({ success: true, message: `Deleted ${ids.length} selected games` });
   }
 
   const id = String(body.id || "").trim();
@@ -252,8 +217,5 @@ export async function DELETE(request: Request) {
 
   await logActivity("game_deleted", `Deleted ${id}`);
 
-  return Response.json({
-    success: true,
-    message: `Deleted ${id}`,
-  });
+  return Response.json({ success: true, message: `Deleted ${id}` });
 }
