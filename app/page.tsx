@@ -16,6 +16,7 @@ import {
   Smartphone,
   ArrowUp,
   Heart,
+  Clock,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 
@@ -24,6 +25,8 @@ const ADMIN_USER_IDS = [
   "user_3FdWs0pdbEHCG85yExuAaW700hE",
   "user_3FdahY3hXmw7c589YMnDefAwOen",
 ]
+
+const RECENTLY_PLAYED_KEY = "games-portal-recently-played"
 
 type PortalGame = Game & {
   image?: string | null
@@ -43,6 +46,22 @@ type Category = {
   id: string
   name: string
   emoji: string
+}
+
+function saveRecentlyPlayed(gameId: string) {
+  try {
+    const existing = window.localStorage.getItem(RECENTLY_PLAYED_KEY)
+    const parsed = existing ? JSON.parse(existing) : []
+    const entries = Array.isArray(parsed) ? parsed : []
+    const nextEntries = [
+      { gameId, playedAt: new Date().toISOString() },
+      ...entries.filter((entry) => entry?.gameId !== gameId),
+    ].slice(0, 24)
+
+    window.localStorage.setItem(RECENTLY_PLAYED_KEY, JSON.stringify(nextEntries))
+  } catch {
+    // Ignore local storage issues.
+  }
 }
 
 export default function GamePortal() {
@@ -198,6 +217,11 @@ export default function GamePortal() {
     return filteredGames.filter((game) => !game.featured)
   }, [filteredGames, query, selectedCategory])
 
+  const openGame = (game: PortalGame) => {
+    saveRecentlyPlayed(game.id)
+    setActiveGame(game)
+  }
+
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
       try {
@@ -239,7 +263,7 @@ export default function GamePortal() {
             return
           }
 
-          setActiveGame(game)
+          openGame(game)
         }}
       >
         <CardHeader className="pb-2">
@@ -363,6 +387,10 @@ export default function GamePortal() {
           <div className="sm:ml-auto flex items-center gap-2">
             {isSignedIn ? (
               <>
+                <Button variant="outline" onClick={() => (window.location.href = "/recently-played")}>
+                  <Clock className="h-4 w-4 mr-2" />
+                  Recent
+                </Button>
                 <Button variant="outline" onClick={() => (window.location.href = "/favourites")}>
                   <Heart className="h-4 w-4 mr-2" />
                   Favourites
