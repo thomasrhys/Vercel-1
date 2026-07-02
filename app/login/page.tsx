@@ -16,12 +16,20 @@ function safeRedirectUrl(value: string | null) {
 function messageFrom(error: unknown) {
   if (error instanceof Error && error.message && error.message !== "{}") return error.message;
   if (typeof error === "object" && error !== null) {
-    const value = error as { message?: unknown; error_description?: unknown; error?: unknown };
+    const value = error as { message?: unknown; error_description?: unknown; error?: unknown; code?: unknown; status?: unknown; name?: unknown };
     if (typeof value.message === "string" && value.message && value.message !== "{}") return value.message;
     if (typeof value.error_description === "string" && value.error_description) return value.error_description;
     if (typeof value.error === "string" && value.error) return value.error;
+    if (typeof value.code === "string" && value.code) return `Sign-up error: ${value.code}`;
+    if (typeof value.name === "string" && value.name) return `Sign-up error: ${value.name}`;
+    if (value.status) return `Sign-up failed with status ${String(value.status)}. Please check the details and try again.`;
+    try {
+      const json = JSON.stringify(error);
+      if (json && json !== "{}") return `Sign-up error: ${json}`;
+    } catch {}
   }
-  return "Something went wrong. Please check your details and try again.";
+  if (typeof error === "string" && error && error !== "{}") return error;
+  return "Sign-up failed. Please check that email sign-ups are enabled and that the password meets the minimum requirements.";
 }
 
 type AuthMode = "login" | "signup";
@@ -43,6 +51,7 @@ function LoginPageContent() {
     setMessage("");
     if (!email.trim()) return setMessage("Enter your email address.");
     if (!password) return setMessage("Enter your password.");
+    if (mode === "signup" && password.length < 6) return setMessage("Password must be at least 6 characters long.");
     setBusy(true);
     try {
       const result = mode === "login"
