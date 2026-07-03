@@ -26,6 +26,17 @@ function GitHubIcon() {
   );
 }
 
+function MicrosoftIcon() {
+  return (
+    <svg viewBox="0 0 23 23" className="h-5 w-5" aria-hidden="true">
+      <path fill="#f25022" d="M1 1h10v10H1z" />
+      <path fill="#00a4ef" d="M12 1h10v10H12z" />
+      <path fill="#7fba00" d="M1 12h10v10H1z" />
+      <path fill="#ffb900" d="M12 12h10v10H12z" />
+    </svg>
+  );
+}
+
 function getErrorMessage(error: unknown) {
   if (error instanceof Error && error.message) return error.message;
   if (typeof error === "object" && error !== null) {
@@ -39,24 +50,32 @@ export default function AccountPage() {
   const { user, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const email = user?.email || "";
   const linkedProviders = (user?.identities || []).map((identity) => identity.provider);
+  const hasPassword = linkedProviders.includes("email");
   const hasGoogle = linkedProviders.includes("google");
   const hasGitHub = linkedProviders.includes("github");
+  const hasMicrosoft = linkedProviders.includes("azure");
 
   const changePassword = async () => {
     setMessage("");
 
     if (!user || !email) {
-      setMessage("This account does not have an email password login to change.");
+      setMessage("This account does not have an email address for password login.");
       return;
     }
 
-    if (!oldPassword || !newPassword) {
-      setMessage("Enter your current password and your new password.");
+    if (!newPassword || !confirmPassword) {
+      setMessage("Enter your new password and confirmation.");
+      return;
+    }
+
+    if (hasPassword && !oldPassword) {
+      setMessage("Enter your current password.");
       return;
     }
 
@@ -65,18 +84,25 @@ export default function AccountPage() {
       return;
     }
 
+    if (newPassword !== confirmPassword) {
+      setMessage("New passwords do not match.");
+      return;
+    }
+
     setBusy(true);
 
     try {
-      const check = await supabaseAuthClient.auth.signInWithPassword({ email, password: oldPassword });
-      if (check.error) {
-        setMessage("Current password is incorrect.");
-        return;
-      }
+      if (hasPassword) {
+        const check = await supabaseAuthClient.auth.signInWithPassword({ email, password: oldPassword });
+        if (check.error) {
+          setMessage("Current password is incorrect.");
+          return;
+        }
 
-      if (check.data.user?.id !== user.id) {
-        setMessage("Password check did not match this account.");
-        return;
+        if (check.data.user?.id !== user.id) {
+          setMessage("Password check did not match this account.");
+          return;
+        }
       }
 
       const update = await supabaseAuthClient.auth.updateUser({ password: newPassword });
@@ -87,7 +113,8 @@ export default function AccountPage() {
 
       setOldPassword("");
       setNewPassword("");
-      setMessage("Password updated.");
+      setConfirmPassword("");
+      setMessage(hasPassword ? "Password updated." : "Password set. You can now use email and password login.");
     } catch (error) {
       setMessage(getErrorMessage(error));
     } finally {
@@ -95,7 +122,7 @@ export default function AccountPage() {
     }
   };
 
-  const linkProvider = async (provider: "google" | "github") => {
+  const linkProvider = async (provider: "google" | "github" | "azure") => {
     setMessage("");
     setBusy(true);
 
@@ -144,18 +171,23 @@ export default function AccountPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Current password</label>
-              <Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} />
+              <label className="text-sm font-medium text-foreground">{hasPassword ? "Current password" : "Current password"}</label>
+              <Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} disabled={!hasPassword} placeholder={hasPassword ? "Current password" : "Not needed until a password is set"} />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">New password</label>
+              <label className="text-sm font-medium text-foreground">{hasPassword ? "New password" : "Set password"}</label>
               <Input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Confirm password</label>
+              <Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
             </div>
 
             {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
 
-            <Button className="w-full" onClick={changePassword} disabled={busy}>Update password</Button>
+            <Button className="w-full" onClick={changePassword} disabled={busy}>{hasPassword ? "Update password" : "Set password"}</Button>
 
             <div className="grid grid-cols-1 gap-2">
               {hasGoogle ? (
@@ -168,6 +200,12 @@ export default function AccountPage() {
                 <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><GitHubIcon /><Check className="h-4 w-4" />GitHub Linked</Button>
               ) : (
                 <Button variant="outline" onClick={() => linkProvider("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Link GitHub</Button>
+              )}
+
+              {hasMicrosoft ? (
+                <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><MicrosoftIcon /><Check className="h-4 w-4" />Microsoft Linked</Button>
+              ) : (
+                <Button variant="outline" onClick={() => linkProvider("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Link Microsoft</Button>
               )}
             </div>
 
