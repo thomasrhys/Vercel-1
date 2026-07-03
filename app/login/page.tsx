@@ -27,6 +27,17 @@ function GitHubIcon() {
   );
 }
 
+function MicrosoftIcon() {
+  return (
+    <svg viewBox="0 0 23 23" className="h-5 w-5" aria-hidden="true">
+      <path fill="#f25022" d="M1 1h10v10H1z" />
+      <path fill="#00a4ef" d="M12 1h10v10H12z" />
+      <path fill="#7fba00" d="M1 12h10v10H1z" />
+      <path fill="#ffb900" d="M12 12h10v10H12z" />
+    </svg>
+  );
+}
+
 function safeRedirectUrl(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
   return value;
@@ -52,7 +63,7 @@ function messageFrom(error: unknown) {
 }
 
 type AuthMode = "login" | "signup";
-type OAuthProvider = "google" | "github";
+type OAuthProvider = "google" | "github" | "azure";
 
 function LoginPageContent() {
   const { isSignedIn } = useSupabaseAuth();
@@ -133,6 +144,7 @@ function LoginPageContent() {
           <div className="grid grid-cols-1 gap-2">
             <Button variant="outline" onClick={() => oauth("google")} disabled={busy} className="justify-center gap-2"><GoogleIcon />Continue with Google</Button>
             <Button variant="outline" onClick={() => oauth("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Continue with GitHub</Button>
+            <Button variant="outline" onClick={() => oauth("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Continue with Microsoft</Button>
           </div>
           <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
         </CardContent>
