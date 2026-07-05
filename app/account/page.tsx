@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +48,9 @@ function getErrorMessage(error: unknown) {
 
 export default function AccountPage() {
   const { user, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
+  const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -60,6 +63,53 @@ export default function AccountPage() {
   const hasGoogle = linkedProviders.includes("google");
   const hasGitHub = linkedProviders.includes("github");
   const hasMicrosoft = linkedProviders.includes("azure");
+
+  useEffect(() => {
+    if (!user) return;
+
+    supabaseAuthClient
+      .from("user_profiles")
+      .select("display_name, avatar_url")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[account] profile load error:", error);
+          return;
+        }
+
+        setDisplayName(data?.display_name || "");
+        setAvatarUrl(data?.avatar_url || "");
+      });
+  }, [user]);
+
+  const saveProfile = async () => {
+    setMessage("");
+
+    if (!user) return;
+
+    setIsSavingProfile(true);
+
+    try {
+      const { error } = await supabaseAuthClient.from("user_profiles").upsert({
+        user_id: user.id,
+        display_name: displayName.trim() || null,
+        avatar_url: avatarUrl.trim() || null,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        setMessage(getErrorMessage(error));
+        return;
+      }
+
+      setMessage("Profile saved.");
+    } catch (error) {
+      setMessage(getErrorMessage(error));
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   const changePassword = async () => {
     setMessage("");
@@ -161,6 +211,31 @@ export default function AccountPage() {
       <div className="max-w-md mx-auto space-y-6">
         <Card>
           <CardHeader>
+            <CardTitle>Profile</CardTitle>
+            <CardDescription>Choose what appears on your Games Portal account. This does not track recently played games.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" />
+              ) : (
+                <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">
+                  {(displayName || email || "U").slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div>
+                <p className="font-medium text-foreground">{displayName || "Unnamed player"}</p>
+                <p className="text-xs text-muted-foreground">{email}</p>
+              </div>
+            </div>
+            <Input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Display name" />
+            <Input value={avatarUrl} onChange={(event) => setAvatarUrl(event.target.value)} placeholder="Avatar image URL" />
+            <Button className="w-full" onClick={saveProfile} disabled={isSavingProfile}>{isSavingProfile ? "Saving..." : "Save profile"}</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Manage account</CardTitle>
             <CardDescription>Update your password or link another sign-in method.</CardDescription>
           </CardHeader>
@@ -171,7 +246,7 @@ export default function AccountPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">{hasPassword ? "Current password" : "Current password"}</label>
+              <label className="text-sm font-medium text-foreground">Current password</label>
               <Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} disabled={!hasPassword} placeholder={hasPassword ? "Current password" : "Not needed until a password is set"} />
             </div>
 
