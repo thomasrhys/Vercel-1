@@ -32,9 +32,7 @@ export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization") || "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
 
-  if (!token) {
-    return NextResponse.json({ error: "Missing signed-in session." }, { status: 401 });
-  }
+  if (!token) return NextResponse.json({ error: "Missing signed-in session." }, { status: 401 });
 
   const body = await request.json().catch(() => null) as { email?: unknown; password?: unknown; redirectTo?: unknown } | null;
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
@@ -44,22 +42,16 @@ export async function POST(request: Request) {
   if (!email || !email.includes("@")) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
   if (!password || password.length < 6) return NextResponse.json({ error: "Password must be at least 6 characters long." }, { status: 400 });
 
-  const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
+  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const { data: current, error: userError } = await anonClient.auth.getUser(token);
+  const { data: current, error: userError } = await adminClient.auth.getUser(token);
   if (userError || !current.user) {
     return NextResponse.json({ error: readableError(userError) }, { status: 401 });
   }
 
-  if (current.user.email) {
-    return NextResponse.json({ error: "This account already has an email address." }, { status: 400 });
-  }
-
-  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  if (current.user.email) return NextResponse.json({ error: "This account already has an email address." }, { status: 400 });
 
   const { error: updateError } = await adminClient.auth.admin.updateUserById(current.user.id, {
     email,
@@ -67,9 +59,11 @@ export async function POST(request: Request) {
     email_confirm: false,
   });
 
-  if (updateError) {
-    return NextResponse.json({ error: readableError(updateError) }, { status: 400 });
-  }
+  if (updateError) return NextResponse.json({ error: readableError(updateError) }, { status: 400 });
+
+  const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 
   const { error: resendError } = await anonClient.auth.resend({
     type: "signup",
