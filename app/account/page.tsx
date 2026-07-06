@@ -18,7 +18,7 @@ function msg(error: unknown) { if (error instanceof Error && error.message && er
 function cleanUsername(value: string) { return value.trim().toLowerCase().replace(/^@+/, ""); }
 
 export default function AccountPage() {
-  const { user, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
+  const { user, session, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -98,8 +98,7 @@ export default function AccountPage() {
     if (newPassword !== confirmPassword) return setMessage("Passwords do not match.");
     setBusy(true);
     try {
-      const session = await supabaseAuthClient.auth.getSession();
-      const token = session.data.session?.access_token;
+      const token = session?.access_token;
       if (!token) return setMessage("Your session expired. Please log in again.");
       const response = await fetch("/api/account/add-email-password", {
         method: "POST",
