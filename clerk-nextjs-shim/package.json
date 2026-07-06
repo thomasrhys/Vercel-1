@@ -1,0 +1,10 @@
+{
+  "name": "@clerk/nextjs",
+  "version": "0.0.0-game-portal-supabase-shim",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./server": "./server.js"
+  },
+  "dependencies": {}
+}

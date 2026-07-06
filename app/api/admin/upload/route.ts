@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@supabase/supabase-js";
 import { del, list, put } from "@vercel/blob";
 
 const ADMIN_USER_IDS = [
@@ -6,6 +7,11 @@ const ADMIN_USER_IDS = [
   "user_3FdWs0pdbEHCG85yExuAaW700hE",
   "user_3FdahY3hXmw7c589YMnDefAwOen",
 ];
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: Request) {
   try {
@@ -47,6 +53,11 @@ export async function POST(request: Request) {
         access: "public",
       }
     );
+
+    await supabase.from("activity_log").insert({
+      action: "cover_uploaded",
+      details: `Replaced cover for ${gameId}`,
+    });
 
     return Response.json({
       success: true,
