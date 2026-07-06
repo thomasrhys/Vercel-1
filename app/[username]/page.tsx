@@ -17,11 +17,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const { data: profile } = await supabase
     .from("user_profiles")
-    .select("display_name, username, avatar_url, bio, role")
+    .select("display_name, username, avatar_url, bio, role, is_public")
     .ilike("username", handle)
     .maybeSingle();
 
-  if (!profile?.username) notFound();
+  if (!profile?.username || profile.is_public === false) notFound();
 
   const displayName = profile.display_name || "Unnamed player";
 
@@ -37,7 +37,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         )}
         <div>
           <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
-          <p className="text-muted-foreground">@{profile.username}</p>
+          <p className="text-muted-foreground">/{profile.username}</p>
           {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
