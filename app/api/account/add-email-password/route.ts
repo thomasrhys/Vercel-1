@@ -23,8 +23,9 @@ function readableError(error: unknown) {
 export async function POST(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey) {
     return NextResponse.json({ error: "Supabase environment variables are missing." }, { status: 500 });
   }
 
@@ -40,20 +41,14 @@ export async function POST(request: Request) {
   const password = typeof body?.password === "string" ? body.password : "";
   const redirectTo = typeof body?.redirectTo === "string" ? body.redirectTo : undefined;
 
-  if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
-  }
+  if (!email || !email.includes("@")) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  if (!password || password.length < 6) return NextResponse.json({ error: "Password must be at least 6 characters long." }, { status: 400 });
 
-  if (!password || password.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters long." }, { status: 400 });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: { Authorization: `Bearer ${token}` } },
   });
 
-  const { data: current, error: userError } = await supabase.auth.getUser();
+  const { data: current, error: userError } = await anonClient.auth.getUser(token);
   if (userError || !current.user) {
     return NextResponse.json({ error: readableError(userError) }, { status: 401 });
   }
@@ -62,13 +57,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This account already has an email address." }, { status: 400 });
   }
 
-  const { error } = await supabase.auth.updateUser(
-    { email, password },
-    redirectTo ? { emailRedirectTo: redirectTo } : undefined
-  );
+  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 
-  if (error) {
-    return NextResponse.json({ error: readableError(error) }, { status: 400 });
+  const { error: updateError } = await adminClient.auth.admin.updateUserById(current.user.id, {
+    email,
+    password,
+    email_confirm: false,
+  });
+
+  if (updateError) {
+    return NextResponse.json({ error: readableError(updateError) }, { status: 400 });
+  }
+
+  const { error: resendError } = await anonClient.auth.resend({
+    type: "signup",
+    email,
+    options: redirectTo ? { emailRedirectTo: redirectTo } : undefined,
+  });
+
+  if (resendError) {
+    return NextResponse.json({ error: `Email/password was added, but verification email failed: ${readableError(resendError)}` }, { status: 400 });
   }
 
   return NextResponse.json({ message: "Verification email sent. Verify the email address before using email/password login." });
