@@ -24,6 +24,7 @@ export default function AccountPage() {
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [newEmail, setNewEmail] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -86,9 +87,30 @@ export default function AccountPage() {
     } catch (error) { setMessage(msg(error)); } finally { setUploading(false); }
   };
 
+  const addEmailPasswordLogin = async () => {
+    setMessage("");
+    const nextEmail = newEmail.trim().toLowerCase();
+    if (!user) return;
+    if (email) return setMessage("This account already has an email address.");
+    if (!nextEmail || !nextEmail.includes("@")) return setMessage("Enter a valid email address.");
+    if (!newPassword || !confirmPassword) return setMessage("Enter your new password and confirmation.");
+    if (newPassword.length < 6) return setMessage("Password must be at least 6 characters long.");
+    if (newPassword !== confirmPassword) return setMessage("Passwords do not match.");
+    setBusy(true);
+    try {
+      const { error } = await supabaseAuthClient.auth.updateUser(
+        { email: nextEmail, password: newPassword },
+        { emailRedirectTo: `${window.location.origin}/account` }
+      );
+      if (error) return setMessage(msg(error));
+      setNewEmail(""); setNewPassword(""); setConfirmPassword("");
+      setMessage("Verification email sent. Verify the email address before using email/password login.");
+    } catch (error) { setMessage(msg(error)); } finally { setBusy(false); }
+  };
+
   const changePassword = async () => {
     setMessage("");
-    if (!user || !email) return setMessage("This account does not have an email address for password login.");
+    if (!user || !email) return setMessage("This account does not have an email address for password login. Add an email first.");
     if (!newPassword || !confirmPassword) return setMessage("Enter your new password and confirmation.");
     if (hasPassword && !oldPassword) return setMessage("Enter your current password.");
     if (newPassword.length < 6) return setMessage("New password must be at least 6 characters long.");
@@ -131,12 +153,10 @@ export default function AccountPage() {
       {profilePath && <Button variant="outline" className="w-full" onClick={() => (window.location.href = profilePath)}>View public profile</Button>}
     </CardContent></Card>
 
-    <Card><CardHeader><CardTitle>Manage account</CardTitle><CardDescription>Update your password or link another sign-in method.</CardDescription></CardHeader><CardContent className="space-y-4">
+    <Card><CardHeader><CardTitle>Manage account</CardTitle><CardDescription>Update your email, password, or linked sign-in methods.</CardDescription></CardHeader><CardContent className="space-y-4">
       <Input value={email || "No email on this account"} readOnly />
-      <Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} disabled={!hasPassword} placeholder={hasPassword ? "Current password" : "Not needed until a password is set"} />
-      <Input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder={hasPassword ? "New password" : "Set password"} />
-      <Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm password" />
-      <Button className="w-full" onClick={changePassword} disabled={busy}>{hasPassword ? "Update password" : "Set password"}</Button>
+      {!email && <div className="space-y-3 rounded-md border border-border p-3"><p className="text-sm text-muted-foreground">Add an email and password to this account. You must verify the email before using it to log in.</p><Input type="email" value={newEmail} onChange={(event) => setNewEmail(event.target.value)} placeholder="Email address" /><Input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="Password" /><Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm password" /><Button className="w-full" onClick={addEmailPasswordLogin} disabled={busy}>Send verification email</Button></div>}
+      {email && <><Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} disabled={!hasPassword} placeholder={hasPassword ? "Current password" : "Not needed until a password is set"} /><Input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder={hasPassword ? "New password" : "Set password"} /><Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm password" /><Button className="w-full" onClick={changePassword} disabled={busy}>{hasPassword ? "Update password" : "Set password"}</Button></>}
       <div className="grid grid-cols-1 gap-2">
         {hasGoogle ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><GoogleIcon /><Check className="h-4 w-4" />Google Linked</Button> : <Button variant="outline" onClick={() => linkProvider("google")} disabled={busy} className="justify-center gap-2"><GoogleIcon />Link Google</Button>}
         {hasGitHub ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><GitHubIcon /><Check className="h-4 w-4" />GitHub Linked</Button> : <Button variant="outline" onClick={() => linkProvider("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Link GitHub</Button>}
