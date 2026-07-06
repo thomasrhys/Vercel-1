@@ -51,5 +51,5 @@ export async function POST(request: Request) {
 
   if (updateError) return NextResponse.json({ error: readableError(updateError) }, { status: 400 });
 
-  return NextResponse.json({ message: "Email/password added. Verification email sending is temporarily disabled while this flow is being tested." });
+  return NextResponse.json({ message: "Email/password added successfully. Verification email sending is temporarily disabled while this flow is being tested." });
 }
