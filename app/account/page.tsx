@@ -21,7 +21,9 @@ export default function AccountPage() {
   const { user, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,17 +39,20 @@ export default function AccountPage() {
   const hasGoogle = providers.includes("google");
   const hasGitHub = providers.includes("github");
   const hasMicrosoft = providers.includes("azure");
+  const profilePath = username ? `/${username}` : "";
 
   useEffect(() => {
     if (!user) return;
-    supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+    supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url, bio, is_public").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       setDisplayName(data?.display_name || "");
       setUsername(data?.username || (isOwner ? "owner" : ""));
       setAvatarUrl(data?.avatar_url || "");
+      setBio(data?.bio || "");
+      setIsPublic(data?.is_public ?? true);
     });
   }, [user, isOwner]);
 
-  const saveProfile = async () => {
+  const saveProfile = async (nextAvatarUrl = avatarUrl) => {
     if (!user) return;
     setMessage("");
     const nextUsername = cleanUsername(username);
@@ -56,9 +61,10 @@ export default function AccountPage() {
     if (isOwner && nextUsername && !OWNER_NAMES.includes(nextUsername) && RESERVED.includes(nextUsername)) return setMessage("That username is reserved.");
     setSaving(true);
     try {
-      const { error } = await supabaseAuthClient.from("user_profiles").upsert({ user_id: user.id, display_name: displayName.trim() || null, username: nextUsername || null, avatar_url: avatarUrl.trim() || null, role: isOwner ? "owner" : "user", updated_at: new Date().toISOString() });
+      const { error } = await supabaseAuthClient.from("user_profiles").upsert({ user_id: user.id, display_name: displayName.trim() || null, username: nextUsername || null, bio: bio.trim() || null, avatar_url: nextAvatarUrl.trim() || null, is_public: isPublic, role: isOwner ? "owner" : "user", updated_at: new Date().toISOString() });
       if (error) return setMessage(msg(error));
       setUsername(nextUsername);
+      setAvatarUrl(nextAvatarUrl);
       setMessage("Profile saved.");
     } catch (error) { setMessage(msg(error)); } finally { setSaving(false); }
   };
@@ -75,8 +81,8 @@ export default function AccountPage() {
       const { error } = await supabaseAuthClient.storage.from("avatars").upload(path, file, { upsert: true });
       if (error) return setMessage(msg(error));
       const { data } = supabaseAuthClient.storage.from("avatars").getPublicUrl(path);
-      setAvatarUrl(`${data.publicUrl}?v=${Date.now()}`);
-      setMessage("Avatar uploaded. Press Save profile to keep it.");
+      await saveProfile(`${data.publicUrl}?v=${Date.now()}`);
+      setMessage("Avatar uploaded and saved.");
     } catch (error) { setMessage(msg(error)); } finally { setUploading(false); }
   };
 
@@ -111,15 +117,18 @@ export default function AccountPage() {
   if (!isSignedIn) return <main className="min-h-screen bg-background flex items-center justify-center p-4"><Card className="w-full max-w-md"><CardHeader><CardTitle>Account</CardTitle><CardDescription>Sign in to manage your account.</CardDescription></CardHeader><CardContent className="space-y-3"><Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/account")}>Login</Button><Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button></CardContent></Card></main>;
 
   return <main className="min-h-screen bg-background p-4 sm:p-8"><div className="max-w-md mx-auto space-y-6">
-    <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your Games Portal account. This does not track recently played games.</CardDescription></CardHeader><CardContent className="space-y-4">
-      <div className="flex items-center gap-3">{avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" /> : <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">{(displayName || email || "U").slice(0, 1).toUpperCase()}</div>}<div><p className="font-medium text-foreground">{displayName || "Unnamed player"} {isOwner && <span className="ml-1 rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-700">Owner</span>}</p><p className="text-xs text-muted-foreground">{username ? `@${username}` : "No username set"}</p></div></div>
+    <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile. No recently played games are tracked.</CardDescription></CardHeader><CardContent className="space-y-4">
+      <div className="flex items-center gap-3">{avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" /> : <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">{(displayName || email || "U").slice(0, 1).toUpperCase()}</div>}<div><p className="font-medium text-foreground">{displayName || "Unnamed player"} {isOwner && <span className="ml-1 rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-700">Owner</span>}</p><p className="text-xs text-muted-foreground">{username ? `/${username}` : "No username set"}</p></div></div>
       <Input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Display name" />
       <Input value={username} onChange={(event) => setUsername(cleanUsername(event.target.value))} placeholder="username" />
-      {isOwner && <p className="text-xs text-muted-foreground">Reserved for you: @owner and @pitstopyt.</p>}
+      {isOwner && <p className="text-xs text-muted-foreground">Reserved for you: /owner and /pitstopyt.</p>}
+      <textarea value={bio} onChange={(event) => setBio(event.target.value)} maxLength={240} placeholder="Bio" className="w-full min-h-24 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground" />
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} /> Public profile</label>
       <Input value={avatarUrl} onChange={(event) => setAvatarUrl(event.target.value)} placeholder="Avatar URL" />
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-muted"><Upload className="h-4 w-4" />{uploading ? "Uploading..." : "Upload avatar"}<input type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadAvatar(file); }} /></label>
       {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
-      <Button className="w-full" onClick={saveProfile} disabled={saving}>{saving ? "Saving..." : "Save profile"}</Button>
+      <Button className="w-full" onClick={() => saveProfile()} disabled={saving}>{saving ? "Saving..." : "Save profile"}</Button>
+      {profilePath && <Button variant="outline" className="w-full" onClick={() => (window.location.href = profilePath)}>View public profile</Button>}
     </CardContent></Card>
 
     <Card><CardHeader><CardTitle>Manage account</CardTitle><CardDescription>Update your password or link another sign-in method.</CardDescription></CardHeader><CardContent className="space-y-4">
