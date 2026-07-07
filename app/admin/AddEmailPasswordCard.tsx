@@ -19,7 +19,7 @@ export default function AddEmailPasswordCard() {
     setLink("");
 
     if (!userId.trim()) return setMessage("Enter the auth user ID.");
-    if (!email.trim() || !email.includes("@")) return setMessage("Enter a valid email address.");
+    if (email.trim() && !email.includes("@")) return setMessage("Enter a valid email address.");
     if (!password || password.length < 6) return setMessage("Password must be at least 6 characters.");
 
     setBusy(true);
