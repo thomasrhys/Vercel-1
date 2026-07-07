@@ -1,14 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 
-function getSiteUrl(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin) return origin;
-  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
-  const proto = request.headers.get("x-forwarded-proto") || "https";
-  return host ? `${proto}://${host}` : "https://fnfaw.es";
-}
-
 export async function POST(request: Request) {
   if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
@@ -21,21 +13,29 @@ export async function POST(request: Request) {
     return Response.json({ error: "A valid email address is required" }, { status: 400 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } }
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const { error } = await supabase.auth.resend({
+  if (!supabaseUrl || !key) {
+    return Response.json({ error: "Supabase server env vars are missing" }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data, error } = await supabase.auth.admin.generateLink({
     type: "signup",
     email,
-    options: { emailRedirectTo: `${getSiteUrl(request)}/login` },
   });
 
   if (error) {
-    return Response.json({ error: error.message || "Could not send verification email" }, { status: 500 });
+    return Response.json({ error: error.message || "Could not generate verification link" }, { status: 500 });
   }
 
-  return Response.json({ success: true, message: `Verification email sent to ${email}` });
+  return Response.json({
+    success: true,
+    message: `Verification link generated for ${email}`,
+    link: data.properties?.action_link || null,
+  });
 }
