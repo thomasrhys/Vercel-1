@@ -39,26 +39,43 @@ export function UserButton() {
   const { user, signOut } = useSupabaseAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    supabaseAuthClient.from("user_profiles").select("username").eq("user_id", user.id).maybeSingle().then(({ data }) => setUsername(data?.username || ""));
+    supabaseAuthClient
+      .from("user_profiles")
+      .select("username, display_name, avatar_url")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setUsername(data?.username || "");
+        setDisplayName(data?.display_name || "");
+        setAvatarUrl(data?.avatar_url || "");
+      });
   }, [user]);
 
   if (!user) return null;
-  const label = user.email || user.phone || "Account";
+  const label = displayName || user.email || user.phone || "Account";
+  const subLabel = user.email || user.phone || "Signed in";
 
   return (
     <div className="relative">
-      <button type="button" onClick={() => setIsOpen((open) => !open)} title="Account menu" className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center">
-        {label.slice(0, 1).toUpperCase()}
+      <button type="button" onClick={() => setIsOpen((open) => !open)} title="Account menu" className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center overflow-hidden">
+        {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 rounded-md border border-border bg-card shadow-lg z-50 overflow-hidden">
-          <div className="px-3 py-2 border-b border-border">
-            <p className="text-xs text-muted-foreground">Signed in as</p>
-            <p className="text-sm font-medium text-foreground truncate">{label}</p>
-            {username && <p className="text-xs text-muted-foreground truncate">/{username}</p>}
+          <div className="px-3 py-2 border-b border-border flex items-center gap-2">
+            <div className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center overflow-hidden shrink-0">
+              {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{label}</p>
+              <p className="text-xs text-muted-foreground truncate">{subLabel}</p>
+              {username && <p className="text-xs text-muted-foreground truncate">/{username}</p>}
+            </div>
           </div>
           {username && <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted" onClick={() => { setIsOpen(false); window.location.href = `/${username}`; }}>View public profile</button>}
           <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted" onClick={() => { setIsOpen(false); window.location.href = "/account"; }}>Manage account</button>
