@@ -12,7 +12,6 @@ export async function POST(request: Request) {
   const password = String(body.password || "");
 
   if (!userId) return Response.json({ error: "User ID is required" }, { status: 400 });
-  if (!email || !email.includes("@")) return Response.json({ error: "A valid email address is required" }, { status: 400 });
   if (!password || password.length < 6) return Response.json({ error: "Password must be at least 6 characters" }, { status: 400 });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,6 +24,30 @@ export async function POST(request: Request) {
   const supabase = createClient(supabaseUrl, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  const user = await supabase.auth.admin.getUserById(userId);
+  if (user.error || !user.data.user) {
+    return Response.json({ error: user.error?.message || "User not found" }, { status: 404 });
+  }
+
+  const existingEmail = user.data.user.email || "";
+
+  if (existingEmail) {
+    const update = await supabase.auth.admin.updateUserById(userId, { password });
+    if (update.error) {
+      return Response.json({ error: update.error.message || "Could not update password" }, { status: 500 });
+    }
+
+    return Response.json({
+      success: true,
+      message: `Password updated for ${existingEmail}`,
+      link: null,
+    });
+  }
+
+  if (!email || !email.includes("@")) {
+    return Response.json({ error: "This user has no email. Enter a valid email address to add one." }, { status: 400 });
+  }
 
   const update = await supabase.auth.admin.updateUserById(userId, {
     email,
