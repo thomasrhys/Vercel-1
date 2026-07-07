@@ -20,17 +20,29 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!/^[a-z0-9_]{3,20}$/.test(handle)) notFound();
 
-  const { data: profile } = await supabase
+  const full = await supabase
     .from("user_profiles")
     .select("display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
     .ilike("username", handle)
     .maybeSingle();
 
+  const fallback = full.error
+    ? await supabase
+        .from("user_profiles")
+        .select("display_name, username, avatar_url, bio, role, is_public")
+        .ilike("username", handle)
+        .maybeSingle()
+    : full;
+
+  const profile = fallback.data;
+
   if (!profile?.username || profile.is_public === false) notFound();
 
   const displayName = profile.display_name || "Unnamed player";
-  const website = normalizeWebsite(profile.website_url);
-  const favouriteGames = Array.isArray(profile.favourite_games) ? profile.favourite_games.filter(Boolean).slice(0, 12) : [];
+  const country = "country" in profile ? profile.country : "";
+  const websiteUrl = "website_url" in profile ? profile.website_url : "";
+  const favouriteGames = "favourite_games" in profile && Array.isArray(profile.favourite_games) ? profile.favourite_games.filter(Boolean).slice(0, 12) : [];
+  const website = normalizeWebsite(websiteUrl);
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
@@ -48,10 +60,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
-        {(profile.country || website) && (
+        {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
-            {profile.country && <p><span className="font-medium">Country:</span> {profile.country}</p>}
-            {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{profile.website_url}</a></p>}
+            {country && <p><span className="font-medium">Country:</span> {country}</p>}
+            {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
           </div>
         )}
         {favouriteGames.length > 0 && (
