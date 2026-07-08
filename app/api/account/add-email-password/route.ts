@@ -12,64 +12,44 @@ function readableError(error: unknown) {
     if (typeof value.code === "string" && value.code) return value.code;
     if (typeof value.name === "string" && value.name) return value.name;
     if (value.status) return `Request failed with status ${String(value.status)}`;
-    try {
-      const json = JSON.stringify(error);
-      if (json && json !== "{}") return json;
-    } catch {}
   }
-  return "Supabase returned an empty error. Check Auth email settings, SMTP, and rate limits.";
+  return "Supabase returned an empty error.";
 }
 
 export async function POST(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: "Supabase environment variables are missing." }, { status: 500 });
+  if (!supabaseUrl || !serviceRoleKey) {
+    return NextResponse.json({ error: "Supabase server environment variables are missing." }, { status: 500 });
   }
 
-  const authHeader = request.headers.get("authorization") || "";
-  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  if (!token) return NextResponse.json({ error: "Missing signed-in session." }, { status: 401 });
 
-  if (!token) {
-    return NextResponse.json({ error: "Missing signed-in session." }, { status: 401 });
-  }
-
-  const body = await request.json().catch(() => null) as { email?: unknown; password?: unknown; redirectTo?: unknown } | null;
+  const body = await request.json().catch(() => null) as { email?: unknown; password?: unknown } | null;
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
-  const redirectTo = typeof body?.redirectTo === "string" ? body.redirectTo : undefined;
 
-  if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
-  }
+  if (!email || !email.includes("@")) return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  if (!password || password.length < 6) return NextResponse.json({ error: "Password must be at least 6 characters long." }, { status: 400 });
 
-  if (!password || password.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters long." }, { status: 400 });
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: { Authorization: `Bearer ${token}` } },
   });
 
-  const { data: current, error: userError } = await supabase.auth.getUser();
-  if (userError || !current.user) {
-    return NextResponse.json({ error: readableError(userError) }, { status: 401 });
-  }
+  const { data: current, error: userError } = await adminClient.auth.getUser(token);
+  if (userError || !current.user) return NextResponse.json({ error: readableError(userError) }, { status: 401 });
 
-  if (current.user.email) {
-    return NextResponse.json({ error: "This account already has an email address." }, { status: 400 });
-  }
+  if (current.user.email) return NextResponse.json({ error: "This account already has an email address." }, { status: 400 });
 
-  const { error } = await supabase.auth.updateUser(
-    { email, password },
-    redirectTo ? { emailRedirectTo: redirectTo } : undefined
-  );
+  const { error: updateError } = await adminClient.auth.admin.updateUserById(current.user.id, {
+    email,
+    password,
+    email_confirm: false,
+  });
 
-  if (error) {
-    return NextResponse.json({ error: readableError(error) }, { status: 400 });
-  }
+  if (updateError) return NextResponse.json({ error: readableError(updateError) }, { status: 400 });
 
-  return NextResponse.json({ message: "Verification email sent. Verify the email address before using email/password login." });
+  return NextResponse.json({ message: "Email/password added successfully. Verification email sending is temporarily disabled while this flow is being tested." });
 }
