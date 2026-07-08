@@ -8,6 +8,7 @@ import { authFetch } from "@/lib/supabase-auth";
 
 export default function AddEmailPasswordCard() {
   const [userId, setUserId] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -18,17 +19,33 @@ export default function AddEmailPasswordCard() {
     setMessage("");
     setLink("");
 
-    if (!userId.trim()) return setMessage("Enter the auth user ID.");
+    if (!userId.trim() && !username.trim()) return setMessage("Enter an auth user ID or username.");
     if (email.trim() && !email.includes("@")) return setMessage("Enter a valid email address.");
     if (!password || password.length < 6) return setMessage("Password must be at least 6 characters.");
 
     setBusy(true);
 
     try {
+      let resolvedUserId = userId.trim();
+
+      if (!resolvedUserId && username.trim()) {
+        const lookup = await authFetch("/api/admin/resolve-username", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+        const lookupData = await lookup.json().catch(() => ({}));
+        if (!lookup.ok) {
+          setMessage(`✗ ${lookupData.error || "Could not find username"}`);
+          return;
+        }
+        resolvedUserId = lookupData.userId || "";
+      }
+
       const response = await authFetch("/api/admin/add-email-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, email, password }),
+        body: JSON.stringify({ userId: resolvedUserId, email, password }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -58,10 +75,11 @@ export default function AddEmailPasswordCard() {
     <Card>
       <CardHeader>
         <CardTitle>Add Email & Password</CardTitle>
-        <CardDescription>Manually add email/password login to an existing auth user and generate a verification link.</CardDescription>
+        <CardDescription>Use either an auth user ID or username. Email is optional if the user already has one.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <Input value={userId} onChange={(event) => setUserId(event.target.value)} placeholder="Auth user ID" />
+        <Input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="Username, for example luna" />
         <Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="player@example.com" />
         <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Temporary password" />
         {message && <div className={`rounded-md p-3 text-sm ${message.startsWith("✓") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>{message}</div>}
