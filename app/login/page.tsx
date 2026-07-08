@@ -38,6 +38,16 @@ function MicrosoftIcon() {
   );
 }
 
+function TwitchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <path fill="#9146FF" d="M4 3h17v12l-5 5h-4l-3 3H6v-3H2V7l2-4z" />
+      <path fill="#FFFFFF" d="M6 5v12h4v3l3-3h4l2-2V5H6z" />
+      <path fill="#9146FF" d="M9 8h2v6H9V8zm5 0h2v6h-2V8z" />
+    </svg>
+  );
+}
+
 function safeRedirectUrl(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
   return value;
@@ -63,7 +73,7 @@ function messageFrom(error: unknown) {
 }
 
 type AuthMode = "login" | "signup";
-type OAuthProvider = "google" | "github" | "azure";
+type OAuthProvider = "google" | "github" | "azure" | "twitch";
 
 function LoginPageContent() {
   const { isSignedIn } = useSupabaseAuth();
@@ -145,6 +155,7 @@ function LoginPageContent() {
             <Button variant="outline" onClick={() => oauth("google")} disabled={busy} className="justify-center gap-2"><GoogleIcon />Continue with Google</Button>
             <Button variant="outline" onClick={() => oauth("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Continue with GitHub</Button>
             <Button variant="outline" onClick={() => oauth("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Continue with Microsoft</Button>
+            <Button variant="outline" onClick={() => oauth("twitch")} disabled={busy} className="justify-center gap-2"><TwitchIcon />Continue with Twitch</Button>
           </div>
           <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
         </CardContent>
