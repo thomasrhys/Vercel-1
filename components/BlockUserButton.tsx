@@ -2,6 +2,8 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import ConfirmDialog from '@/components/confirm-dialog';
 
 interface BlockUserButtonProps {
   targetUserId: string;
@@ -10,11 +12,9 @@ interface BlockUserButtonProps {
 
 export default function BlockUserButton({ targetUserId, targetUsername }: BlockUserButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleBlock = async () => {
-    const confirmed = confirm(`Block ${targetUsername}? They won't be able to interact with you.`);
-    if (!confirmed) return;
-
     setLoading(true);
 
     try {
@@ -29,7 +29,8 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
       const result = await res.json();
 
       if (result.success) {
-        alert('User blocked successfully');
+        setIsOpen(false);
+        // Reload to reflect changes
         window.location.reload();
       } else {
         alert(result.error || 'Failed to block user');
@@ -43,12 +44,25 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
   };
 
   return (
-    <button
-      onClick={handleBlock}
-      disabled={loading}
-      className="px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {loading ? 'Blocking...' : 'Block User'}
-    </button>
+    <>
+      <Button
+        onClick={() => setIsOpen(true)}
+        disabled={loading}
+        className="bg-red-600 hover:bg-red-700 text-white"
+      >
+        {loading ? 'Blocking...' : 'Block User'}
+      </Button>
+
+      <ConfirmDialog
+        open={isOpen}
+        title="Block User"
+        description={`Are you sure you want to block ${targetUsername}? They won't be able to interact with you anymore.`}
+        confirmLabel="Block"
+        destructive
+        isWorking={loading}
+        onCancel={() => setIsOpen(false)}
+        onConfirm={handleBlock}
+      />
+    </>
   );
 }
