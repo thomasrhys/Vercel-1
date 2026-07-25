@@ -2,16 +2,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import FriendButton from './FriendButton';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 interface FriendSectionProps {
-  targetUserId: string; // This is user_id from user_profiles table
+  targetUserId: string;
 }
 
 export default function FriendSection({ targetUserId }: FriendSectionProps) {
@@ -35,7 +30,7 @@ export default function FriendSection({ targetUserId }: FriendSectionProps) {
   }, []);
 
   if (loading) {
-    return <div className="h-10" />; // Placeholder while loading
+    return <div className="h-10" />;
   }
 
   if (!currentUserId) {
