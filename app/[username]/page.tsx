@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import FriendSection from "@/components/FriendSection";
+import FriendsList from "@/components/FriendsList";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const full = await supabase
     .from("user_profiles")
-    .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
+    .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games, friends_visible")
     .ilike("username", handle)
     .maybeSingle();
 
@@ -39,6 +40,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const profile = fallback.data;
 
   if (!profile?.username || profile.is_public === false) notFound();
+
+  // Get current logged-in user (safely - won't crash if it fails)
+  let currentUserId: string | null = null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUserId = user?.id || null;
+  } catch (error) {
+    console.log('Could not fetch current user (not logged in or session expired)');
+  }
 
   const displayName = profile.display_name || "Unnamed player";
   const country = "country" in profile ? profile.country : "";
@@ -68,15 +78,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
-        // app/[username]/page.tsx - ADD THIS PART IN THE RETURN
-       // After the bio section, before favourite games
 
-       {/* Friends List */}
-       <div className="rounded-md border border-border p-4">
-       <h3 className="font-semibold text-foreground mb-3">Friends</h3>
-       {/* You'll need to pass userId and currentUserId here */}
-       <FriendsList userId={profile.user_id} currentUserId={currentUserId} />
-       </div>
+        {/* Friends List */}
+        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
+
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
             {country && <p><span className="font-medium">Country:</span> {country}</p>}
