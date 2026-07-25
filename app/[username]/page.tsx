@@ -68,6 +68,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
+        // app/[username]/page.tsx - ADD THIS PART IN THE RETURN
+       // After the bio section, before favourite games
+
+       {/* Friends List */}
+       <div className="rounded-md border border-border p-4">
+       <h3 className="font-semibold text-foreground mb-3">Friends</h3>
+       {/* You'll need to pass userId and currentUserId here */}
+       <FriendsList userId={profile.user_id} currentUserId={currentUserId} />
+       </div>
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
             {country && <p><span className="font-medium">Country:</span> {country}</p>}
