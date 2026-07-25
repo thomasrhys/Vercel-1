@@ -10,7 +10,6 @@ interface BlockUserButtonProps {
 
 export default function BlockUserButton({ targetUserId, targetUsername }: BlockUserButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false);
 
   const handleBlock = async () => {
     const confirmed = confirm(`Block ${targetUsername}? They won't be able to interact with you.`);
@@ -43,19 +42,11 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
     }
   };
 
-  if (isBlocked) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        You have blocked this user
-      </div>
-    );
-  }
-
   return (
     <button
       onClick={handleBlock}
       disabled={loading}
-      className="px-4 py-2 rounded-md text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/80 transition-colors"
+      className="px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? 'Blocking...' : 'Block User'}
     </button>
