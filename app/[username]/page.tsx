@@ -1,6 +1,7 @@
 // app/[username]/page.tsx
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import FriendButton from "@/components/FriendButton";
 
 export const dynamic = "force-dynamic";
 
@@ -23,14 +24,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const full = await supabase
     .from("user_profiles")
-    .select("display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
+    .select("id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
     .ilike("username", handle)
     .maybeSingle();
 
   const fallback = full.error
     ? await supabase
         .from("user_profiles")
-        .select("display_name, username, avatar_url, bio, role, is_public")
+        .select("id, display_name, username, avatar_url, bio, role, is_public")
         .ilike("username", handle)
         .maybeSingle()
     : full;
@@ -38,6 +39,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const profile = fallback.data;
 
   if (!profile?.username || profile.is_public === false) notFound();
+
+  // Get current logged-in user (safely - won't crash if it fails)
+  let currentUserId: string | null = null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUserId = user?.id || null;
+  } catch (error) {
+    // Silently ignore auth failures - user will see login link instead
+    console.log('Could not fetch current user (not logged in or session expired)');
+  }
 
   const displayName = profile.display_name || "Unnamed player";
   const country = "country" in profile ? profile.country : "";
@@ -60,6 +71,21 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <p className="text-muted-foreground">/{profile.username}</p>
           {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
+
+        {/* Friend Button Section */}
+        <div className="flex justify-center gap-4 py-4">
+          {currentUserId ? (
+            <FriendButton 
+              targetUserId={profile.id}
+              currentUserId={currentUserId}
+            />
+          ) : (
+            <a href="/login" className="inline-block rounded-md border border-border px-4 py-2 text-sm hover:bg-muted">
+              Log in to add friends
+            </a>
+          )}
+        </div>
+
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
