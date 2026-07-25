@@ -1,22 +1,21 @@
 // app/api/friendship-status/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase'; // Browser client for basic queries
-import { getSupabaseUserId } from '@/lib/supabase-server-auth';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false, autoRefreshToken: false } }
+);
 
 export async function GET(req: NextRequest) {
-  const userId = await getSupabaseUserId(req);
+  const userId = req.nextUrl.searchParams.get('userId');
+  const targetId = req.nextUrl.searchParams.get('targetId');
   
-  if (!userId) {
+  if (!userId || !targetId) {
     return NextResponse.json({ status: 'none' });
   }
   
-  const targetId = req.nextUrl.searchParams.get('targetId');
-  
-  if (!targetId) {
-    return NextResponse.json({ error: 'Missing targetId param' }, { status: 400 });
-  }
-  
-  // Query the friendships table
   const { data, error } = await supabase
     .from('friendships')
     .select('status')
@@ -24,9 +23,9 @@ export async function GET(req: NextRequest) {
     .or(`requester_id.eq.${targetId},addressee_id.eq.${targetId}`)
     .maybeSingle();
   
-  if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+  if (error && error.code !== 'PGRST116') {
     console.error('Friendship query error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ status: 'none' });
   }
   
   const status = data?.status || 'none';
