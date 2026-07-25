@@ -8,7 +8,9 @@ export default function FriendProvider({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      <FriendNotificationBell />
+      <div className="fixed top-4 right-4 z-50">
+        <FriendNotificationBell />
+      </div>
     </>
   );
 }
