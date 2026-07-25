@@ -23,8 +23,9 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.access_token) {
-        alert('You must be logged in to block users');
-        setLoading(false);
+        setIsOpen(false);
+        // Redirect to login instead of alert
+        window.location.href = '/login?redirect_url=' + encodeURIComponent(window.location.pathname);
         return;
       }
 
@@ -41,14 +42,18 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
 
       if (result.success) {
         setIsOpen(false);
-        alert('User blocked successfully');
+        // Reload to reflect changes - no alert needed
         window.location.reload();
       } else {
-        alert(result.error || 'Failed to block user');
+        setIsOpen(false);
+        // Show error in console, don't use alert
+        console.error('Block user error:', result.error);
+        alert(result.error || 'Failed to block user'); // Keep this one for now
       }
     } catch (error) {
       console.error('Block error:', error);
-      alert('Failed to block user');
+      setIsOpen(false);
+      alert('Failed to block user'); // Keep this one for now
     } finally {
       setLoading(false);
     }
