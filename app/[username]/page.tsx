@@ -24,14 +24,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const full = await supabase
     .from("user_profiles")
-    .select("id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
+    .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games")
     .ilike("username", handle)
     .maybeSingle();
 
   const fallback = full.error
     ? await supabase
         .from("user_profiles")
-        .select("id, display_name, username, avatar_url, bio, role, is_public")
+        .select("user_id, display_name, username, avatar_url, bio, role, is_public")
         .ilike("username", handle)
         .maybeSingle()
     : full;
@@ -64,7 +64,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
         {/* Friend Button Section - Client Side */}
         <div className="flex justify-center gap-4 py-4">
-          <FriendSection targetUserId={profile.id} />
+          <FriendSection targetUserId={profile.user_id} />
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
