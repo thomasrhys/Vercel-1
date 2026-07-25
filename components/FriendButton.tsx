@@ -25,19 +25,28 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
 
     try {
       const result = await sendFriendRequest(targetUserId);
+      
       if (result.success) {
         setRelationship('pending');
       } else {
         setErrorMessage(result.message || 'Something went wrong');
       }
     } catch (err: any) {
-      console.error('Send friend request error:', err);
+      // Full error logging - CHECK BROWSER CONSOLE!
+      console.error('=== SEND FRIEND REQUEST ERROR ===');
+      console.error('Error object:', err);
+      console.error('Error message:', err.message);
+      console.error('Error digest:', err.digest);
+      console.error('Stack trace:', err.stack);
+      console.error('=== END ERROR ===');
+      
       setErrorMessage(err.message || 'Failed to send friend request');
     } finally {
       setLoading(false);
     }
   };
 
+  // Don't show button on own profile
   if (currentUserId === targetUserId) {
     return null;
   }
