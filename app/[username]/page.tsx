@@ -1,4 +1,4 @@
-// app/[username]/page.tsx
+// app/[username]/page.tsx - FINAL VERSION
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import FriendSection from "@/components/FriendSection";
@@ -42,12 +42,27 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
+  // Get current logged-in user
   let currentUserId: string | null = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();
     currentUserId = user?.id || null;
   } catch (error) {
-    console.log('Could not fetch current user (not logged in or session expired)');
+    console.log('Could not fetch current user');
+  }
+
+  // CHECK IF PROFILE OWNER HAS BLOCKED CURRENT USER
+  if (currentUserId) {
+    const blockCheck = await supabase
+      .from('blocks')
+      .select('id')
+      .eq('blocker_id', profile.user_id)
+      .eq('blocked_id', currentUserId)
+      .maybeSingle();
+    
+    if (blockCheck.data) {
+      notFound(); // Return 404
+    }
   }
 
   const displayName = profile.display_name || "Unnamed player";
@@ -83,17 +98,21 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
 
         {/* Block User Section */}
-        {currentUserId && currentUserId !== profile.user_id && (
-          <div className="rounded-md border border-border p-4">
-            <h3 className="font-semibold text-foreground mb-2">Actions</h3>
-            <div className="flex gap-2 justify-center">
+        <div className="rounded-md border border-border p-4">
+          <h3 className="font-semibold text-foreground mb-2">Actions</h3>
+          <div className="flex gap-2 justify-center">
+            {currentUserId && currentUserId !== profile.user_id ? (
               <BlockUserButton 
                 targetUserId={profile.user_id} 
                 targetUsername={profile.username} 
               />
-            </div>
+            ) : currentUserId === profile.user_id ? (
+              <span className="text-sm text-muted-foreground">You can't block yourself</span>
+            ) : (
+              <span className="text-sm text-muted-foreground">Log in to block users</span>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Country & Website */}
         {(country || website) && (
