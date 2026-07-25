@@ -14,28 +14,44 @@ interface Friend {
 }
 
 interface FriendsListProps {
-  userId: string; // Profile user_id being viewed
+  userId: string;
   currentUserId: string | null;
+  friendsVisible: boolean;
 }
 
-export default function FriendsList({ userId, currentUserId }: FriendsListProps) {
+export default function FriendsList({ userId, currentUserId, friendsVisible }: FriendsListProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const isOwnProfile = currentUserId === userId;
+  const canSeeFriends = isOwnProfile || friendsVisible;
 
   useEffect(() => {
     const fetchFriends = async () => {
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+
+      // If friends are hidden and this isn't own profile, show empty state
+      if (!canSeeFriends && !isOwnProfile) {
+        setFriends([]);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Check if viewing own profile
-        setIsOwnProfile(currentUserId === userId);
-        
-        // For now, we'll show everyone's friends list (if you want to restrict, we can add RLS later)
+        let headers = {};
+        if (currentUserId) {
+          // We'd need to fetch token here for authenticated requests
+          // For now, we'll use a simple fetch
+        }
+
         const res = await fetch(`/api/friend/list?userId=${userId}`, {
-          headers: currentUserId ? {} : {},
+          headers: headers,
         });
-        
+
         const result = await res.json();
-        
+
         if (result.success && result.data) {
           setFriends(result.data);
         }
@@ -46,15 +62,24 @@ export default function FriendsList({ userId, currentUserId }: FriendsListProps)
       }
     };
 
-    if (userId) {
-      fetchFriends();
-    }
-  }, [userId, currentUserId]);
+    fetchFriends();
+  }, [userId, currentUserId, canSeeFriends, isOwnProfile]);
 
   if (loading) {
     return (
       <div className="rounded-md border border-border p-4">
         <p className="text-center text-muted-foreground">Loading friends...</p>
+      </div>
+    );
+  }
+
+  if (!canSeeFriends && !isOwnProfile) {
+    return (
+      <div className="rounded-md border border-border p-4">
+        <h3 className="font-semibold text-foreground mb-2">Friends</h3>
+        <p className="text-center text-muted-foreground py-4">
+          This user has hidden their friends list
+        </p>
       </div>
     );
   }
@@ -66,7 +91,7 @@ export default function FriendsList({ userId, currentUserId }: FriendsListProps)
         <p className="text-center text-muted-foreground py-4">
           {isOwnProfile 
             ? "You haven't added any friends yet."
-            : `${display_name || username} has no friends yet.`}
+            : "This user has no friends yet."}
         </p>
       </div>
     );
@@ -77,7 +102,7 @@ export default function FriendsList({ userId, currentUserId }: FriendsListProps)
       <h3 className="font-semibold text-foreground mb-3">
         Friends ({friends.length})
       </h3>
-      
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {friends.map((friend) => (
           <a
@@ -96,7 +121,7 @@ export default function FriendsList({ userId, currentUserId }: FriendsListProps)
                 {(friend.display_name || friend.username).charAt(0).toUpperCase()}
               </div>
             )}
-            
+
             <p className="font-medium text-sm text-foreground text-center truncate w-full">
               {friend.display_name || friend.username}
             </p>
