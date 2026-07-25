@@ -40,14 +40,21 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
-  // Get current logged-in user (if any)
-  const { data: { user: currentUser } } = await supabase.auth.getUser();
-
   const displayName = profile.display_name || "Unnamed player";
   const country = "country" in profile ? profile.country : "";
   const websiteUrl = "website_url" in profile ? profile.website_url : "";
   const favouriteGames = "favourite_games" in profile && Array.isArray(profile.favourite_games) ? profile.favourite_games.filter(Boolean).slice(0, 12) : [];
   const website = normalizeWebsite(websiteUrl);
+
+  // Try to get current user, but don't fail if it doesn't work
+  let currentUser: { id: string } | null = null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user || null;
+  } catch (error) {
+    // Auth failed silently - user won't see friend button but page loads
+    console.warn('Failed to get current user:', error);
+  }
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
@@ -68,13 +75,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Friend Button Section */}
         <div className="flex justify-center gap-4 py-4">
           {currentUser ? (
-            <>
-              <FriendButton 
-                targetUserId={profile.id}
-                currentUserId={currentUser.id}
-              />
-              {/* Optional: Message button or other actions */}
-            </>
+            <FriendButton 
+              targetUserId={profile.id}
+              currentUserId={currentUser.id}
+            />
           ) : (
             <a href="/login" className="inline-block rounded-md border border-border px-4 py-2 text-sm hover:bg-muted">
               Log in to add friends
