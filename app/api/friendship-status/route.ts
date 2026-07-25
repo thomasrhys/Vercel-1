@@ -1,17 +1,22 @@
 // app/api/friendship-status/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase'; // Browser client for basic queries
+import { getSupabaseUserId } from '@/lib/supabase-server-auth';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
+  const userId = await getSupabaseUserId(req);
   
-  const userId = req.nextUrl.searchParams.get('userId');
-  const targetId = req.nextUrl.searchParams.get('targetId');
-  
-  if (!userId || !targetId) {
-    return NextResponse.json({ error: 'Missing params' }, { status: 400 });
+  if (!userId) {
+    return NextResponse.json({ status: 'none' });
   }
   
+  const targetId = req.nextUrl.searchParams.get('targetId');
+  
+  if (!targetId) {
+    return NextResponse.json({ error: 'Missing targetId param' }, { status: 400 });
+  }
+  
+  // Query the friendships table
   const { data, error } = await supabase
     .from('friendships')
     .select('status')
@@ -20,6 +25,7 @@ export async function GET(req: NextRequest) {
     .maybeSingle();
   
   if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+    console.error('Friendship query error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
   
