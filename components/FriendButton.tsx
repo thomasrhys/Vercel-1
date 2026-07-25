@@ -12,6 +12,7 @@ interface FriendButtonProps {
 export default function FriendButton({ targetUserId, currentUserId }: FriendButtonProps) {
   const [relationship, setRelationship] = useState<'none' | 'pending'>('none');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleClick = async () => {
     if (!currentUserId) {
@@ -20,13 +21,18 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     }
 
     setLoading(true);
+    setErrorMessage(null);
 
     try {
-      await sendFriendRequest(targetUserId);
-      setRelationship('pending');
+      const result = await sendFriendRequest(targetUserId);
+      if (result.success) {
+        setRelationship('pending');
+      } else {
+        setErrorMessage(result.message || 'Something went wrong');
+      }
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || 'Something went wrong');
+      console.error('Send friend request error:', err);
+      setErrorMessage(err.message || 'Failed to send friend request');
     } finally {
       setLoading(false);
     }
@@ -36,22 +42,23 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     return null;
   }
 
-  const buttonText = {
-    none: 'Add Friend',
-    pending: 'Request Sent ✓',
-  }[relationship];
-
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading || relationship === 'pending'}
-      className={`px-4 py-2 rounded ${
-        relationship === 'pending'
-          ? 'bg-green-600 cursor-default'
-          : 'bg-purple-600 hover:bg-purple-700'
-      } text-white disabled:opacity-50 transition-colors`}
-    >
-      {loading ? 'Loading...' : buttonText}
-    </button>
+    <>
+      <button
+        onClick={handleClick}
+        disabled={loading || relationship === 'pending'}
+        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          relationship === 'pending'
+            ? 'bg-green-600 text-white cursor-default'
+            : 'bg-purple-600 text-white hover:bg-purple-700'
+        } disabled:opacity-50`}
+      >
+        {loading ? 'Sending...' : relationship === 'pending' ? 'Request Sent ✓' : 'Add Friend'}
+      </button>
+      
+      {errorMessage && (
+        <p className="text-red-500 text-xs mt-2">{errorMessage}</p>
+      )}
+    </>
   );
 }
