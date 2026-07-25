@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 
@@ -18,10 +19,20 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
     setLoading(true);
 
     try {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        alert('You must be logged in to block users');
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch('/api/friend/block-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ targetUserId, action: 'block' }),
       });
@@ -30,6 +41,7 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
 
       if (result.success) {
         setIsOpen(false);
+        alert('User blocked successfully');
         window.location.reload();
       } else {
         alert(result.error || 'Failed to block user');
