@@ -39,11 +39,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ is_blocked: false });
     }
     
+    // FIXED: Check if CURRENT USER (viewer) blocked the TARGET USER (profile owner)
     const { data } = await supabase
       .from('blocks')
       .select('id')
-      .eq('blocker_id', targetUserId)
-      .eq('blocked_id', user.id)
+      .eq('blocker_id', user.id)        // Who did the blocking (current user/viewer)
+      .eq('blocked_id', targetUserId)   // Who got blocked (profile owner/target)
       .maybeSingle();
     
     return NextResponse.json({ is_blocked: !!data });
