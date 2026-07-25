@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-import { sendFriendRequest } from '@/app/actions/friends';
 
 interface FriendButtonProps {
   targetUserId: string;
@@ -25,7 +24,20 @@ export default function FriendButton({ targetUserId, currentUserId, authToken }:
     setErrorMessage(null);
 
     try {
-      const result = await sendFriendRequest(targetUserId, authToken);
+      const res = await fetch('/api/friend/send-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ addresseeId: targetUserId }),
+      });
+      
+      const result = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(result.error || 'Failed to send friend request');
+      }
       
       if (result.success) {
         setRelationship('pending');
