@@ -11,7 +11,7 @@ const supabase = createClient(
 );
 
 interface FriendSectionProps {
-  targetUserId: string;
+  targetUserId: string; // This is user_id from user_profiles table
 }
 
 export default function FriendSection({ targetUserId }: FriendSectionProps) {
