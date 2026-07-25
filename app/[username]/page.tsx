@@ -82,6 +82,52 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Friends List */}
         <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
 
+        {/* Block User Section */}
+        {currentUserId && currentUserId !== profile.user_id && (
+          <div className="rounded-md border border-border p-4">
+            <h3 className="font-semibold text-foreground mb-2">Actions</h3>
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={async () => {
+                  const confirmed = confirm('Block this user? They won\'t be able to interact with you.');
+                  if (!confirmed) return;
+                  
+                  try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session?.access_token) {
+                      alert('Please log in');
+                      return;
+                    }
+
+                    const res = await fetch('/api/friend/block-user', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`,
+                      },
+                      body: JSON.stringify({ targetUserId: profile.user_id, action: 'block' }),
+                    });
+
+                    const result = await res.json();
+                    if (result.success) {
+                      alert('User blocked successfully');
+                      window.location.reload();
+                    } else {
+                      alert(result.error || 'Failed to block user');
+                    }
+                  } catch (error) {
+                    console.error('Block error:', error);
+                    alert('Failed to block user');
+                  }
+                }}
+                className="px-4 py-2 rounded-md text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/80 transition-colors"
+              >
+                Block User
+              </button>
+            </div>
+          </div>
+        )}
+
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
             {country && <p><span className="font-medium">Country:</span> {country}</p>}
