@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
+import BlockUserButton from "@/components/BlockUserButton";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,6 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
-  // Get current logged-in user (safely - won't crash if it fails)
   let currentUserId: string | null = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -72,7 +72,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
 
-        {/* Friend Button Section - Client Side */}
+        {/* Friend Button Section */}
         <div className="flex justify-center gap-4 py-4">
           <FriendSection targetUserId={profile.user_id} />
         </div>
@@ -87,53 +87,23 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <div className="rounded-md border border-border p-4">
             <h3 className="font-semibold text-foreground mb-2">Actions</h3>
             <div className="flex gap-2 justify-center">
-              <button
-                onClick={async () => {
-                  const confirmed = confirm('Block this user? They won\'t be able to interact with you.');
-                  if (!confirmed) return;
-                  
-                  try {
-                    const { data: { session } } = await supabase.auth.getSession();
-                    if (!session?.access_token) {
-                      alert('Please log in');
-                      return;
-                    }
-
-                    const res = await fetch('/api/friend/block-user', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`,
-                      },
-                      body: JSON.stringify({ targetUserId: profile.user_id, action: 'block' }),
-                    });
-
-                    const result = await res.json();
-                    if (result.success) {
-                      alert('User blocked successfully');
-                      window.location.reload();
-                    } else {
-                      alert(result.error || 'Failed to block user');
-                    }
-                  } catch (error) {
-                    console.error('Block error:', error);
-                    alert('Failed to block user');
-                  }
-                }}
-                className="px-4 py-2 rounded-md text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/80 transition-colors"
-              >
-                Block User
-              </button>
+              <BlockUserButton 
+                targetUserId={profile.user_id} 
+                targetUsername={profile.username} 
+              />
             </div>
           </div>
         )}
 
+        {/* Country & Website */}
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
             {country && <p><span className="font-medium">Country:</span> {country}</p>}
             {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
           </div>
         )}
+
+        {/* Favourite Games */}
         {favouriteGames.length > 0 && (
           <div className="rounded-md border border-border p-4 text-left space-y-3">
             <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
@@ -142,6 +112,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </div>
           </div>
         )}
+
+        {/* Back Link */}
         <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
       </div>
     </main>
