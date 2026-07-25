@@ -7,15 +7,16 @@ import { sendFriendRequest } from '@/app/actions/friends';
 interface FriendButtonProps {
   targetUserId: string;
   currentUserId: string | null;
+  authToken: string | null;
 }
 
-export default function FriendButton({ targetUserId, currentUserId }: FriendButtonProps) {
+export default function FriendButton({ targetUserId, currentUserId, authToken }: FriendButtonProps) {
   const [relationship, setRelationship] = useState<'none' | 'pending'>('none');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleClick = async () => {
-    if (!currentUserId) {
+    if (!authToken) {
       alert('Please log in to add friends');
       return;
     }
@@ -24,7 +25,7 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     setErrorMessage(null);
 
     try {
-      const result = await sendFriendRequest(targetUserId);
+      const result = await sendFriendRequest(targetUserId, authToken);
       
       if (result.success) {
         setRelationship('pending');
@@ -32,12 +33,8 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
         setErrorMessage(result.message || 'Something went wrong');
       }
     } catch (err: any) {
-      // Full error logging - CHECK BROWSER CONSOLE!
       console.error('=== SEND FRIEND REQUEST ERROR ===');
-      console.error('Error object:', err);
       console.error('Error message:', err.message);
-      console.error('Error digest:', err.digest);
-      console.error('Stack trace:', err.stack);
       console.error('=== END ERROR ===');
       
       setErrorMessage(err.message || 'Failed to send friend request');
@@ -46,7 +43,6 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     }
   };
 
-  // Don't show button on own profile
   if (currentUserId === targetUserId) {
     return null;
   }
