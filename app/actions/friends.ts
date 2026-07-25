@@ -1,17 +1,16 @@
 // app/actions/friends.ts
 'use server';
 
-import { createClient as createBasicClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-// Create Supabase client with cookies for auth
 async function createServerClient() {
   const cookieStore = await cookies();
   
-  const supabase = createBasicClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!, // Service role key for server actions
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       auth: {
         persistSession: false,
@@ -27,8 +26,6 @@ async function createServerClient() {
   
   return supabase;
 }
-
-// ============ FRIEND REQUESTS ============
 
 export async function sendFriendRequest(addresseeId: string) {
   const supabase = await createServerClient();
@@ -114,8 +111,6 @@ export async function removeFriend(friendshipId: string) {
   return { success: true };
 }
 
-// ============ BLOCKING ============
-
 export async function blockUser(targetUserId: string) {
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -123,7 +118,6 @@ export async function blockUser(targetUserId: string) {
   if (!user) throw new Error('Not authenticated');
   if (user.id === targetUserId) throw new Error('Cannot block yourself');
   
-  // Remove any existing friendships first
   await supabase
     .from('friendships')
     .delete()
@@ -153,8 +147,6 @@ export async function unblockUser(targetUserId: string) {
   revalidatePath('/dashboard');
   return { success: true };
 }
-
-// ============ QUERY HELPERS ============
 
 export async function getFriends() {
   const supabase = await createServerClient();
