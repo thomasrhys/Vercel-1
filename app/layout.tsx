@@ -1,9 +1,11 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import V13Enhancer from "./V13Enhancer";
 import AuthFetchPatch from "./AuthFetchPatch";
+import FriendProvider from "@/components/FriendProvider"; // ← Add this import
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -59,7 +61,7 @@ export default function RootLayout({
           />
         </noscript>
 
-        {children}
+        <FriendProvider>{children}</FriendProvider> {/* ← Wrap children */}
         <AuthFetchPatch />
         <V13Enhancer />
         {process.env.NODE_ENV === "production" && <Analytics />}
