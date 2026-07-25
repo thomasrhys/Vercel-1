@@ -47,17 +47,17 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
       <button
         onClick={handleClick}
         disabled={loading || relationship === 'pending'}
-        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+        className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
           relationship === 'pending'
-            ? 'bg-green-600 text-white cursor-default'
-            : 'bg-purple-600 text-white hover:bg-purple-700'
+            ? 'bg-green-600 text-white cursor-default hover:bg-green-600'
+            : 'bg-primary text-primary-foreground hover:bg-primary/90'
         } disabled:opacity-50`}
       >
         {loading ? 'Sending...' : relationship === 'pending' ? 'Request Sent ✓' : 'Add Friend'}
       </button>
       
       {errorMessage && (
-        <p className="text-red-500 text-xs mt-2">{errorMessage}</p>
+        <p className="text-destructive text-xs mt-2">{errorMessage}</p>
       )}
     </>
   );
