@@ -1,4 +1,4 @@
-// app/[username]/page.tsx - RESTORED ORIGINAL
+// app/[username]/page.tsx
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
@@ -69,4 +69,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         )}
         {favouriteGames.length > 0 && (
           <div className="rounded-md border border-border p-4 text-left space-y-3">
-            <h2 className="font-semibold text-foreground text-center">Favourite ga
+            <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
+            <div className="flex flex-wrap justify-center gap-2">
+              {favouriteGames.map((game) => <span key={game} className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">{game}</span>)}
+            </div>
+          </div>
+        )}
+        <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
+      </div>
+    </main>
+  );
+}
