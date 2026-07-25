@@ -1,7 +1,7 @@
-// components/FriendProvider.tsx - FIXED
+// components/FriendProvider.tsx - UPDATED
 'use client';
 
-import { FriendNotificationBell } from '@/components/FriendNotificationBell'; // ← Use @ alias!
+import { FriendNotificationBell } from '../components/FriendNotificationBell'; // ← Changed to relative
 import { ReactNode } from 'react';
 
 export default function FriendProvider({ children }: { children: ReactNode }) {
