@@ -14,7 +14,6 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check relationship status when component mounts
   useEffect(() => {
     checkRelationship();
   }, [targetUserId, currentUserId]);
@@ -25,9 +24,9 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
       return;
     }
 
-    // Fetch all friendships and filter for this pair
-    // We'll implement getRelationship helper in a moment
-    const res = await fetch(`/api/friendship-status?userId=${currentUserId}&targetId=${targetUserId}`);
+    const res = await fetch(`/api/friendship-status?userId=${currentUserId}&targetId=${targetUserId}`, {
+      credentials: 'include', // Send cookies
+    });
     const data = await res.json();
     setRelationship(data.status || 'none');
   };
@@ -46,9 +45,13 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
         await sendFriendRequest(targetUserId);
         setRelationship('pending');
       } else if (relationship === 'friends') {
-        // Note: We'd need friendship ID here for removal
-        // For now, placeholder - we'll improve this next
-        alert('Unfriend functionality needs friendship ID lookup');
+        // For unfriending, we'll need to handle friendship ID differently
+        // See note below
+        const confirmed = confirm('Remove this friend?');
+        if (!confirmed) return;
+        
+        // You'll need to fetch the friendship ID first (see below)
+        alert('Unfriend requires friendship ID lookup - coming soon!');
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
@@ -57,7 +60,6 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     }
   };
 
-  // Don't show button if viewing own profile
   if (currentUserId === targetUserId) {
     return null;
   }
