@@ -1,12 +1,37 @@
+// app/actions/friends.ts
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createBasicClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+
+// Create Supabase client with cookies for auth
+async function createServerClient() {
+  const cookieStore = await cookies();
+  
+  const supabase = createBasicClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!, // Service role key for server actions
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      global: {
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      },
+    }
+  );
+  
+  return supabase;
+}
 
 // ============ FRIEND REQUESTS ============
 
 export async function sendFriendRequest(addresseeId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) throw new Error('Not authenticated');
@@ -42,7 +67,7 @@ export async function sendFriendRequest(addresseeId: string) {
 }
 
 export async function acceptFriendRequest(friendshipId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await supabase
@@ -61,7 +86,7 @@ export async function acceptFriendRequest(friendshipId: string) {
 }
 
 export async function declineFriendRequest(friendshipId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await supabase
@@ -76,7 +101,7 @@ export async function declineFriendRequest(friendshipId: string) {
 }
 
 export async function removeFriend(friendshipId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await supabase
@@ -92,7 +117,7 @@ export async function removeFriend(friendshipId: string) {
 // ============ BLOCKING ============
 
 export async function blockUser(targetUserId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) throw new Error('Not authenticated');
@@ -115,7 +140,7 @@ export async function blockUser(targetUserId: string) {
 }
 
 export async function unblockUser(targetUserId: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { error } = await supabase
@@ -132,7 +157,7 @@ export async function unblockUser(targetUserId: string) {
 // ============ QUERY HELPERS ============
 
 export async function getFriends() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data } = await supabase
@@ -152,7 +177,7 @@ export async function getFriends() {
 }
 
 export async function getPendingRequests() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data } = await supabase
@@ -170,7 +195,7 @@ export async function getPendingRequests() {
 }
 
 export async function getBlockedUsers() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data } = await supabase
