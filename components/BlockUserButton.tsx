@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import ConfirmDialog from '@/components/confirm-dialog';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 interface BlockUserButtonProps {
   targetUserId: string;
@@ -30,7 +30,6 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
 
       if (result.success) {
         setIsOpen(false);
-        // Reload to reflect changes
         window.location.reload();
       } else {
         alert(result.error || 'Failed to block user');
