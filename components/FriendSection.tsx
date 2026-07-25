@@ -12,39 +12,35 @@ interface FriendSectionProps {
 export default function FriendSection({ targetUserId }: FriendSectionProps) {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const getCurrentUser = async () => {
+    const initAuth = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setCurrentUserId(user?.id || null);
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        setCurrentUserId(session?.user?.id || null);
+        setSessionToken(session?.access_token || null);
       } catch (error) {
-        console.log('Not logged in or auth check failed');
+        console.log('Auth check failed');
         setCurrentUserId(null);
+        setSessionToken(null);
       } finally {
         setLoading(false);
       }
     };
 
-    getCurrentUser();
+    initAuth();
   }, []);
 
-  if (loading) {
-    return <div className="h-10" />;
-  }
-
-  if (!currentUserId) {
-    return (
-      <a href="/login" className="inline-block rounded-md border border-border px-4 py-2 text-sm hover:bg-muted">
-        Log in to add friends
-      </a>
-    );
-  }
+  if (loading) return <div className="h-10" />;
+  if (!currentUserId) return <a href="/login" className="text-sm underline">Log in to add friends</a>;
 
   return (
     <FriendButton 
-      targetUserId={targetUserId}
+      targetUserId={targetUserId} 
       currentUserId={currentUserId}
+      authToken={sessionToken}
     />
   );
 }
