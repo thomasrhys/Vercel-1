@@ -1,4 +1,4 @@
-// app/[username]/page.tsx - Simplified Version
+// app/[username]/page.tsx
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import FriendSection from "@/components/FriendSection";
@@ -42,23 +42,28 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
-  // Check if profile owner has blocked current user
+  // Get current logged-in user
+  let currentUserId: string | null = null;
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const blockCheck = await supabase
-        .from('blocks')
-        .select('id')
-        .eq('blocker_id', profile.user_id)
-        .eq('blocked_id', user.id)
-        .maybeSingle();
-      
-      if (blockCheck.data) {
-        notFound();
-      }
-    }
+    currentUserId = user?.id || null;
   } catch (error) {
-    // If auth check fails, still allow viewing (they might be logged out)
+    console.log('Could not fetch current user');
+  }
+
+  // CHECK IF CURRENT USER IS BLOCKED BY PROFILE OWNER
+  if (currentUserId) {
+    const blockCheck = await supabase
+      .from('blocks')
+      .select('id')
+      .eq('blocker_id', profile.user_id)
+      .eq('blocked_id', currentUserId)
+      .maybeSingle();
+    
+    if (blockCheck.data) {
+      // Throw error to trigger 500 error.tsx - looks like server error
+      throw new Error('Failed to load profile data');
+    }
   }
 
   const displayName = profile.display_name || "Unnamed player";
@@ -93,7 +98,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {/* Friends List */}
         <FriendsList userId={profile.user_id} currentUserId={null} friendsVisible={profile.friends_visible ?? false} />
 
-        {/* Block Section - Now Client-Side! */}
+        {/* Block Section */}
         <BlockSection 
           targetUserId={profile.user_id} 
           targetUsername={profile.username} 
