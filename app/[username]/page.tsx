@@ -61,8 +61,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       .maybeSingle();
     
     if (blockCheck.data) {
-      // Throw error to trigger 500 error.tsx - looks like server error
-      throw new Error('Failed to load profile data');
+      // Throw error with a specific message for blocked users
+      const error = new Error('You are blocked');
+      (error as any).statusCode = 403;
+      throw error;
     }
   }
 
