@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
-    // Get auth token from request header
     const authorization = req.headers.get('authorization');
     const authToken = authorization?.startsWith('Bearer ') 
       ? authorization.slice(7) 
@@ -31,7 +30,6 @@ export async function GET(req: NextRequest) {
       }
     );
     
-    // Get user from token
     const { data: { user }, error: userError } = await supabase.auth.getUser(authToken);
     
     if (userError || !user) {
@@ -41,15 +39,10 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    // Get pending requests
+    // Get pending requests where current user is the recipient
     const { data, error } = await supabase
       .from('friendships')
-      .select(`
-        id,
-        requester_id,
-        created_at,
-        requester:user_profile(requester_id, username, display_name, avatar_url)
-      `)
+      .select('id, requester_id, created_at')
       .eq('addressee_id', user.id)
       .eq('status', 'pending');
     
@@ -61,7 +54,25 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    return NextResponse.json({ success: true, data: data || [] });
+    // For each request, get the requester's profile info separately
+    const requestsWithProfile = await Promise.all(
+      (data || []).map(async (request) => {
+        const { data: profileData } = await supabase
+          .from('user_profiles')
+          .select('username, display_name, avatar_url')
+          .eq('user_id', request.requester_id)
+          .single();
+        
+        return {
+          id: request.id,
+          requester_id: request.requester_id,
+          created_at: request.created_at,
+          requester: profileData || null,
+        };
+      })
+    );
+    
+    return NextResponse.json({ success: true, data: requestsWithProfile });
   } catch (err: any) {
     console.error('[Pending Requests Catch]:', err.message);
     return NextResponse.json(
