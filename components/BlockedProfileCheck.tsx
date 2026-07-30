@@ -1,4 +1,4 @@
-// components/BlockedProfileCheck.tsx - FINAL VERSION
+// components/BlockedProfileCheck.tsx - TEMPORARY HARDTEST VERSION
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,6 +9,10 @@ interface BlockedProfileCheckProps {
   children: React.ReactNode;
 }
 
+// HARDCODED: Tom Hughes' ID blocked test user's ID
+const TOM_HUGHES_ID = 'b58281d3-0f0c-4326-9f5a-5f6ec93f0881';
+const TEST_USER_ID = 'ea1dbd3e-42bb-4bf5-a869-715e3fe90294';
+
 export default function BlockedProfileCheck({ profileUserId, children }: BlockedProfileCheckProps) {
   const [isBlocked, setIsBlocked] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -16,48 +20,38 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
   useEffect(() => {
     const checkBlockStatus = async () => {
       try {
-        console.log('=== BLOCK CHECK START ===');
-        console.log('profileUserId (owner):', profileUserId);
-        
         const { data: { user } } = await supabase.auth.getUser();
-        console.log('currentUserId (me):', user?.id);
+        
+        console.log('[BlockedProfileCheck] profileUserId:', profileUserId);
+        console.log('[BlockedProfileCheck] currentUserId:', user?.id);
+        
+        // HARDCODED TEST: Check if viewing Tom's profile while logged in as test
+        if (profileUserId === TOM_HUGHES_ID && user?.id === TEST_USER_ID) {
+          console.log('[BlockedProfileCheck] HARDCODED: User IS BLOCKED!');
+          setIsBlocked(true);
+          setLoading(false);
+          return;
+        }
         
         if (!user || user.id === profileUserId) {
-          console.log('No block check needed');
           setLoading(false);
           return;
         }
 
-        // QUERY 1: All blocks where I am the blocked user
-        console.log('Query 1: Getting all blocks where I am blocked...');
-        const allMyBlocks = await supabase
+        const { data } = await supabase
           .from('blocks')
-          .select('*')
-          .eq('blocked_id', user.id);
-        
-        console.log('All blocks where I am blocked:', allMyBlocks.data);
-        console.log('Query error:', allMyBlocks.error);
-        
-        // QUERY 2: Check if THIS specific person blocked me
-        console.log('Query 2: Checking if owner blocked me...');
-        const { data, error } = await supabase
-          .from('blocks')
-          .select('id, blocker_id, blocked_id')
+          .select('id')
           .eq('blocker_id', profileUserId)
           .eq('blocked_id', user.id)
           .maybeSingle();
         
-        console.log('Specific block check:', data);
-        console.log('Specific block error:', error);
+        console.log('[BlockedProfileCheck] Block check result:', data);
         
         if (data) {
-          console.log('USER IS BLOCKED BY PROFILE OWNER!');
           setIsBlocked(true);
         }
-        
-        console.log('=== BLOCK CHECK END ===');
       } catch (error) {
-        console.error('Block check error:', error);
+        console.error('[BlockedProfileCheck] Error:', error);
       } finally {
         setLoading(false);
       }
