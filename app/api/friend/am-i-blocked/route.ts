@@ -4,14 +4,18 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('[am-i-blocked] Request received');
+    console.log('[am-i-blocked] === REQUEST START ===');
+    console.log('[am-i-blocked] Method:', req.method);
+    console.log('[am-i-blocked] URL:', req.url);
     
     const authorization = req.headers.get('authorization');
+    console.log('[am-i-blocked] Authorization header exists:', !!authorization);
+    
     const authToken = authorization?.startsWith('Bearer ') 
       ? authorization.slice(7) 
       : null;
     
-    console.log('[am-i-blocked] Token exists:', !!authToken);
+    console.log('[am-i-blocked] Token (first 20 chars):', authToken?.substring(0, 20));
     
     if (!authToken) {
       console.log('[am-i-blocked] No token - returning not blocked');
@@ -34,7 +38,7 @@ export async function GET(req: NextRequest) {
     
     const { data: { user }, error: userError } = await supabase.auth.getUser(authToken);
     
-    console.log('[am-i-blocked] Current user:', user?.id);
+    console.log('[am-i-blocked] Current user ID:', user?.id);
     console.log('[am-i-blocked] User error:', userError);
     
     if (userError || !user) {
@@ -52,23 +56,38 @@ export async function GET(req: NextRequest) {
     }
     
     // Check if TARGET USER (profile owner) blocked CURRENT USER (viewer)
-    console.log('[am-i-blocked] Checking blocks table...');
-    console.log('[am-i-blocked] blocker_id (should be targetUserId):', targetUserId);
-    console.log('[am-i-blocked] blocked_id (should be current user):', user.id);
+    console.log('[am-i-blocked] === QUERYING BLOCKS TABLE ===');
+    console.log('[am-i-blocked] Looking for: blocker_id =', targetUserId);
+    console.log('[am-i-blocked] Looking for: blocked_id =', user.id);
     
-    const { data } = await supabase
+    // Try ALL blocks for the current user first
+    const allBlocks = await supabase
       .from('blocks')
-      .select('id')
-      .eq('blocker_id', targetUserId)   // Profile owner did the blocking
-      .eq('blocked_id', user.id)        // Current user got blocked
+      .select('*')
+      .eq('blocked_id', user.id);
+    
+    console.log('[am-i-blocked] All blocks where I am blocked:', allBlocks.data);
+    console.log('[am-i-blocked] All blocks error:', allBlocks.error);
+    
+    // Now check the specific one
+    const { data, error } = await supabase
+      .from('blocks')
+      .select('id, blocker_id, blocked_id')
+      .eq('blocker_id', targetUserId)
+      .eq('blocked_id', user.id)
       .maybeSingle();
     
-    console.log('[am-i-blocked] Block record found:', !!data);
-    console.log('[am-i-blocked] Block record:', data);
+    console.log('[am-i-blocked] Specific query result:', data);
+    console.log('[am-i-blocked] Specific query error:', error);
     
-    return NextResponse.json({ is_blocked: !!data });
+    const isBlocked = !!data;
+    console.log('[am-i-blocked] === FINAL RESULT ===');
+    console.log('[am-i-blocked] is_blocked:', isBlocked);
+    
+    return NextResponse.json({ is_blocked });
   } catch (err: any) {
-    console.error('[am-i-blocked] Error:', err.message);
+    console.error('[am-i-blocked] ERROR:', err.message);
+    console.error('[am-i-blocked] Stack:', err.stack);
     return NextResponse.json({ is_blocked: false });
   }
 }
