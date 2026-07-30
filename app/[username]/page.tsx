@@ -61,8 +61,26 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       .maybeSingle();
     
     if (blockCheck.data) {
-      // Throw error to trigger 500 error.tsx - looks like server error
-      throw new Error('Failed to load profile data');
+      // Render custom 500 error UI directly
+      return (
+        <main className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md text-center space-y-4">
+            <h1 className="text-6xl font-bold text-foreground">500</h1>
+            <h2 className="text-xl font-semibold text-foreground">
+              Something went wrong
+            </h2>
+            <p className="text-muted-foreground">
+              An unexpected error occurred while loading this page.
+            </p>
+            <a 
+              href="/" 
+              className="inline-block px-4 py-2 rounded-md border border-border text-sm hover:bg-muted transition-colors"
+            >
+              Go Home
+            </a>
+          </div>
+        </main>
+      );
     }
   }
 
