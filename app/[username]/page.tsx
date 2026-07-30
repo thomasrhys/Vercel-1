@@ -60,6 +60,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       .eq('blocked_id', currentUserId)
       .maybeSingle();
     
+    console.log("[v0] Block check - Blocker:", profile.user_id, "Blocked:", currentUserId, "Result:", blockCheck.data);
+    
     if (blockCheck.data) {
       // Throw error to trigger 500 error.tsx - looks like server error
       throw new Error('Failed to load profile data');
