@@ -4,15 +4,21 @@ import { createClient } from "@supabase/supabase-js";
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
 import BlockSection from "@/components/BlockSection";
-import BlockedProfileCheck from "@/components/BlockedProfileCheck";
 
 export const dynamic = "force-dynamic";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false, autoRefreshToken: false } }
-);
+function getServerSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { 
+      auth: { 
+        persistSession: false, 
+        autoRefreshToken: false 
+      } 
+    }
+  );
+}
 
 function normalizeWebsite(value?: string | null) {
   if (!value) return "";
@@ -24,6 +30,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const handle = username.trim().toLowerCase().replace(/^@+/, "");
 
   if (!/^[a-z0-9_]{3,20}$/.test(handle)) notFound();
+
+  const supabase = getServerSupabase();
 
   const full = await supabase
     .from("user_profiles")
@@ -43,6 +51,53 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
+  // Get current logged-in user from session cookie
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserId = user?.id || null;
+
+  console.log('[Profile Page] Current User ID:', currentUserId);
+  console.log('[Profile Page] Profile User ID:', profile.user_id);
+
+  // CHECK IF PROFILE OWNER BLOCKED CURRENT USER (SERVER-SIDE)
+  if (currentUserId && currentUserId !== profile.user_id) {
+    console.log('[Profile Page] Checking if profile owner blocked current user...');
+    
+    const blockCheck = await supabase
+      .from('blocks')
+      .select('id')
+      .eq('blocker_id', profile.user_id)      // Profile owner did the blocking
+      .eq('blocked_id', currentUserId)        // Current user got blocked
+      .maybeSingle();
+    
+    console.log('[Profile Page] Block check result:', blockCheck);
+    
+    if (blockCheck.data) {
+      console.log('[Profile Page] USER IS BLOCKED - Returning 500 page');
+      // Render custom 500 error UI directly
+      return (
+        <main className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md text-center space-y-4">
+            <h1 className="text-6xl font-bold text-foreground">500</h1>
+            <h2 className="text-xl font-semibold text-foreground">
+              Something went wrong
+            </h2>
+            <p className="text-muted-foreground">
+              An unexpected error occurred while loading this page.
+            </p>
+            <a 
+              href="/" 
+              className="inline-block px-4 py-2 rounded-md border border-border text-sm hover:bg-muted transition-colors"
+            >
+              Go Home
+            </a>
+          </div>
+        </main>
+      );
+    }
+    
+    console.log('[Profile Page] User is NOT blocked');
+  }
+
   const displayName = profile.display_name || "Unnamed player";
   const country = "country" in profile ? profile.country : "";
   const websiteUrl = "website_url" in profile ? profile.website_url : "";
@@ -50,60 +105,58 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const website = normalizeWebsite(websiteUrl);
 
   return (
-    <BlockedProfileCheck profileUserId={profile.user_id}>
-      <main className="min-h-screen bg-background p-4 sm:p-8">
-        <div className="max-w-xl mx-auto rounded-lg border border-border bg-card p-6 text-center space-y-4">
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt="Profile avatar" className="h-24 w-24 rounded-full object-cover mx-auto border border-border" />
-          ) : (
-            <div className="h-24 w-24 rounded-full bg-primary text-primary-foreground mx-auto flex items-center justify-center text-3xl font-bold">
-              {displayName.slice(0, 1).toUpperCase()}
-            </div>
-          )}
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
-            <p className="text-muted-foreground">/{profile.username}</p>
-            {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
+    <main className="min-h-screen bg-background p-4 sm:p-8">
+      <div className="max-w-xl mx-auto rounded-lg border border-border bg-card p-6 text-center space-y-4">
+        {profile.avatar_url ? (
+          <img src={profile.avatar_url} alt="Profile avatar" className="h-24 w-24 rounded-full object-cover mx-auto border border-border" />
+        ) : (
+          <div className="h-24 w-24 rounded-full bg-primary text-primary-foreground mx-auto flex items-center justify-center text-3xl font-bold">
+            {displayName.slice(0, 1).toUpperCase()}
           </div>
-
-          {/* Friend Button Section */}
-          <div className="flex justify-center gap-4 py-4">
-            <FriendSection targetUserId={profile.user_id} />
-          </div>
-
-          <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
-
-          {/* Friends List */}
-          <FriendsList userId={profile.user_id} currentUserId={null} friendsVisible={profile.friends_visible ?? false} />
-
-          {/* Block Section */}
-          <BlockSection 
-            targetUserId={profile.user_id} 
-            targetUsername={profile.username} 
-          />
-
-          {/* Country & Website */}
-          {(country || website) && (
-            <div className="rounded-md border border-border p-4 text-sm space-y-2">
-              {country && <p><span className="font-medium">Country:</span> {country}</p>}
-              {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
-            </div>
-          )}
-
-          {/* Favourite Games */}
-          {favouriteGames.length > 0 && (
-            <div className="rounded-md border border-border p-4 text-left space-y-3">
-              <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
-              <div className="flex flex-wrap justify-center gap-2">
-                {favouriteGames.map((game) => <span key={game} className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">{game}</span>)}
-              </div>
-            </div>
-          )}
-
-          {/* Back Link */}
-          <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
+        )}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
+          <p className="text-muted-foreground">/{profile.username}</p>
+          {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
-      </main>
-    </BlockedProfileCheck>
+
+        {/* Friend Button Section */}
+        <div className="flex justify-center gap-4 py-4">
+          <FriendSection targetUserId={profile.user_id} />
+        </div>
+
+        <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
+
+        {/* Friends List */}
+        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
+
+        {/* Block Section */}
+        <BlockSection 
+          targetUserId={profile.user_id} 
+          targetUsername={profile.username} 
+        />
+
+        {/* Country & Website */}
+        {(country || website) && (
+          <div className="rounded-md border border-border p-4 text-sm space-y-2">
+            {country && <p><span className="font-medium">Country:</span> {country}</p>}
+            {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
+          </div>
+        )}
+
+        {/* Favourite Games */}
+        {favouriteGames.length > 0 && (
+          <div className="rounded-md border border-border p-4 text-left space-y-3">
+            <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
+            <div className="flex flex-wrap justify-center gap-2">
+              {favouriteGames.map((game) => <span key={game} className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">{game}</span>)}
+            </div>
+          </div>
+        )}
+
+        {/* Back Link */}
+        <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
+      </div>
+    </main>
   );
 }
