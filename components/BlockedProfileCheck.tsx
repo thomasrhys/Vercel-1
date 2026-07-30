@@ -18,14 +18,7 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user) {
-          // Not logged in - can't be blocked
-          setLoading(false);
-          return;
-        }
-
-        if (user.id === profileUserId) {
-          // Viewing own profile - not blocked
+        if (!user || user.id === profileUserId) {
           setLoading(false);
           return;
         }
@@ -36,8 +29,8 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
           return;
         }
 
-        // Check if profile owner blocked current user
-        const res = await fetch(`/api/friend/is-blocked?targetUserId=${profileUserId}`, {
+        // Use the NEW endpoint that checks "did they block ME?"
+        const res = await fetch(`/api/friend/am-i-blocked?targetUserId=${profileUserId}`, {
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
           },
