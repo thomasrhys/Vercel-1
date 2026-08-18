@@ -1,16 +1,13 @@
+// app/admin/descriptions/page.tsx
+// Auth migration: Clerk → Pure Supabase with role-based permissions
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@/lib/clerk-compat";
+import { useUser, supabase } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Lock } from "lucide-react";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 type AdminGame = {
   id: string;
@@ -21,8 +18,8 @@ type AdminGame = {
 };
 
 export default function DescriptionsPage() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+  const { isSignedIn, user, loading, signOut } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [games, setGames] = useState<AdminGame[]>([]);
   const [selectedGameId, setSelectedGameId] = useState("");
@@ -44,6 +41,23 @@ export default function DescriptionsPage() {
 
   const gamesWithDescriptions = games.filter((game) => game.description?.trim()).length;
 
+  // Check admin role from user_profiles table
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || loading) return;
+
+    const checkAdminRole = async () => {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      setIsAdmin(profile?.role === 'owner' || profile?.role === 'admin');
+    };
+
+    checkAdminRole();
+  }, [isSignedIn, user?.id, loading]);
+
   const loadGames = async () => {
     setIsLoading(true);
     setMessage("");
@@ -64,8 +78,8 @@ export default function DescriptionsPage() {
   };
 
   useEffect(() => {
-    if (isAdmin) loadGames();
-  }, [isAdmin]);
+    if (!loading && isAdmin) loadGames();
+  }, [isAdmin, loading]);
 
   const pickGame = (game: AdminGame) => {
     setSelectedGameId(game.id);
@@ -112,6 +126,18 @@ export default function DescriptionsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">Loading...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -121,7 +147,7 @@ export default function DescriptionsPage() {
             <CardDescription>Sign in to edit hidden game descriptions.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <SignInButton mode="modal"><Button className="w-full">Sign in</Button></SignInButton>
+            <Button className="w-full" onClick={() => (window.location.href = "/auth/login")}>Sign in</Button>
             <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
           </CardContent>
         </Card>
@@ -138,8 +164,8 @@ export default function DescriptionsPage() {
             <CardDescription>This account does not have admin access.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <UserButton />
-            <SignOutButton redirectUrl="/"><Button variant="outline" className="w-full">Sign out</Button></SignOutButton>
+            <Button variant="outline" className="w-full" onClick={() => signOut()}>Sign out</Button>
+            <Button className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
           </CardContent>
         </Card>
       </div>
