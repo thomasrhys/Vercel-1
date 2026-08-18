@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Check, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,41 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 
-const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
-const OWNER_NAMES = ["owner", "pitstopyt"];
-const RESERVED = ["admin", "administrator", "support", "staff", "system", "gamesportal", "fnfaw", "moderator", "official", "api", "root"];
+// Helper component that only runs on client
+function OAuthErrorHandler() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    const errorDesc = searchParams.get("error_description");
+    
+    if (errorParam || errorDesc) {
+      const message = errorDesc || errorParam || "An OAuth error occurred";
+      setErrorMessage(message);
+      
+      // Clean URL after displaying error (debounce slightly)
+      setTimeout(() => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("error");
+        newParams.delete("error_description");
+        newParams.delete("error_code");
+        newParams.delete("sb");
+        
+        if (newParams.toString()) {
+          router.replace(`?${newParams.toString()}`, { scroll: false });
+        } else {
+          router.replace(window.location.pathname, { scroll: false });
+        }
+      }, 100);
+    }
+  }, [searchParams, router]);
+
+  if (!errorMessage) return null;
+
+  return <div className="text-xs text-orange-600 mb-2">⚠️ {errorMessage}</div>;
+}
 
 function DiscordIcon() {
   return (
@@ -56,7 +88,6 @@ function cleanUsername(value: string) {
   return value.trim().toLowerCase().replace(/^@+/, ""); 
 }
 
-// OAuth scopes for each provider - REQUIRED for linkIdentity to work
 const OAUTH_SCOPES: Record<string, string> = {
   google: "email",
   github: "user:email",
@@ -67,8 +98,6 @@ const OAUTH_SCOPES: Record<string, string> = {
 
 export default function AccountPage() {
   const { user, session, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -93,32 +122,6 @@ export default function AccountPage() {
   const hasTwitch = providers.includes("twitch");
   const hasDiscord = providers.includes("discord");
   const profilePath = username ? `/${username}` : "";
-
-  // Parse URL errors and display them on the page
-  useEffect(() => {
-    const errorParam = searchParams.get("error");
-    const errorDesc = searchParams.get("error_description");
-    const errorCode = searchParams.get("error_code");
-    
-    if (errorParam || errorDesc) {
-      const errorMessage = errorDesc || errorParam || "An OAuth error occurred";
-      console.warn("OAuth error from URL:", errorMessage);
-      setMessage(errorMessage);
-      
-      // Clean URL by removing error params
-      const newParams = new URLSearchParams(searchParams.toString());
-      newParams.delete("error");
-      newParams.delete("error_description");
-      newParams.delete("error_code");
-      newParams.delete("sb");
-      
-      if (newParams.toString()) {
-        router.replace(`?${newParams.toString()}`, { scroll: false });
-      } else {
-        router.replace(window.location.pathname, { scroll: false });
-      }
-    }
-  }, [searchParams, router]);
 
   useEffect(() => {
     if (!user) return;
@@ -254,6 +257,11 @@ export default function AccountPage() {
 
   return <main className="min-h-screen bg-background p-4 sm:p-8"><div className="max-w-md mx-auto space-y-6">
     <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile. No recently played games are tracked.</CardDescription></CardHeader><CardContent className="space-y-4">
+      {/* OAuth error handler (client-side only) */}
+      <Suspense fallback={null}>
+        <OAuthErrorHandler />
+      </Suspense>
+      
       <div className="flex items-center gap-3">{avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" /> : <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">{(displayName || email || "U").slice(0, 1).toUpperCase()}</div>}<div><p className="font-medium text-foreground">{displayName || "Unnamed player"} {isOwner && <span className="ml-1 rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-700">Owner</span>}</p><p className="text-xs text-muted-foreground">{username ? `/${username}` : "No username set"}</p></div></div>
       <Input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Display name" />
       <Input value={username} onChange={(event) => setUsername(cleanUsername(event.target.value))} placeholder="username" />
