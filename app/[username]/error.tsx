@@ -8,6 +8,15 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const handleRetry = () => {
+    try {
+      reset();
+    } catch (err) {
+      // If reset() fails for any reason, force full page reload
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-4">
@@ -26,7 +35,7 @@ export default function Error({
             Go Home
           </a>
           <button
-            onClick={reset}
+            onClick={handleRetry}
             className="px-4 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80"
           >
             Retry
