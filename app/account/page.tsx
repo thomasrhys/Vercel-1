@@ -26,6 +26,14 @@ function TwitchIcon() { return <svg viewBox="0 0 24 24" className="h-5 w-5" aria
 function msg(error: unknown) { if (error instanceof Error && error.message && error.message !== "{}") return error.message; if (typeof error === "string" && error && error !== "{}") return error; if (typeof error === "object" && error !== null) { const value = error as { message?: unknown; error_description?: unknown; error?: unknown; code?: unknown; status?: unknown; name?: unknown }; if (typeof value.message === "string" && value.message && value.message !== "{}") return value.message; if (typeof value.error_description === "string" && value.error_description) return value.error_description; if (typeof value.error === "string" && value.error) return value.error; if (typeof value.code === "string" && value.code) return value.code; if (typeof value.name === "string" && value.name) return value.name; if (value.status) return `Request failed with status ${String(value.status)}`; try { const json = JSON.stringify(error); if (json && json !== "{}") return json; } catch {} } return "Supabase returned an empty error. Check Auth email settings, SMTP, and rate limits."; }
 function cleanUsername(value: string) { return value.trim().toLowerCase().replace(/^@+/, ""); }
 
+const OAUTH_SCOPES: Record<string, string> = {
+  google: "email",
+  github: "user:email",
+  azure: "email openid profile",
+  twitch: "user:read:email",
+  discord: "identify email",
+};
+
 export default function AccountPage() {
   const { user, session, isLoaded, isSignedIn, signOut } = useSupabaseAuth();
   const [displayName, setDisplayName] = useState("");
@@ -144,10 +152,21 @@ export default function AccountPage() {
     } catch (error) { setMessage(msg(error)); } finally { setBusy(false); }
   };
 
-  const linkProvider = async (provider: "google" | "github" | "azure" | "twitch") => {
+  const linkProvider = async (provider: "google" | "github" | "azure" | "twitch" | "discord") => {
     setMessage(""); setBusy(true);
-    const { error } = await supabaseAuthClient.auth.linkIdentity({ provider, options: { redirectTo: `${window.location.origin}/account` } });
-    if (error) { setMessage(msg(error)); setBusy(false); }
+    const scopes = OAUTH_SCOPES[provider];
+    const { error } = await supabaseAuthClient.auth.linkIdentity({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/account`,
+        ...(scopes ? { scopes } : {}),
+      },
+    });
+    if (error) {
+      console.error("Linking error:", { provider, error: error.message });
+      setMessage(msg(error));
+      setBusy(false);
+    }
   };
 
   if (!isLoaded) return <main className="min-h-screen bg-background flex items-center justify-center p-4">Loading account...</main>;
