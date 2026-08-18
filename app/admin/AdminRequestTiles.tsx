@@ -6,11 +6,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useUser } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client"; // ✅ Direct import
 import { AlertTriangle, Gamepad2, RefreshCcw } from "lucide-react";
-
-type Profile = {
-  role: string;
-};
 
 type StatusItem = {
   status?: string;
@@ -30,8 +27,6 @@ export default function AdminRequestTiles() {
     if (!isSignedIn || !user?.id || loading) return;
 
     const checkAdminRole = async () => {
-      const supabase = (window as any).__supabaseClient; // Or import from @/lib/supabase-client
-      
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('role')
