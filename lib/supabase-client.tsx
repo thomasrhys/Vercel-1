@@ -1,6 +1,8 @@
 // lib/supabase-client.tsx
 // Supabase Client SDK for browser (replaces Clerk completely)
-// NOTE: Must be .tsx extension because it contains JSX components
+// IMPORTANT: Must have "use client" directive because it uses React hooks
+
+"use client";
 
 import { createClient } from '@supabase/supabase-js';
 import type { User, Session } from '@supabase/supabase-js';
