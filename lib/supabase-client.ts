@@ -1,57 +1,129 @@
 // lib/supabase-client.ts
+// Supabase Client SDK for browser (replaces Clerk completely)
+
+'use client';
+
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database'; // If you have a DB type definition
+import type { User, Session } from '@supabase/supabase-js';
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
 
+// Environment variables (must be set in .env.local or Vercel)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-type AuthContextType = {
-  user: User | null;
-  isSignedIn: boolean;
-  loading: boolean;
-};
-
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isSignedIn: false,
-  loading: true,
-});
-
-export function useUser() {
-  return useContext(AuthContext);
+// Validate env vars exist
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
+// Create authenticated Supabase client
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+});
+
+// Auth context types
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  isSignedIn: boolean;
+  loading: boolean;
+  signOut: () => Promise<void>;
+};
+
+// Default context value
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  session: null,
+  isSignedIn: false,
+  loading: true,
+  signOut: async () => {},
+};
+
+// Context
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+// Custom hook for accessing auth state
+export function useUser() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within an AuthProvider');
+  }
+  return context;
+}
+
+// Auth Provider component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
+    // Get initial session on mount
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('[AuthProvider] Init error:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getUser();
+    initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        setLoading(false);
+      }
     });
 
+    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('[AuthProvider] Sign out error:', error);
+    }
+  };
+
   const isSignedIn = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, isSignedIn, loading }}>
+    <AuthContext.Provider value={{ user, session, isSignedIn, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
+}
+
+// Helper to get current user ID (for admin checks)
+export async function getCurrentUserId(): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
+
+// Helper to check admin role
+export async function isAdminUser(userId: string): Promise<boolean> {
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('user_id', userId)
+    .single();
+
+  return profile?.role === 'owner' || profile?.role === 'admin';
 }
