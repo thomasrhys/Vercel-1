@@ -1,22 +1,17 @@
-import { auth } from "@clerk/nextjs/server";
+// app/api/admin/import-games/route.ts
+// Auth migration: Clerk → Supabase role-based (via requireSupabaseAdmin)
+
+import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 import { createClient } from "@supabase/supabase-js";
 import { games } from "@/lib/games";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function POST() {
-  const { userId } = await auth();
-
-  if (!userId || !ADMIN_USER_IDS.includes(userId)) {
+export async function POST(request: Request) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -37,6 +32,11 @@ export async function POST() {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
+
+  await supabase.from("activity_log").insert({
+    action: "games_imported",
+    details: `Imported ${rows.length} games`,
+  });
 
   return Response.json({
     success: true,
