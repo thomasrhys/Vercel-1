@@ -4,7 +4,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useUser, signOut as supabaseSignOut } from "@/lib/supabase-client"; // Changed import
+import { useUser } from "@/lib/supabase-client"; // Removed Seperate Signout import
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
@@ -20,7 +20,7 @@ type PortalGame = Game & {
 };
 
 export default function GamePageClient({ id }: { id: string }) {
-  const { isSignedIn, user, loading } = useUser();
+  const { isSignedIn, user, loading, signOut } = useUser();
   const [games, setGames] = useState<PortalGame[]>([]);
   const [blobImages, setBlobImages] = useState<Record<string, string>>({});
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null);
@@ -270,7 +270,7 @@ export default function GamePageClient({ id }: { id: string }) {
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => supabaseSignOut?.() || (window.location.href = '/')}
+                onClick={() => SignOut()} // ✅ Use signOut from hook
               >
                 Sign Out
               </Button>
