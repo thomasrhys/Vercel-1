@@ -1,23 +1,37 @@
 // middleware.ts
-
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 export async function middleware(request: NextRequest) {
-  console.log("========== MIDDLEWARE ==========");
+  const cookieStore = await cookies()
 
-  console.log("Path:", request.nextUrl.pathname);
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => 
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
 
-  console.log("Cookies:");
+  // Optional: Refresh session on every request
+  await supabase.auth.getUser()
 
-  request.cookies.getAll().forEach((cookie) => {
-    console.log(`${cookie.name} = ${cookie.value.substring(0, 30)}...`);
-  });
-
-  console.log("================================");
-
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/:path*"],
-};
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|public|api/auth).*)',
+  ],
+}
