@@ -1,16 +1,13 @@
+// app/admin/update-requests/page.tsx
+// Auth migration: Clerk → Pure Supabase with role-based permissions
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignInButton, useUser } from "@clerk/nextjs";
+import { useUser, supabase } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Lock, RefreshCcw } from "lucide-react";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 type UpdateRequest = {
   id: string;
@@ -26,11 +23,28 @@ type UpdateRequest = {
 };
 
 export default function AdminUpdateRequestsPage() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+  const { isSignedIn, user, loading, signOut } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [requests, setRequests] = useState<UpdateRequest[]>([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check admin role from user_profiles table
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || loading) return;
+
+    const checkAdminRole = async () => {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      setIsAdmin(profile?.role === 'owner' || profile?.role === 'admin');
+    };
+
+    checkAdminRole();
+  }, [isSignedIn, user?.id, loading]);
 
   const loadRequests = async () => {
     setIsLoading(true);
@@ -48,8 +62,8 @@ export default function AdminUpdateRequestsPage() {
   };
 
   useEffect(() => {
-    if (isAdmin) loadRequests();
-  }, [isAdmin]);
+    if (!loading && isAdmin) loadRequests();
+  }, [isAdmin, loading]);
 
   const markCompleted = async (id: string) => {
     const response = await fetch("/api/admin/update-requests", {
@@ -65,6 +79,18 @@ export default function AdminUpdateRequestsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="p-8">
+            <p className="text-muted-foreground">Loading...</p>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -73,7 +99,9 @@ export default function AdminUpdateRequestsPage() {
             <CardTitle className="flex items-center justify-center gap-2"><Lock className="h-5 w-5" />Admin Login Required</CardTitle>
             <CardDescription>Sign in to view update requests.</CardDescription>
           </CardHeader>
-          <CardContent><SignInButton mode="modal"><Button>Sign In</Button></SignInButton></CardContent>
+          <CardContent>
+            <Button className="w-full" onClick={() => (window.location.href = "/auth/login")}>Sign In</Button>
+          </CardContent>
         </Card>
       </main>
     );
@@ -83,8 +111,14 @@ export default function AdminUpdateRequestsPage() {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md text-center">
-          <CardHeader><CardTitle>Access denied</CardTitle><CardDescription>Your account is not authorised for admin access.</CardDescription></CardHeader>
-          <CardContent><Button onClick={() => (window.location.href = "/")}>Back to Games</Button></CardContent>
+          <CardHeader>
+            <CardTitle>Access denied</CardTitle>
+            <CardDescription>Your account is not authorised for admin access.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button variant="outline" className="w-full" onClick={() => signOut()}>Sign Out</Button>
+            <Button className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
+          </CardContent>
         </Card>
       </main>
     );
