@@ -1,7 +1,11 @@
+// app/admin/AdminUtilitiesCard.tsx
+// Auth migration: Clerk → Pure Supabase with role-based permissions
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignInButton, SignOutButton, UserButton, useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,11 +16,9 @@ import {
 } from "@/components/ui/card";
 import { Activity, DatabaseBackup, Lock, SearchCheck, Settings } from "lucide-react";
 
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
+type Profile = {
+  role: string;
+};
 
 type SiteSettings = {
   site_name?: string;
@@ -48,9 +50,9 @@ type GameCheckResult = {
 };
 
 export default function AdminUtilitiesCard() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
-
+  const { isSignedIn, user, loading, signOut } = useUser();
+  
+  const [isAdmin, setIsAdmin] = useState(false);
   const [settings, setSettings] = useState<SiteSettings>({});
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [backups, setBackups] = useState<BackupItem[]>([]);
@@ -59,6 +61,23 @@ export default function AdminUtilitiesCard() {
   const [isCheckingGames, setIsCheckingGames] = useState(false);
   const [isCreatingBackup, setIsCreatingBackup] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Check admin role from user_profiles table
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || loading) return;
+
+    const checkAdminRole = async () => {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      setIsAdmin(profile?.role === 'owner' || profile?.role === 'admin');
+    };
+
+    checkAdminRole();
+  }, [isSignedIn, user?.id, loading]);
 
   const loadUtilities = async () => {
     try {
@@ -83,8 +102,8 @@ export default function AdminUtilitiesCard() {
   };
 
   useEffect(() => {
-    if (isAdmin) loadUtilities();
-  }, [isAdmin]);
+    if (!loading && isAdmin) loadUtilities();
+  }, [isAdmin, loading]);
 
   const saveSettings = async () => {
     setIsSavingSettings(true);
@@ -159,6 +178,18 @@ export default function AdminUtilitiesCard() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -168,12 +199,15 @@ export default function AdminUtilitiesCard() {
               <Lock className="h-5 w-5" />
               Admin Utilities Login
             </CardTitle>
-            <CardDescription>Sign in with GitHub to access utilities.</CardDescription>
+            <CardDescription>Sign in with Supabase to access utilities.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <SignInButton mode="modal">
-              <Button className="w-full">Sign in</Button>
-            </SignInButton>
+            <Button 
+              className="w-full"
+              onClick={() => (window.location.href = "/auth/login")}
+            >
+              Sign in
+            </Button>
             <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/admin")}>
               Back to Admin
             </Button>
@@ -192,10 +226,12 @@ export default function AdminUtilitiesCard() {
             <CardDescription>You are signed in, but this account does not have admin access.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <UserButton />
-            <SignOutButton redirectUrl="/">
-              <Button variant="outline" className="w-full">Sign out</Button>
-            </SignOutButton>
+            <Button 
+              className="w-full" 
+              onClick={() => signOut()}
+            >
+              Sign out
+            </Button>
             <Button className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
           </CardContent>
         </Card>
