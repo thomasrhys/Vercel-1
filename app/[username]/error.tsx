@@ -9,8 +9,10 @@ export default function Error({
   reset: () => void;
 }) {
   const handleRetry = () => {
-    // Force a full hard page reload to hit the server again
-    window.location.reload();
+    // Let React finish its current cycle, then reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 0);
   };
 
   return (
