@@ -1,30 +1,51 @@
+// app/admin/adminrequesttiles.tsx
+// Auth migration: Clerk → Pure Supabase with role-based permissions
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useUser } from "@/lib/clerk-compat";
+import { useUser } from "@/lib/supabase-client";
 import { AlertTriangle, Gamepad2, RefreshCcw } from "lucide-react";
 
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
+type Profile = {
+  role: string;
+};
 
 type StatusItem = {
   status?: string;
 };
 
 export default function AdminRequestTiles() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
+  const { isSignedIn, user, loading } = useUser();
+  
+  const [isAdmin, setIsAdmin] = useState(false);
   const [gameRequests, setGameRequests] = useState(0);
   const [problemReports, setProblemReports] = useState(0);
   const [updateRequests, setUpdateRequests] = useState(0);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
+  // Check admin role from user_profiles table
   useEffect(() => {
-    if (!isSignedIn || !isAdmin) return;
+    if (!isSignedIn || !user?.id || loading) return;
+
+    const checkAdminRole = async () => {
+      const supabase = (window as any).__supabaseClient; // Or import from @/lib/supabase-client
+      
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      setIsAdmin(profile?.role === 'owner' || profile?.role === 'admin');
+    };
+
+    checkAdminRole();
+  }, [isSignedIn, user?.id, loading]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
 
     const insertTarget = () => {
       const heading = Array.from(document.querySelectorAll("h1")).find((item) => item.textContent?.trim() === "Admin Dashboard");
@@ -45,10 +66,10 @@ export default function AdminRequestTiles() {
 
     const timeout = window.setTimeout(insertTarget, 0);
     return () => window.clearTimeout(timeout);
-  }, [isSignedIn, isAdmin]);
+  }, [isAdmin]);
 
   useEffect(() => {
-    if (!isSignedIn || !isAdmin) return;
+    if (!isAdmin) return;
 
     const loadCounts = async () => {
       const [gameResponse, problemResponse, updateResponse] = await Promise.allSettled([
@@ -71,9 +92,9 @@ export default function AdminRequestTiles() {
     };
 
     loadCounts();
-  }, [isSignedIn, isAdmin]);
+  }, [isAdmin]);
 
-  if (!isSignedIn || !isAdmin || !portalTarget) return null;
+  if (!isAdmin || !portalTarget || loading) return null;
 
   const tiles = [
     {
