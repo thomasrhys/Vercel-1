@@ -1,7 +1,10 @@
+// app/game/[id]/GamePageClient.tsx
+// Auth migration: Clerk → Pure Supabase
+
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { useUser, signOut as supabaseSignOut } from "@/lib/supabase-client"; // Changed import
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
@@ -17,7 +20,7 @@ type PortalGame = Game & {
 };
 
 export default function GamePageClient({ id }: { id: string }) {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user, loading } = useUser();
   const [games, setGames] = useState<PortalGame[]>([]);
   const [blobImages, setBlobImages] = useState<Record<string, string>>({});
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null);
@@ -28,7 +31,7 @@ export default function GamePageClient({ id }: { id: string }) {
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [isFavouriteWorking, setIsFavouriteWorking] = useState(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
-  const loginUrl = `/login?redirect_url=${encodeURIComponent(`/game/${id}`)}`;
+  const loginUrl = `/auth/login?redirect_url=${encodeURIComponent(`/game/${id}`)}`;
 
   useEffect(() => {
     const loadGameData = async () => {
@@ -220,7 +223,7 @@ export default function GamePageClient({ id }: { id: string }) {
   const isDesktopOnlyOnMobile = !!game?.desktop_only && isMobileDevice;
   const isFavourite = game ? favouriteIds.includes(game.id) : false;
 
-  if (isLoading) {
+  if (loading || isLoading) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md text-center">
@@ -258,7 +261,20 @@ export default function GamePageClient({ id }: { id: string }) {
             Back to All Games
           </Button>
           {isSignedIn ? (
-            <UserButton />
+            <div className="flex items-center gap-2">
+              {user?.email && (
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  {user.email.split('@')[0]}
+                </span>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => supabaseSignOut?.() || (window.location.href = '/')}
+              >
+                Sign Out
+              </Button>
+            </div>
           ) : (
             <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>Login</Button>
           )}
