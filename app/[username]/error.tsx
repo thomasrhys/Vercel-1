@@ -9,12 +9,8 @@ export default function Error({
   reset: () => void;
 }) {
   const handleRetry = () => {
-    try {
-      reset();
-    } catch (err) {
-      // If reset() fails for any reason, force full page reload
-      window.location.reload();
-    }
+    // Force a full hard page reload to hit the server again
+    window.location.reload();
   };
 
   return (
