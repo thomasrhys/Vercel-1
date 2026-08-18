@@ -1,4 +1,3 @@
-// app/api/friend/list/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,6 +40,14 @@ export async function GET(req: NextRequest) {
       );
     }
     
+    // 🔒 NEW: Get current user's blocked list
+    const { data: blockedData } = await supabase
+      .from('blocks')
+      .select('blocked_id')
+      .eq('blocker_id', user.id);
+    
+    const blockedIds = blockedData?.map(b => b.blocked_id) || [];
+    
     // Get friends (accepted friendships)
     const { data, error } = await supabase
       .from('friendships')
@@ -49,8 +56,8 @@ export async function GET(req: NextRequest) {
         requester_id,
         addressee_id,
         accepted_at,
-        requester:user_profile(requester_id, username, display_name, avatar_url),
-        addressee:user_profile(addressee_id, username, display_name, avatar_url)
+        requester:user_profile(requester_id, username, display_name, avatar_url, is_public),
+        addressee:user_profile(addressee_id, username, display_name, avatar_url, is_public)
       `)
       .eq('status', 'accepted')
       .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
@@ -80,10 +87,29 @@ export async function GET(req: NextRequest) {
         display_name: otherUserProfile?.display_name,
         avatar_url: otherUserProfile?.avatar_url,
         accepted_at: friendship.accepted_at,
+        is_public: otherUserProfile?.is_public,
       };
     }).filter(f => f.user_id) || [];
     
-    return NextResponse.json({ success: true, data: friends });
+    // 🔒 NEW: Filter OUT blocked users and private profiles
+    const filteredFriends = friends.filter(friend => {
+      // Skip if user is blocked
+      if (blockedIds.includes(friend.user_id)) {
+        return false;
+      }
+      
+      // Skip if friend's profile is not public (optional)
+      if (friend.is_public === false) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    // Return without is_public field in response
+    const finalResponse = filteredFriends.map(({ is_public, ...rest }) => rest);
+    
+    return NextResponse.json({ success: true, data: finalResponse });
   } catch (err: any) {
     console.error('[Friends List Catch]:', err.message);
     return NextResponse.json(
