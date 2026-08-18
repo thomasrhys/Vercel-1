@@ -1,6 +1,7 @@
-import { createClient, type User } from "@supabase/supabase-js";
+// lib/supabase-server-auth.ts
+// Updated: Now checks user_profiles.role instead of hardcoded emails
 
-const DEFAULT_ADMIN_EMAILS = "pitstopyt1@gmail.com,thomasrhyshughes29@gmail.com";
+import { createClient, type User } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,13 +13,6 @@ const supabase = createClient(
     },
   }
 );
-
-function getAdminEmails() {
-  return (process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || DEFAULT_ADMIN_EMAILS)
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
 
 export async function getSupabaseUser(request: Request): Promise<User | null> {
   const header = request.headers.get("authorization") || "";
@@ -38,6 +32,15 @@ export async function getSupabaseUserId(request: Request) {
 
 export async function requireSupabaseAdmin(request: Request) {
   const user = await getSupabaseUser(request);
-  const email = user?.email?.toLowerCase() || "";
-  return !!user && !!email && getAdminEmails().includes(email);
+  
+  if (!user?.id) return false;
+
+  // Check role from user_profiles table (consistent with client components)
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("role")
+    .eq("user_id", user.id)
+    .single();
+
+  return profile?.role === "owner" || profile?.role === "admin";
 }
