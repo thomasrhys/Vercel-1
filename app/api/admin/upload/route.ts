@@ -1,12 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
+// app/api/admin/upload/route.ts
+// Auth migration: Clerk → Supabase role-based (via requireSupabaseAdmin)
+
+import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 import { createClient } from "@supabase/supabase-js";
 import { del, list, put } from "@vercel/blob";
-
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,13 +12,7 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!ADMIN_USER_IDS.includes(userId)) {
+    if (!(await requireSupabaseAdmin(request))) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
