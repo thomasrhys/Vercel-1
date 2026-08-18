@@ -1,13 +1,11 @@
 // app/[username]/page.tsx
 import { notFound } from "next/navigation";
-import { createServerSupabase } from '@/lib/supabase-server';  // ← Add this import
+import { createServerSupabase } from '@/lib/supabase-server';
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
 import BlockSection from "@/components/BlockSection";
 
 export const dynamic = "force-dynamic";
-
-// REMOVE the old getServerSupabase function
 
 function normalizeWebsite(value?: string | null) {
   if (!value) return "";
@@ -20,7 +18,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!/^[a-z0-9_]{3,20}$/.test(handle)) notFound();
 
-  const supabase = await createServerSupabase();  // ← Use SSR client
+  const supabase = await createServerSupabase();
 
   const full = await supabase
     .from("user_profiles")
@@ -47,7 +45,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   console.log('[Profile Page] Profile User ID:', profile.user_id);
   console.log('[Profile Page] Full user data:', user);
 
-  // CHECK IF PROFILE OWNER BLOCKED CURRENT USER
+  // CHECK IF PROFILE OWNER BLOCKED CURRENT USER (SERVER-SIDE)
   if (currentUserId && currentUserId !== profile.user_id) {
     console.log('[Profile Page] Checking if profile owner blocked current user...');
     
@@ -67,4 +65,66 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     
     console.log('[Profile Page] User is NOT blocked');
   }
-  // ... rest of your component stays the same
+
+  const displayName = profile.display_name || "Unnamed player";
+  const country = "country" in profile ? profile.country : "";
+  const websiteUrl = "website_url" in profile ? profile.website_url : "";
+  const favouriteGames = "favourite_games" in profile && Array.isArray(profile.favourite_games) ? profile.favourite_games.filter(Boolean).slice(0, 12) : [];
+  const website = normalizeWebsite(websiteUrl);
+
+  return (
+    <main className="min-h-screen bg-background p-4 sm:p-8">
+      <div className="max-w-xl mx-auto rounded-lg border border-border bg-card p-6 text-center space-y-4">
+        {profile.avatar_url ? (
+          <img src={profile.avatar_url} alt="Profile avatar" className="h-24 w-24 rounded-full object-cover mx-auto border border-border" />
+        ) : (
+          <div className="h-24 w-24 rounded-full bg-primary text-primary-foreground mx-auto flex items-center justify-center text-3xl font-bold">
+            {displayName.slice(0, 1).toUpperCase()}
+          </div>
+        )}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
+          <p className="text-muted-foreground">/{profile.username}</p>
+          {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
+        </div>
+
+        {/* Friend Button Section */}
+        <div className="flex justify-center gap-4 py-4">
+          <FriendSection targetUserId={profile.user_id} />
+        </div>
+
+        <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
+
+        {/* Friends List */}
+        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
+
+        {/* Block Section */}
+        <BlockSection 
+          targetUserId={profile.user_id} 
+          targetUsername={profile.username} 
+        />
+
+        {/* Country & Website */}
+        {(country || website) && (
+          <div className="rounded-md border border-border p-4 text-sm space-y-2">
+            {country && <p><span className="font-medium">Country:</span> {country}</p>}
+            {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
+          </div>
+        )}
+
+        {/* Favourite Games */}
+        {favouriteGames.length > 0 && (
+          <div className="rounded-md border border-border p-4 text-left space-y-3">
+            <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
+            <div className="flex flex-wrap justify-center gap-2">
+              {favouriteGames.map((game) => <span key={game} className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">{game}</span>)}
+            </div>
+          </div>
+        )}
+
+        {/* Back Link */}
+        <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
+      </div>
+    </main>
+  );
+}
