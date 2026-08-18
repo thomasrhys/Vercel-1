@@ -1,11 +1,31 @@
 // app/[username]/page.tsx
 import { notFound } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from '@/lib/supabase-server';
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
 import BlockSection from "@/components/BlockSection";
 
 export const dynamic = "force-dynamic";
+
+// Service role client for reading profiles & blocks (bypasses RLS)
+function getDataClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { 
+      auth: { 
+        persistSession: false, 
+        autoRefreshToken: false 
+      } 
+    }
+  );
+}
+
+// SSR client for AUTH (reads sb-* cookies)
+async function getAuthClient() {
+  return await createServerSupabase();
+}
 
 function normalizeWebsite(value?: string | null) {
   if (!value) return "";
@@ -18,16 +38,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!/^[a-z0-9_]{3,20}$/.test(handle)) notFound();
 
-  const supabase = await createServerSupabase();
+  // Create both clients
+  const dataClient = getDataClient();
+  const authClient = await getAuthClient();
 
-  const full = await supabase
+  // Read profile with service role (bypasses RLS)
+  const full = await dataClient
     .from("user_profiles")
     .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games, friends_visible")
     .ilike("username", handle)
     .maybeSingle();
 
   const fallback = full.error
-    ? await supabase
+    ? await dataClient
         .from("user_profiles")
         .select("user_id, display_name, username, avatar_url, bio, role, is_public")
         .ilike("username", handle)
@@ -38,7 +61,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!profile?.username || profile.is_public === false) notFound();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Get current user via auth client (reads cookies!)
+  const { data: { user } } = await authClient.auth.getUser();
   const currentUserId = user?.id || null;
 
   console.log('[Profile Page] Current User ID:', currentUserId);
@@ -49,7 +73,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (currentUserId && currentUserId !== profile.user_id) {
     console.log('[Profile Page] Checking if profile owner blocked current user...');
     
-    const blockCheck = await supabase
+    const blockCheck = await dataClient
       .from('blocks')
       .select('id')
       .eq('blocker_id', profile.user_id)
