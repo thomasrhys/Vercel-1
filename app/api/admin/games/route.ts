@@ -1,11 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
+// app/api/admin/games/route.ts
+// Auth migration: Clerk → Supabase role-based (via requireSupabaseAdmin)
 
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
+import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,17 +17,12 @@ function makeId(title: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-async function requireAdmin() {
-  const { userId } = await auth();
-  return !!userId && ADMIN_USER_IDS.includes(userId);
-}
-
 async function logActivity(action: string, details: string) {
   await supabase.from("activity_log").insert({ action, details });
 }
 
-export async function GET() {
-  if (!(await requireAdmin())) {
+export async function GET(request: Request) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -47,7 +39,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -103,7 +95,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -179,7 +171,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await requireAdmin())) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
