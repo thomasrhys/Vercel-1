@@ -8,6 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 
+// CONSTANTS (Must be at module level!)
+const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
+const OWNER_NAMES = ["owner", "pitstopyt"];
+const RESERVED = ["admin", "administrator", "support", "staff", "system", "gamesportal", "fnfaw", "moderator", "official", "api", "root"];
+
 // Helper component that only runs on client
 function OAuthErrorHandler() {
   const searchParams = useSearchParams();
