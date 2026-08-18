@@ -1,23 +1,34 @@
 // app/[username]/page.tsx
 import { notFound } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
 import BlockSection from "@/components/BlockSection";
 
 export const dynamic = "force-dynamic";
 
-function getServerSupabase() {
-  return createClient(
+async function getServerSupabase() {
+  const cookieStore = await cookies()
+
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { 
-      auth: { 
-        persistSession: false, 
-        autoRefreshToken: false 
-      } 
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          } catch {
+            // Handle errors
+          }
+        },
+      },
     }
-  );
+  )
 }
 
 function normalizeWebsite(value?: string | null) {
@@ -31,7 +42,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   if (!/^[a-z0-9_]{3,20}$/.test(handle)) notFound();
 
-  const supabase = getServerSupabase();
+  const supabase = await getServerSupabase();
 
   const full = await supabase
     .from("user_profiles")
@@ -65,15 +76,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     const blockCheck = await supabase
       .from('blocks')
       .select('id')
-      .eq('blocker_id', profile.user_id)      // Profile owner did the blocking
-      .eq('blocked_id', currentUserId)        // Current user got blocked
+      .eq('blocker_id', profile.user_id)
+      .eq('blocked_id', currentUserId)
       .maybeSingle();
     
     console.log('[Profile Page] Block check result:', blockCheck);
     
     if (blockCheck.data) {
       console.log('[Profile Page] USER IS BLOCKED - Throwing error');
-      // Throw error instead of returning HTML - let error.tsx handle it
       throw new Error('BLOCKED_FROM_VIEWING');
     }
     
