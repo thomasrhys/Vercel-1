@@ -69,7 +69,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       .eq('blocked_id', currentUserId)        // Current user got blocked
       .maybeSingle();
     
-    console.log('[Profile Page] Block check result:', blockCheck);
+    console.log("[v0] Block check - Blocker:", profile.user_id, "Blocked:", currentUserId, "Result:", blockCheck.data);
     
     if (blockCheck.data) {
       console.log('[Profile Page] USER IS BLOCKED - Returning 500 page');
