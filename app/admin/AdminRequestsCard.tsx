@@ -1,7 +1,10 @@
+// app/admin/adminrequestscard.tsx
+// Auth migration: Clerk → Pure Supabase with role-based permissions
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@/lib/clerk-compat";
+import { useUser } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,11 +16,9 @@ import {
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Check, Inbox, Plus, RotateCcw, Trash2 } from "lucide-react";
 
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
+type Profile = {
+  role: string;
+};
 
 type GameRequest = {
   id: string;
@@ -31,14 +32,33 @@ type GameRequest = {
 };
 
 export default function AdminRequestsCard() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = !!user?.id && ADMIN_USER_IDS.includes(user.id);
-
+  const { isSignedIn, user, loading } = useUser();
+  
+  const [isAdmin, setIsAdmin] = useState(false);
   const [requests, setRequests] = useState<GameRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [workingId, setWorkingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [requestToDelete, setRequestToDelete] = useState<GameRequest | null>(null);
+
+  // Check admin role from user_profiles table
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || loading) return;
+
+    const checkAdminRole = async () => {
+      const supabase = (window as any).__supabaseClient; // Or import from @/lib/supabase-client
+      
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      setIsAdmin(profile?.role === 'owner' || profile?.role === 'admin');
+    };
+
+    checkAdminRole();
+  }, [isSignedIn, user?.id, loading]);
 
   const openRequests = requests.filter((request) => request.status === "open");
   const completedRequests = requests.filter((request) => request.status === "completed");
@@ -65,10 +85,10 @@ export default function AdminRequestsCard() {
   };
 
   useEffect(() => {
-    if (isAdmin) {
+    if (!loading && isAdmin) {
       loadRequests();
     }
-  }, [isAdmin]);
+  }, [isAdmin, loading]);
 
   const updateRequestStatus = async (request: GameRequest, status: "open" | "completed") => {
     setWorkingId(request.id);
@@ -145,7 +165,7 @@ export default function AdminRequestsCard() {
     window.location.href = `/admin?${params.toString()}`;
   };
 
-  if (!isSignedIn || !isAdmin) {
+  if (!isSignedIn || !isAdmin || loading) {
     return null;
   }
 
