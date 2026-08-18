@@ -1,21 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
+// app/api/admin/check-games/route.ts
+// Auth migration: Clerk → Supabase role-based (via requireSupabaseAdmin)
 
-const ADMIN_USER_IDS = [
-  "user_3FdWvBXtWNeEtinKkLjZ9vHYyoR",
-  "user_3FdWs0pdbEHCG85yExuAaW700hE",
-  "user_3FdahY3hXmw7c589YMnDefAwOen",
-];
+import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-async function requireAdmin() {
-  const { userId } = await auth();
-  return !!userId && ADMIN_USER_IDS.includes(userId);
-}
 
 async function fetchWithTimeout(url: string, method: "HEAD" | "GET") {
   const controller = new AbortController();
@@ -77,8 +69,8 @@ async function checkGame(game: { id: string; title: string; url: string }) {
   }
 }
 
-export async function POST() {
-  if (!(await requireAdmin())) {
+export async function POST(request: Request) {
+  if (!(await requireSupabaseAdmin(request))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
