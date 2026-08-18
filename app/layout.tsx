@@ -5,10 +5,9 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import V13Enhancer from "./V13Enhancer";
 import AuthFetchPatch from "./AuthFetchPatch";
-import FriendProvider from "@/components/FriendProvider"; // ← Add this import
+import FriendProvider from "@/components/FriendProvider";
 import "./globals.css";
 import { AuthProvider } from '@/lib/supabase-client';
-
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -62,16 +61,15 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-    
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
-  );
-}
-        <FriendProvider>{children}</FriendProvider> {/* ← Wrap children */}
-        <AuthFetchPatch />
-        <V13Enhancer />
-        {process.env.NODE_ENV === "production" && <Analytics />}
+
+        <AuthProvider>
+          <FriendProvider>
+            <AuthFetchPatch />
+            <V13Enhancer />
+            {process.env.NODE_ENV === "production" && <Analytics />}
+            {children}
+          </FriendProvider>
+        </AuthProvider>
       </body>
     </html>
   );
