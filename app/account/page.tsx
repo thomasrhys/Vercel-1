@@ -291,7 +291,8 @@ export default function AccountPage() {
         {hasMicrosoft ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><MicrosoftIcon /><Check className="h-4 w-4" />Microsoft Linked</Button> : <Button variant="outline" onClick={() => linkProvider("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Link Microsoft</Button>}
         {hasTwitch ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><TwitchIcon /><Check className="h-4 w-4" />Twitch Linked</Button> : <Button variant="outline" onClick={() => linkProvider("twitch")} disabled={busy} className="justify-center gap-2"><TwitchIcon />Link Twitch</Button>}
       </div>
-      <p className="text-xs text-muted-foreground pt-2">ℹ️ OAuth linking requires manual identity linking to be enabled in Supabase. Contact support for access.</p>
+      <p className="text-xs text-muted-foreground pt-2">  ℹ️ OAuth linking requires manual identity linking to be enabled in Supabase. 
+  Buttons are enabled - errors will display if the feature isn't ready yet.</p>
       <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button><Button variant="outline" className="w-full" onClick={signOut}>Log out</Button>
     </CardContent></Card>
   </div></main>;
