@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client"; // ✅ Direct import
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,10 +16,6 @@ import {
 } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Check, Inbox, Plus, RotateCcw, Trash2 } from "lucide-react";
-
-type Profile = {
-  role: string;
-};
 
 type GameRequest = {
   id: string;
@@ -46,8 +43,6 @@ export default function AdminRequestsCard() {
     if (!isSignedIn || !user?.id || loading) return;
 
     const checkAdminRole = async () => {
-      const supabase = (window as any).__supabaseClient; // Or import from @/lib/supabase-client
-      
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('role')
