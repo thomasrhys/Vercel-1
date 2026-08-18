@@ -72,27 +72,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     console.log('[Profile Page] Block check result:', blockCheck);
     
     if (blockCheck.data) {
-      console.log('[Profile Page] USER IS BLOCKED - Returning 500 page');
-      // Render custom 500 error UI directly
-      return (
-        <main className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="max-w-md text-center space-y-4">
-            <h1 className="text-6xl font-bold text-foreground">500</h1>
-            <h2 className="text-xl font-semibold text-foreground">
-              Something went wrong
-            </h2>
-            <p className="text-muted-foreground">
-              An unexpected error occurred while loading this page.
-            </p>
-            <a 
-              href="/" 
-              className="inline-block px-4 py-2 rounded-md border border-border text-sm hover:bg-muted transition-colors"
-            >
-              Go Home
-            </a>
-          </div>
-        </main>
-      );
+      console.log('[Profile Page] USER IS BLOCKED - Throwing error');
+      // Throw error instead of returning HTML - let error.tsx handle it
+      throw new Error('BLOCKED_FROM_VIEWING');
     }
     
     console.log('[Profile Page] User is NOT blocked');
