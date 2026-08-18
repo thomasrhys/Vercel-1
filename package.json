@@ -9,7 +9,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@clerk/nextjs": "file:./clerk-nextjs-shim",
     "@hookform/resolvers": "5.9.1",
     "@radix-ui/react-accordion": "1.2.20",
     "@radix-ui/react-alert-dialog": "1.1.23",
