@@ -24,6 +24,37 @@ const ACCENT_COLOURS = [
   { name: 'black', label: 'Black', value: '#000000' },
 ];
 
+interface ProfileData {
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  is_public: boolean;
+  accent_colour: string | null;
+  created_at: string | null;
+  role: string | null;
+}
+
+function computeBadges(created_at: string | null | undefined, role: string | null | undefined): Array<{ emoji: string; name: string; description: string }> {
+  const badges: Array<{ emoji: string; name: string; description: string }> = [];
+  
+  // Early Bird: Profile created before August 2026
+  if (created_at) {
+    const createdDate = new Date(created_at);
+    const earlyBirdDate = new Date('2026-08-01T00:00:00Z');
+    if (createdDate < earlyBirdDate) {
+      badges.push({ emoji: '🔰', name: 'Early Bird', description: 'Joined before August 2026' });
+    }
+  }
+  
+  // Owner role
+  if (role === 'owner') {
+    badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
+  }
+  
+  return badges;
+}
+
 function OAuthErrorHandler() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -116,6 +147,8 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [accentColour, setAccentColour] = useState('system');
+  const [created_at, setCreatedAt] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   const email = user?.email?.toLowerCase() || "";
   const isOwner = email === OWNER_EMAIL;
@@ -127,16 +160,21 @@ export default function AccountPage() {
   const hasTwitch = providers.includes("twitch");
   const hasDiscord = providers.includes("discord");
   const profilePath = username ? `/${username}` : "";
+  
+  // Compute badges from fetched data
+  const badges = computeBadges(created_at, role);
 
   useEffect(() => {
     if (!user) return;
-    supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url, bio, is_public, accent_colour").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+    supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url, bio, is_public, accent_colour, created_at, role").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       setDisplayName(data?.display_name || "");
       setUsername(data?.username || (isOwner ? "owner" : ""));
       setAvatarUrl(data?.avatar_url || "");
       setBio(data?.bio || "");
       setIsPublic(data?.is_public ?? true);
       setAccentColour(data?.accent_colour || 'system');
+      setCreatedAt(data?.created_at || null);
+      setRole(data?.role || null);
     });
   }, [user, isOwner]);
 
@@ -263,6 +301,25 @@ export default function AccountPage() {
         <OAuthErrorHandler />
       </Suspense>
       <div className="flex items-center gap-3">{avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" /> : <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">{(displayName || email || "U").slice(0, 1).toUpperCase()}</div>}<div><p className="font-medium text-foreground">{displayName || "Unnamed player"} {isOwner && <span className="ml-1 rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-700">Owner</span>}</p><p className="text-xs text-muted-foreground">{username ? `/${username}` : "No username set"}</p></div></div>
+      
+      {/* Badges Section */}
+      {badges.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+          {badges.map((badge) => (
+            <span key={badge.name} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-xs font-medium border border-border">
+              <span>{badge.emoji}</span>
+              <span className="font-semibold">{badge.name}</span>
+              <span className="text-muted-foreground ml-1">•</span>
+              <span className="text-muted-foreground">{badge.description}</span>
+            </span>
+          ))}
+        </div>
+      )}
+      
+      {badges.length === 0 && (
+        <p className="text-xs text-muted-foreground italic pt-2 border-t border-border">No badges earned yet 🔰👑 coming soon!</p>
+      )}
+      
       <Input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Display name" />
       <Input value={username} onChange={(event) => setUsername(cleanUsername(event.target.value))} placeholder="username" />
       {isOwner && <p className="text-xs text-muted-foreground">Reserved for you: /owner and /pitstopyt.</p>}
