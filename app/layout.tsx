@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
@@ -6,8 +5,9 @@ import Script from "next/script";
 import V13Enhancer from "./V13Enhancer";
 import AuthFetchPatch from "./AuthFetchPatch";
 import FriendProvider from "@/components/FriendProvider";
-import "./globals.css";
 import { AuthProvider } from '@/lib/supabase-client';
+import { ThemeProvider } from "@/components/theme-provider";
+import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <Script id="gtm-script" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -62,14 +62,21 @@ export default function RootLayout({
           />
         </noscript>
 
-        <AuthProvider>
-          <FriendProvider>
-            <AuthFetchPatch />
-            <V13Enhancer />
-            {process.env.NODE_ENV === "production" && <Analytics />}
-            {children}
-          </FriendProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <FriendProvider>
+              <AuthFetchPatch />
+              <V13Enhancer />
+              {process.env.NODE_ENV === "production" && <Analytics />}
+              {children}
+            </FriendProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
