@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function GET(req: NextRequest) {
   try {
-    // Get auth token from request header
     const authorization = req.headers.get('authorization');
     const authToken = authorization?.startsWith('Bearer ') 
       ? authorization.slice(7) 
@@ -30,7 +29,6 @@ export async function GET(req: NextRequest) {
       }
     );
     
-    // Get user from token
     const { data: { user }, error: userError } = await supabase.auth.getUser(authToken);
     
     if (userError || !user) {
@@ -40,7 +38,6 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    // 🔒 NEW: Get current user's blocked list
     const { data: blockedData } = await supabase
       .from('blocks')
       .select('blocked_id')
@@ -48,7 +45,7 @@ export async function GET(req: NextRequest) {
     
     const blockedIds = blockedData?.map(b => b.blocked_id) || [];
     
-    // Get friends (accepted friendships)
+    // Added accent_colour to both requester and addressee
     const { data, error } = await supabase
       .from('friendships')
       .select(`
@@ -56,8 +53,8 @@ export async function GET(req: NextRequest) {
         requester_id,
         addressee_id,
         accepted_at,
-        requester:user_profile(requester_id, username, display_name, avatar_url, is_public),
-        addressee:user_profile(addressee_id, username, display_name, avatar_url, is_public)
+        requester:user_profile(requester_id, username, display_name, avatar_url, accent_colour, is_public),
+        addressee:user_profile(addressee_id, username, display_name, avatar_url, accent_colour, is_public)
       `)
       .eq('status', 'accepted')
       .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
@@ -70,7 +67,6 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    // Process data to get friend info for each user
     const friends = data?.map((friendship) => {
       const otherUserId = friendship.requester_id === user.id 
         ? friendship.addressee_id 
@@ -86,27 +82,22 @@ export async function GET(req: NextRequest) {
         username: otherUserProfile?.username,
         display_name: otherUserProfile?.display_name,
         avatar_url: otherUserProfile?.avatar_url,
+        accent_colour: otherUserProfile?.accent_colour,
         accepted_at: friendship.accepted_at,
         is_public: otherUserProfile?.is_public,
       };
     }).filter(f => f.user_id) || [];
     
-    // 🔒 NEW: Filter OUT blocked users and private profiles
     const filteredFriends = friends.filter(friend => {
-      // Skip if user is blocked
       if (blockedIds.includes(friend.user_id)) {
         return false;
       }
-      
-      // Skip if friend's profile is not public (optional)
       if (friend.is_public === false) {
         return false;
       }
-      
       return true;
     });
     
-    // Return without is_public field in response
     const finalResponse = filteredFriends.map(({ is_public, ...rest }) => rest);
     
     return NextResponse.json({ success: true, data: finalResponse });
