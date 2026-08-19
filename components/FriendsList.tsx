@@ -4,12 +4,29 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+const ACCENT_COLOUR_MAP: Record<string, string> = {
+  purple: '#6d4aff',
+  blue: '#3b82f6',
+  green: '#22c55e',
+  pink: '#ec4899',
+  orange: '#f97316',
+  red: '#ef4444',
+  white: '#ffffff',
+  black: '#000000',
+};
+
+function getAccentHex(accentColour?: string | null): string | null {
+  if (!accentColour || accentColour === 'system') return null;
+  return ACCENT_COLOUR_MAP[accentColour] || null;
+}
+
 interface Friend {
   id: string;
   user_id: string;
   username: string;
   display_name?: string;
   avatar_url?: string;
+  accent_colour?: string | null;
   accepted_at: string;
 }
 
@@ -129,43 +146,49 @@ export default function FriendsList({ userId, currentUserId, friendsVisible }: F
       </h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {friends.map((friend) => (
-          <div key={friend.id} className="group flex flex-col items-center p-3 rounded-lg hover:bg-muted transition-colors relative">
-            {friend.avatar_url ? (
-              <a href={`/${friend.username}`} className="w-16 h-16 rounded-full overflow-hidden mb-2 group-hover:scale-105 transition-transform block">
-                <img 
-                  src={friend.avatar_url} 
-                  alt={friend.display_name}
-                  className="w-full h-full object-cover"
-                />
+        {friends.map((friend) => {
+          const accentHex = getAccentHex(friend.accent_colour);
+          return (
+            <div key={friend.id} className="group flex flex-col items-center p-3 rounded-lg hover:bg-muted transition-colors relative">
+              {friend.avatar_url ? (
+                <a href={`/${friend.username}`} className="w-16 h-16 rounded-full overflow-hidden mb-2 group-hover:scale-105 transition-transform block border-2" style={accentHex ? { borderColor: accentHex } : undefined}>
+                  <img 
+                    src={friend.avatar_url} 
+                    alt={friend.display_name}
+                    className="w-full h-full object-cover"
+                  />
+                </a>
+              ) : (
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center font-bold mb-2 group-hover:scale-105 transition-transform text-white"
+                  style={accentHex ? { backgroundColor: accentHex } : { backgroundColor: 'var(--primary)' }}
+                >
+                  {(friend.display_name || friend.username).charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              <a href={`/${friend.username}`} className="font-medium text-sm text-foreground text-center truncate w-full hover:underline">
+                {friend.display_name || friend.username}
               </a>
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mb-2 group-hover:scale-105 transition-transform">
-                {(friend.display_name || friend.username).charAt(0).toUpperCase()}
-              </div>
-            )}
+              <p className="text-xs text-muted-foreground text-center truncate w-full">
+                @{friend.username}
+              </p>
 
-            <a href={`/${friend.username}`} className="font-medium text-sm text-foreground text-center truncate w-full hover:underline">
-              {friend.display_name || friend.username}
-            </a>
-            <p className="text-xs text-muted-foreground text-center truncate w-full">
-              @{friend.username}
-            </p>
-
-            {isOwnProfile && (
-              <button
-                onClick={() => handleRemoveFriend(friend.id, friend.display_name || friend.username)}
-                className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/80 opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Remove friend"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        ))}
+              {isOwnProfile && (
+                <button
+                  onClick={() => handleRemoveFriend(friend.id, friend.display_name || friend.username)}
+                  className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/80 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove friend"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
