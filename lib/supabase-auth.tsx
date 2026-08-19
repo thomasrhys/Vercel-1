@@ -8,11 +8,26 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const DEFAULT_ADMIN_EMAILS = "pitstopyt1@gmail.com,thomasrhyshughes29@gmail.com";
 
-// Use @supabase/ssr browser client (stores auth in COOKIES instead of localStorage)
 export const supabaseAuthClient = createBrowserClient(
   supabaseUrl,
   supabaseAnonKey
 );
+
+const ACCENT_COLOUR_MAP: Record<string, string> = {
+  purple: '#6d4aff',
+  blue: '#3b82f6',
+  green: '#22c55e',
+  pink: '#ec4899',
+  orange: '#f97316',
+  red: '#ef4444',
+  white: '#ffffff',
+  black: '#000000',
+};
+
+function getAccentHex(accentColour: string | null | undefined): string | null {
+  if (!accentColour || accentColour === 'system') return null;
+  return ACCENT_COLOUR_MAP[accentColour] || null;
+}
 
 type AuthValue = { 
   user: User | null; 
@@ -71,24 +86,27 @@ export function UserButton() {
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [accentColour, setAccentColour] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     supabaseAuthClient
       .from("user_profiles")
-      .select("username, display_name, avatar_url")
+      .select("username, display_name, avatar_url, accent_colour")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         setUsername(data?.username || "");
         setDisplayName(data?.display_name || "");
         setAvatarUrl(data?.avatar_url || "");
+        setAccentColour(data?.accent_colour || null);
       });
   }, [user]);
 
   if (!user) return null;
   const label = displayName || user.email || user.phone || "Account";
   const subLabel = user.email || user.phone || "Signed in";
+  const accentHex = getAccentHex(accentColour);
 
   return (
     <div className="relative">
@@ -96,14 +114,18 @@ export function UserButton() {
         type="button" 
         onClick={() => setIsOpen((open) => !open)} 
         title="Account menu" 
-        className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center overflow-hidden"
+        className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden border-2"
+        style={accentHex ? { backgroundColor: accentHex, borderColor: accentHex, color: '#fff' } : { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
       >
         {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 rounded-md border border-border bg-card shadow-lg z-50 overflow-hidden">
           <div className="px-3 py-2 border-b border-border flex items-center gap-2">
-            <div className="h-9 w-9 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center overflow-hidden shrink-0">
+            <div 
+              className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden shrink-0 border-2"
+              style={accentHex ? { backgroundColor: accentHex, borderColor: accentHex, color: '#fff' } : { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
+            >
               {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
             </div>
             <div className="min-w-0">
