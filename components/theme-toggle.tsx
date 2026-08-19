@@ -24,7 +24,7 @@ export default function ThemeToggle() {
       className="px-3 py-2 rounded-md border border-border text-sm hover:bg-muted transition-colors"
       title={`Theme: ${theme}`}
     >
-      {theme === 'light' && '☀️'}
+      {theme === 'light' && '💡'}
       {theme === 'dark' && '🌙'}
       {theme === 'system' && '💻'}
     </button>
