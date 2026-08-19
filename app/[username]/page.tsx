@@ -44,6 +44,16 @@ function computeBadges(profile: any): Array<{ emoji: string; name: string; descr
     }
   }
   
+  // Artist: Has custom avatar
+  if (profile.avatar_url && profile.avatar_url.trim()) {
+    badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
+  }
+  
+  // Customiser: Has custom accent colour (not system)
+  if (profile.accent_colour && profile.accent_colour !== 'system') {
+    badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
+  }
+  
   // Owner role
   if (profile.role === 'owner') {
     badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
