@@ -190,10 +190,38 @@ export default function AccountPage() {
     });
   }, [user, isOwner]);
 
+  const validateImageUrl = (url: string): string | null => {
+    const trimmedUrl = url.trim();
+    
+    if (!trimmedUrl) return null;
+    
+    // Reject data URIs (base64) - security risk
+    if (trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
+      return "Please use a direct image URL instead of embedded data.";
+    }
+    
+    // Check for valid http/https URL
+    try {
+      const parsedUrl = new URL(trimmedUrl);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        return "Please enter a valid image URL starting with http:// or https://";
+      }
+    } catch {
+      return "That doesn't look like a valid URL. Please enter a direct image link.";
+    }
+    
+    return null;
+  };
+
   const saveProfile = async (nextAvatarUrl = avatarUrl) => {
     if (!user) return;
     setMessage("");
     const nextUsername = cleanUsername(username);
+    
+    // Validate avatar URL format
+    const urlError = validateImageUrl(nextAvatarUrl);
+    if (urlError) return setMessage(urlError);
+    
     if (nextUsername && !/^[a-z0-9_]{3,20}$/.test(nextUsername)) return setMessage("Username must be 3-20 characters using letters, numbers, or underscores.");
     if (!isOwner && (OWNER_NAMES.includes(nextUsername) || RESERVED.includes(nextUsername))) return setMessage("That username is reserved.");
     if (isOwner && nextUsername && !OWNER_NAMES.includes(nextUsername) && RESERVED.includes(nextUsername)) return setMessage("That username is reserved.");
