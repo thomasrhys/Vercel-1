@@ -1,3 +1,4 @@
+// app/account/page.tsx
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
@@ -12,6 +13,7 @@ import ThemeToggle from "@/components/theme-toggle";
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
 const RESERVED = ["admin", "administrator", "support", "staff", "system", "gamesportal", "fnfaw", "moderator", "official", "api", "root"];
+
 const ACCENT_COLOURS = [
   { name: 'system', label: 'System', value: null },
   { name: 'purple', label: 'Purple', value: '#6d4aff' },
@@ -35,7 +37,7 @@ interface ProfileData {
   role: string | null;
 }
 
-function computeBadges(created_at: string | null | undefined, role: string | null | undefined): Array<{ emoji: string; name: string; description: string }> {
+function computeBadges(created_at: string | null | undefined, role: string | null | undefined, avatar_url: string | null | undefined, accent_colour: string | null | undefined): Array<{ emoji: string; name: string; description: string }> {
   const badges: Array<{ emoji: string; name: string; description: string }> = [];
   
   // Early Bird: Profile created before August 2026
@@ -45,6 +47,16 @@ function computeBadges(created_at: string | null | undefined, role: string | nul
     if (createdDate < earlyBirdDate) {
       badges.push({ emoji: '🔰', name: 'Early Bird', description: 'Joined before August 2026' });
     }
+  }
+  
+  // Artist: Has custom avatar
+  if (avatar_url && avatar_url.trim()) {
+    badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
+  }
+  
+  // Customiser: Has custom accent colour (not system)
+  if (accent_colour && accent_colour !== 'system') {
+    badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
   }
   
   // Owner role
@@ -162,7 +174,7 @@ export default function AccountPage() {
   const profilePath = username ? `/${username}` : "";
   
   // Compute badges from fetched data
-  const badges = computeBadges(created_at, role);
+  const badges = computeBadges(created_at, role, avatarUrl, accentColour);
 
   useEffect(() => {
     if (!user) return;
