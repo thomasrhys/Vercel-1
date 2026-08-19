@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
+import ThemeToggle from "@/components/theme-toggle";
 
 // CONSTANTS (Must be at module level!)
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
@@ -261,6 +262,13 @@ export default function AccountPage() {
   if (!isSignedIn) return <main className="min-h-screen bg-background flex items-center justify-center p-4"><Card className="w-full max-w-md"><CardHeader><CardTitle>Account</CardTitle><CardDescription>Sign in to manage your account.</CardDescription></CardHeader><CardContent className="space-y-3"><Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/account")}>Login</Button><Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button></CardContent></Card></main>;
 
   return <main className="min-h-screen bg-background p-4 sm:p-8"><div className="max-w-md mx-auto space-y-6">
+
+    {/* Theme Toggle Header */}
+    <div className="flex justify-between items-center mb-2">
+      <h1 className="text-2xl font-bold">Account Settings</h1>
+      <ThemeToggle />
+    </div>
+
     <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile. No recently played games are tracked.</CardDescription></CardHeader><CardContent className="space-y-4">
       {/* OAuth error handler (client-side only) */}
       <Suspense fallback={null}>
