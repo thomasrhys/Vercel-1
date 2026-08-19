@@ -30,6 +30,28 @@ function normalizeWebsite(value?: string | null) {
   return value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
 }
 
+// Compute badges based on profile data
+function computeBadges(profile: any): Array<{ emoji: string; name: string; description: string }> {
+  const badges: Array<{ emoji: string; name: string; description: string }> = [];
+  
+  // Early Bird: Profile created before August 2026
+  const createdAt = profile.created_at || profile.updated_at;
+  if (createdAt) {
+    const createdDate = new Date(createdAt);
+    const earlyBirdDate = new Date('2026-08-01T00:00:00Z');
+    if (createdDate < earlyBirdDate) {
+      badges.push({ emoji: '🔰', name: 'Early Bird', description: 'Joined before August 2026' });
+    }
+  }
+  
+  // Owner role
+  if (profile.role === 'owner') {
+    badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
+  }
+  
+  return badges;
+}
+
 export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const handle = username.trim().toLowerCase().replace(/^@+/, "");
@@ -41,14 +63,14 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const full = await dataClient
     .from("user_profiles")
-    .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games, friends_visible, accent_colour")
+    .select("user_id, display_name, username, avatar_url, bio, role, is_public, country, website_url, favourite_games, friends_visible, accent_colour, created_at")
     .ilike("username", handle)
     .maybeSingle();
 
   const fallback = full.error
     ? await dataClient
         .from("user_profiles")
-        .select("user_id, display_name, username, avatar_url, bio, role, is_public, accent_colour")
+        .select("user_id, display_name, username, avatar_url, bio, role, is_public, accent_colour, created_at")
         .ilike("username", handle)
         .maybeSingle()
     : full;
@@ -94,6 +116,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     ? null
     : accentColourMap[profile.accent_colour] || null;
 
+  const badges = computeBadges(profile);
+
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
       {profile.accent_colour && (
@@ -131,6 +155,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         <div>
           <h1 className="text-3xl font-bold text-foreground" style={accentHex ? { color: accentHex } : undefined}>{displayName}</h1>
           <p className="text-muted-foreground">/{profile.username}</p>
+          
+          {/* Badges */}
+          {badges.length > 0 && (
+            <div className="flex justify-center gap-2 mt-2 flex-wrap">
+              {badges.map((badge) => (
+                <span key={badge.name} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted text-xs font-medium">
+                  <span>{badge.emoji}</span>
+                  <span>{badge.name}</span>
+                </span>
+              ))}
+            </div>
+          )}
+          
           {profile.role === "owner" && <p className="mt-2 text-sm font-medium text-purple-700">Owner</p>}
         </div>
 
