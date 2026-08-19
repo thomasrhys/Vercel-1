@@ -171,7 +171,8 @@ export default function AccountPage() {
       is_public: isPublic, 
       accent_colour: accentColour,
       role: isOwner ? "owner" : "user", 
-      updated_at: new Date().toISOString() 
+      updated_at: new Date().toISOString()
+      }}
       if (error) return setMessage(msg(error));
       setUsername(nextUsername);
       setAvatarUrl(nextAvatarUrl);
