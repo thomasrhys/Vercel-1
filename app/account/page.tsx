@@ -13,6 +13,17 @@ import ThemeToggle from "@/components/theme-toggle";
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
 const RESERVED = ["admin", "administrator", "support", "staff", "system", "gamesportal", "fnfaw", "moderator", "official", "api", "root"];
+const ACCENT_COLOURS = [
+  { name: 'system', label: 'System', value: null },
+  { name: 'purple', label: 'Purple', value: '#6d4aff' },
+  { name: 'blue', label: 'Blue', value: '#3b82f6' },
+  { name: 'green', label: 'Green', value: '#22c55e' },
+  { name: 'pink', label: 'Pink', value: '#ec4899' },
+  { name: 'orange', label: 'Orange', value: '#f97316' },
+  { name: 'red', label: 'Red', value: '#ef4444' },
+  { name: 'white', label: 'White', value: '#ffffff' },
+  { name: 'black', label: 'Black', value: '#000000' },
+];
 
 // Helper component that only runs on client
 function OAuthErrorHandler() {
@@ -117,6 +128,7 @@ export default function AccountPage() {
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [accentColour, setAccentColour] = useState('system');
 
   const email = user?.email?.toLowerCase() || "";
   const isOwner = email === OWNER_EMAIL;
@@ -129,17 +141,18 @@ export default function AccountPage() {
   const hasDiscord = providers.includes("discord");
   const profilePath = username ? `/${username}` : "";
 
-  useEffect(() => {
-    if (!user) return;
-    supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url, bio, is_public").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      setDisplayName(data?.display_name || "");
-      setUsername(data?.username || (isOwner ? "owner" : ""));
-      setAvatarUrl(data?.avatar_url || "");
-      setBio(data?.bio || "");
-      setIsPublic(data?.is_public ?? true);
-    });
-  }, [user, isOwner]);
-
+ useEffect(() => {
+  if (!user) return;
+  supabaseAuthClient.from("user_profiles").select("display_name, username, avatar_url, bio, is_public, accent_colour").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+    setDisplayName(data?.display_name || "");
+    setUsername(data?.username || (isOwner ? "owner" : ""));
+    setAvatarUrl(data?.avatar_url || "");
+    setBio(data?.bio || "");
+    setIsPublic(data?.is_public ?? true);
+    setAccentColour(data?.accent_colour || 'system');
+  });
+}, [user, isOwner]);
+  
   const saveProfile = async (nextAvatarUrl = avatarUrl) => {
     if (!user) return;
     setMessage("");
@@ -149,7 +162,16 @@ export default function AccountPage() {
     if (isOwner && nextUsername && !OWNER_NAMES.includes(nextUsername) && RESERVED.includes(nextUsername)) return setMessage("That username is reserved.");
     setSaving(true);
     try {
-      const { error } = await supabaseAuthClient.from("user_profiles").upsert({ user_id: user.id, display_name: displayName.trim() || null, username: nextUsername || null, bio: bio.trim() || null, avatar_url: nextAvatarUrl.trim() || null, is_public: isPublic, role: isOwner ? "owner" : "user", updated_at: new Date().toISOString() });
+      const { error } = await supabaseAuthClient.from("user_profiles").upsert({ 
+      user_id: user.id, 
+      display_name: displayName.trim() || null, 
+      username: nextUsername || null, 
+      bio: bio.trim() || null, 
+      avatar_url: nextAvatarUrl.trim() || null, 
+      is_public: isPublic, 
+      accent_colour: accentColour,
+      role: isOwner ? "owner" : "user", 
+      updated_at: new Date().toISOString() 
       if (error) return setMessage(msg(error));
       setUsername(nextUsername);
       setAvatarUrl(nextAvatarUrl);
