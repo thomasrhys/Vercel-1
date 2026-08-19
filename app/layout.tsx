@@ -46,25 +46,9 @@ export default function RootLayout({
         {/* Dynamic theme color that updates with dark/light mode */}
         <meta id="theme-color-meta" name="theme-color" content="#0a0a0a" />
         <link rel="manifest" href="/manifest.json" />
-        <Script id="gtm-script" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-WS27V73W');`}
-        </Script>
       </head>
 
       <body className="font-sans antialiased">
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-WS27V73W"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
-
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
