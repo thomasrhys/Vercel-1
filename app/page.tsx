@@ -153,9 +153,7 @@ export default function GamePortal() {
   const newGames = useMemo(() => query.trim() || selectedCategory !== "All" ? [] : filteredGames.filter((game) => game.is_new === true).slice(0, 12), [filteredGames, query, selectedCategory])
   const regularGames = useMemo(() => query.trim() || selectedCategory !== "All" ? filteredGames : filteredGames.filter((game) => !game.featured && !game.is_new), [filteredGames, query, selectedCategory])
 
-  const openGame = (game: PortalGame) => {
-    window.location.href = `/game/${game.id}`
-  }
+  const openGame = (game: PortalGame) => setActiveGame(game)
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
