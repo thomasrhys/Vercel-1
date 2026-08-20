@@ -159,7 +159,6 @@ export default function AccountPage() {
   const [created_at, setCreatedAt] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
-  // Stats card data
   const [statsGamesPlayed, setStatsGamesPlayed] = useState(0);
   const [statsRecentGames, setStatsRecentGames] = useState<Array<{ id: string; title: string; image?: string | null }>>([]);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -191,14 +190,12 @@ export default function AccountPage() {
     });
   }, [user, isOwner]);
 
-  // Fetch recently played games for stats card
   useEffect(() => {
     if (!user) return;
 
     const fetchStats = async () => {
       setStatsLoading(true);
       try {
-        // 1. Get total count of unique games played
         const { count } = await supabaseAuthClient
           .from("recently_played")
           .select("*", { count: "exact", head: true })
@@ -206,7 +203,6 @@ export default function AccountPage() {
 
         setStatsGamesPlayed(count || 0);
 
-        // 2. Get the 5 most recent game records
         const { data: recentData } = await supabaseAuthClient
           .from("recently_played")
           .select("game_id, last_played")
@@ -217,7 +213,6 @@ export default function AccountPage() {
         if (recentData && recentData.length > 0) {
           const gameIds = recentData.map((r) => r.game_id);
 
-          // 3. Fetch game details and images
           const [gamesRes, imagesRes] = await Promise.all([
             fetch("/api/games").then((r) => r.json()),
             fetch("/api/game-images").then((r) => r.json()),
@@ -226,7 +221,6 @@ export default function AccountPage() {
           const allGames = Array.isArray(gamesRes) ? gamesRes : [];
           const images = imagesRes || {};
 
-          // 4. Match game IDs to titles and images
           const matched = gameIds
             .map((gid) => {
               const game = allGames.find((g: any) => g.id === gid);
@@ -244,7 +238,7 @@ export default function AccountPage() {
           setStatsRecentGames([]);
         }
       } catch (error) {
-        console.error("Failed to fetch stats data:", error);
+        // Silent failure for stats - doesn't break UX
       } finally {
         setStatsLoading(false);
       }
@@ -402,7 +396,6 @@ export default function AccountPage() {
       </Suspense>
       <div className="flex items-center gap-3">{avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-14 w-14 rounded-full border border-border object-cover" /> : <div className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold">{(displayName || email || "U").slice(0, 1).toUpperCase()}</div>}<div><p className="font-medium text-foreground">{displayName || "Unnamed player"} {isOwner && <span className="ml-1 rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-700">Owner</span>}</p><p className="text-xs text-muted-foreground">{username ? `/${username}` : "No username set"}</p></div></div>
       
-      {/* Badges Section */}
       {badges.length > 0 && (
         <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
           {badges.map((badge) => (
@@ -420,7 +413,6 @@ export default function AccountPage() {
         <p className="text-xs text-muted-foreground italic pt-2 border-t border-border">No badges earned yet 🔰👑 coming soon!</p>
       )}
 
-      {/* Stats Card Generator */}
       <div className="pt-2 border-t border-border">
         <StatsCard
           userId={user.id}
