@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
@@ -17,10 +18,8 @@ import {
   ArrowUp,
   Heart,
   Sparkles,
-  CloudDownload,
 } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
-import { saveGame, loadGame } from "@/lib/cloud-save"
 
 type PortalGame = Game & {
   image?: string | null
@@ -29,8 +28,6 @@ type PortalGame = Game & {
   hidden?: boolean
   desktop_only?: boolean
   is_new?: boolean
-  hasSave?: boolean
-  lastSaved?: string | null
 }
 
 type PublicSettings = {
@@ -101,58 +98,6 @@ export default function GamePortal() {
       .then((data) => setBlobImages(data))
       .catch(() => setBlobImages({}))
   }, [])
-
-  // Load cloud saves for all games when logged in
-  useEffect(() => {
-    const loadGameSaves = async () => {
-      if (!isSignedIn) {
-        setGames(prev => prev.map(g => ({ ...g, hasSave: false, lastSaved: null })))
-        return
-      }
-
-      const updatedGames = await Promise.all(
-        games.map(async (game) => {
-          try {
-            const savedData = await loadGame(game.id)
-            if (savedData && typeof savedData === 'object' && savedData !== null) {
-              return { ...game, hasSave: true, lastSaved: savedData.timestamp || null }
-            }
-          } catch (error) {
-            console.error(`Failed to load save for ${game.id}:`, error)
-          }
-          return { ...game, hasSave: false, lastSaved: null }
-        })
-      )
-
-      setGames(updatedGames)
-    }
-
-    loadGameSaves()
-  }, [isSignedIn])
-
-  // Auto-save game progress (call this from within games)
-  const saveGameProgress = async (gameId: string, progressData: any) => {
-    const success = await saveGame(gameId, { ...progressData, timestamp: new Date().toISOString() })
-    if (success) {
-      setGames(prev => prev.map(g => 
-        g.id === gameId 
-          ? { ...g, hasSave: true, lastSaved: new Date().toISOString() }
-          : g
-      ))
-    }
-  }
-
-  // Expose save function to window for games to use
-  useEffect(() => {
-    if (!isSignedIn) return
-    
-    const win = window as any
-    win.saveGameProgress = saveGameProgress
-    
-    return () => {
-      delete win.saveGameProgress
-    }
-  }, [isSignedIn])
 
   useEffect(() => {
     const updateMobileState = () => {
@@ -238,14 +183,13 @@ export default function GamePortal() {
     
     return (
       <Card key={game.id} className={`group hover:shadow-lg transition-shadow ${isDesktopOnlyOnMobile ? "cursor-not-allowed" : "cursor-pointer"}`} onClick={(event) => { if (isDesktopOnlyOnMobile) { event.preventDefault(); event.stopPropagation(); return } openGame(game) }}>
-        <CardHeader className="pb-2"><CardTitle className="text-base sm:text-lg truncate flex items-center gap-2">{game.featured && <Star className="h-4 w-4 shrink-0" />}{game.is_new && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">NEW</span>}<span className="truncate">{game.title}</span>{game.hasSave && isSignedIn && <CloudDownload className="h-4 w-4 shrink-0 text-green-600" />}</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-base sm:text-lg truncate flex items-center gap-2">{game.featured && <Star className="h-4 w-4 shrink-0" />}{game.is_new && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">NEW</span>}<span className="truncate">{game.title}</span></CardTitle></CardHeader>
         <CardContent className="p-0">
           <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
             {coverImage ? <img src={coverImage} alt={game.title} className={`w-full h-full object-cover ${isDesktopOnlyOnMobile ? "opacity-45" : ""}`} /> : <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20"><Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground" /></div>}
             {isDesktopOnlyOnMobile && <div className="absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white flex items-center gap-1"><Monitor className="h-3 w-3" />Desktop Only</div>}
             {isDesktopOnlyOnMobile ? <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white" onClick={(event) => { event.preventDefault(); event.stopPropagation() }}><Smartphone className="h-8 w-8 mb-2" /><p className="font-semibold">Desktop Only</p><p className="text-xs mt-1 max-w-[220px]">This game is not supported on mobile devices. Please use a desktop or laptop.</p></div> : <><div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" /><div className="absolute inset-0 flex items-center justify-center"><Button variant="secondary" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">Play</Button></div></>}
             <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); window.location.href = `/game/${game.id}` }} className="absolute bottom-2 right-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground shadow hover:bg-background">Details →</button>
-            {game.hasSave && isSignedIn && <div className="absolute top-2 right-2 rounded-full bg-green-600/90 p-1.5"><CloudDownload className="h-3 w-3 text-white" /></div>}
           </div>
         </CardContent>
       </Card>
@@ -270,7 +214,7 @@ export default function GamePortal() {
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {categoryCards.length > 0 && !query.trim() && <section className="mb-6"><div className="flex items-center justify-between gap-3 mb-3"><h2 className="text-xl font-bold text-foreground">Categories</h2>{selectedCategory !== "All" && <Button variant="outline" size="sm" onClick={() => setSelectedCategory("All")}>Show All</Button>}</div><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">{categoryCards.map((category) => <button key={category.name} type="button" onClick={() => setSelectedCategory(category.name)} className={`rounded-lg border p-4 text-left transition hover:shadow-md ${selectedCategory === category.name ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50"}`}><div className="text-2xl mb-2">{category.emoji}</div><div className="font-semibold text-foreground truncate">{category.name}</div><div className="text-xs text-muted-foreground">{category.gameCount} {category.gameCount === 1 ? "game" : "games"}</div></button>)}</div></section>}
         {categories.length > 1 && <div className="mb-4 flex gap-2 overflow-x-auto pb-2">{categories.map((category) => <Button key={category} variant={selectedCategory === category ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(category)} className="shrink-0">{category}</Button>)}</div>}
-        <p className="text-sm text-muted-foreground mb-4">{filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}{query || selectedCategory !== "All" ? " found" : " available"}{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}{isSignedIn && <span className="ml-2 inline-flex items-center gap-1 text-xs"><CloudDownload className="h-3 w-3" />Cloud save enabled</span>}</p>
+        <p className="text-sm text-muted-foreground mb-4">{filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}{query || selectedCategory !== "All" ? " found" : " available"}{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}</p>
         {featuredGames.length > 0 && <section className="mb-8"><div className="flex items-center gap-2 mb-3"><Star className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold text-foreground">Featured Games</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{featuredGames.map(renderGameCard)}</div></section>}
         {newGames.length > 0 && <section className="mb-8"><div className="flex items-center gap-2 mb-3"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold text-foreground">New Games</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{newGames.map(renderGameCard)}</div></section>}
         <section>{!query && selectedCategory === "All" && (featuredGames.length > 0 || newGames.length > 0) && regularGames.length > 0 && <h2 className="text-xl font-bold text-foreground mb-3">All Games</h2>}{selectedCategory !== "All" && filteredGames.length > 0 && <h2 className="text-xl font-bold text-foreground mb-3">{selectedCategory}</h2>}<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{regularGames.map(renderGameCard)}</div></section>
