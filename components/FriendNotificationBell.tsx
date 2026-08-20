@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 import PendingRequestsModal from './PendingRequestsModal';
 
 export default function FriendNotificationBell() {
@@ -13,7 +13,7 @@ export default function FriendNotificationBell() {
 
   const fetchRequestCount = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         setHasRequests(false);
         setRequestCount(0);
@@ -42,27 +42,23 @@ export default function FriendNotificationBell() {
 
   useEffect(() => {
     fetchRequestCount();
-    
-    // Poll for new requests every 30 seconds
     const interval = setInterval(fetchRequestCount, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const handleBellClick = async () => {
     setIsModalOpen(true);
-    // Reset count when opening modal
     setHasRequests(false);
     setRequestCount(0);
   };
 
   const handleClose = () => {
     setIsModalOpen(false);
-    // Refetch after closing to get fresh count
     setTimeout(fetchRequestCount, 500);
   };
 
   if (loading) {
-    return <div className="w-8 h-8" />; // Placeholder
+    return <div className="w-8 h-8" />;
   }
 
   return (
@@ -72,7 +68,6 @@ export default function FriendNotificationBell() {
         className="relative p-2 hover:bg-muted rounded-full transition-colors"
         aria-label="Friend requests"
       >
-        {/* Bell Icon */}
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="24" 
@@ -89,7 +84,6 @@ export default function FriendNotificationBell() {
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
         </svg>
         
-        {/* Badge */}
         {hasRequests && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center min-w-[20px]">
             {requestCount}
