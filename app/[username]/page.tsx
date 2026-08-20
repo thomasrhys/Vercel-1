@@ -34,7 +34,6 @@ function normalizeWebsite(value?: string | null) {
 function computeBadges(profile: any): Array<{ emoji: string; name: string; description: string }> {
   const badges: Array<{ emoji: string; name: string; description: string }> = [];
   
-  // Early Bird: Profile created before August 2026
   const createdAt = profile.created_at || profile.updated_at;
   if (createdAt) {
     const createdDate = new Date(createdAt);
@@ -44,17 +43,14 @@ function computeBadges(profile: any): Array<{ emoji: string; name: string; descr
     }
   }
   
-  // Artist: Has custom avatar
   if (profile.avatar_url && profile.avatar_url.trim()) {
     badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
   }
   
-  // Customiser: Has custom accent colour (not system)
   if (profile.accent_colour && profile.accent_colour !== 'system') {
     badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
   }
   
-  // Owner role
   if (profile.role === 'owner') {
     badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
   }
@@ -126,6 +122,11 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     ? null
     : accentColourMap[profile.accent_colour] || null;
 
+  const accentBg = accentHex ? { backgroundColor: accentHex } : undefined;
+  const accentBorder = accentHex ? { borderColor: accentHex } : undefined;
+  const accentText = accentHex ? { color: accentHex } : undefined;
+  const accentHover = accentHex ? { ':hover': { borderColor: accentHex } } : undefined;
+
   const badges = computeBadges(profile);
 
   return (
@@ -149,28 +150,31 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               if (accent === 'system') {
                 hex = window.matchMedia('(prefers-color-scheme: dark)').matches ? '#ffffff' : '#000000';
               }
-              if (hex) document.documentElement.style.setProperty('--accent', hex);
+              if (hex) {
+                document.documentElement.style.setProperty('--accent', hex);
+                document.documentElement.style.setProperty('--primary', hex);
+                document.documentElement.style.setProperty('--primary-foreground', '#ffffff');
+              }
             })();
           `
         }} />
       )}
       <div className="max-w-xl mx-auto rounded-lg border border-border bg-card p-6 text-center space-y-4">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt="Profile avatar" className="h-24 w-24 rounded-full object-cover mx-auto border-2" style={accentHex ? { borderColor: accentHex } : undefined} />
+          <img src={profile.avatar_url} alt="Profile avatar" className="h-24 w-24 rounded-full object-cover mx-auto border-2" style={accentBorder} />
         ) : (
-          <div className="h-24 w-24 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white" style={accentHex ? { backgroundColor: accentHex } : { backgroundColor: 'var(--primary)' }}>
+          <div className="h-24 w-24 rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white" style={accentBg}>
             {displayName.slice(0, 1).toUpperCase()}
           </div>
         )}
         <div>
-          <h1 className="text-3xl font-bold text-foreground" style={accentHex ? { color: accentHex } : undefined}>{displayName}</h1>
+          <h1 className="text-3xl font-bold text-foreground" style={accentText}>{displayName}</h1>
           <p className="text-muted-foreground">/{profile.username}</p>
           
-          {/* Badges */}
           {badges.length > 0 && (
             <div className="flex justify-center gap-2 mt-2 flex-wrap">
               {badges.map((badge) => (
-                <span key={badge.name} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted text-xs font-medium">
+                <span key={badge.name} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={accentBg ? { backgroundColor: accentHex + '20', color: accentHex } : undefined}>
                   <span>{badge.emoji}</span>
                   <span>{badge.name}</span>
                 </span>
@@ -182,22 +186,23 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </div>
 
         <div className="flex justify-center gap-4 py-4">
-          <FriendSection targetUserId={profile.user_id} />
+          <FriendSection targetUserId={profile.user_id} accentHex={accentHex} />
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
 
-        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
+        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} accentHex={accentHex} />
 
         <BlockSection 
           targetUserId={profile.user_id} 
-          targetUsername={profile.username} 
+          targetUsername={profile.username}
+          accentHex={accentHex}
         />
 
         {(country || website) && (
           <div className="rounded-md border border-border p-4 text-sm space-y-2">
-            {country && <p><span className="font-medium">Country:</span> {country}</p>}
-            {website && <p><span className="font-medium">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank">{websiteUrl}</a></p>}
+            {country && <p><span className="font-medium text-foreground">Country:</span> {country}</p>}
+            {website && <p><span className="font-medium text-foreground">Website:</span> <a className="underline" href={website} rel="noreferrer" target="_blank" style={accentText}>{websiteUrl}</a></p>}
           </div>
         )}
 
@@ -205,12 +210,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <div className="rounded-md border border-border p-4 text-left space-y-3">
             <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
             <div className="flex flex-wrap justify-center gap-2">
-              {favouriteGames.map((game) => <span key={game} className="rounded-full bg-muted px-3 py-1 text-xs text-foreground">{game}</span>)}
+              {favouriteGames.map((game) => <span key={game} className="rounded-full px-3 py-1 text-xs text-foreground" style={accentBg ? { backgroundColor: accentHex + '20', color: accentHex, border: `1px solid ${accentHex}` } : undefined}>{game}</span>)}
             </div>
           </div>
         )}
 
-        <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm">Back to Games</a>
+        <a href="/" className="inline-block rounded-md border border-border px-4 py-2 text-sm hover:bg-muted transition-colors" style={accentBorder}>Back to Games</a>
       </div>
     </main>
   );
