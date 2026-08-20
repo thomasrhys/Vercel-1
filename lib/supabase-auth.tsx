@@ -1,3 +1,4 @@
+// lib/supabase-auth.tsx
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -108,6 +109,13 @@ export function UserButton() {
   const subLabel = user.email || user.phone || "Signed in";
   const accentHex = getAccentHex(accentColour);
 
+  // Build style: only apply accent background when NO avatar is set
+  const avatarStyle = avatarUrl
+    ? { backgroundColor: 'transparent', borderColor: 'transparent', color: 'inherit' }
+    : accentHex
+      ? { backgroundColor: accentHex, borderColor: accentHex, color: '#fff' }
+      : { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' };
+
   return (
     <div className="relative">
       <button 
@@ -115,7 +123,7 @@ export function UserButton() {
         onClick={() => setIsOpen((open) => !open)} 
         title="Account menu" 
         className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden border-2"
-        style={accentHex ? { backgroundColor: accentHex, borderColor: accentHex, color: '#fff' } : { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
+        style={avatarStyle}
       >
         {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
       </button>
@@ -124,7 +132,7 @@ export function UserButton() {
           <div className="px-3 py-2 border-b border-border flex items-center gap-2">
             <div 
               className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden shrink-0 border-2"
-              style={accentHex ? { backgroundColor: accentHex, borderColor: accentHex, color: '#fff' } : { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
+              style={avatarStyle}
             >
               {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
             </div>
