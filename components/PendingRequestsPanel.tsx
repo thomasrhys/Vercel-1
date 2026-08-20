@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 
 interface PendingRequest {
   id: string;
@@ -22,7 +22,7 @@ export default function PendingRequestsPanel() {
 
   const fetchRequests = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         setRequests([]);
         return;
@@ -51,8 +51,6 @@ export default function PendingRequestsPanel() {
 
   useEffect(() => {
     fetchRequests();
-    
-    // Poll for new requests every 30 seconds
     const interval = setInterval(fetchRequests, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -61,7 +59,7 @@ export default function PendingRequestsPanel() {
     setUpdatingId(friendshipId);
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
@@ -78,7 +76,6 @@ export default function PendingRequestsPanel() {
       const result = await res.json();
       
       if (result.success) {
-        // Remove from list
         setRequests(prev => prev.filter(r => r.id !== friendshipId));
       } else {
         alert(result.error || 'Something went wrong');
