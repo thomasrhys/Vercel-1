@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 
 interface FriendButtonProps {
   targetUserId: string;
@@ -23,10 +23,9 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) return;
 
-      // Check relationship status
       const res = await fetch(`/api/friendship-status?userId=${currentUserId}&targetId=${targetUserId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -35,7 +34,6 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
       const data = await res.json();
       setRelationship(data.status || 'none');
 
-      // Check if blocked
       const blockedRes = await fetch(`/api/friend/is-blocked?targetUserId=${targetUserId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -64,7 +62,7 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     setErrorMessage(null);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
@@ -104,7 +102,7 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     if (!confirmed) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
@@ -137,7 +135,7 @@ export default function FriendButton({ targetUserId, currentUserId }: FriendButt
     if (!confirmed) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
