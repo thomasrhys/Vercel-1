@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 import FriendButton from './FriendButton';
 
 export default function FriendSection({ targetUserId }: { targetUserId: string }) {
@@ -12,7 +12,7 @@ export default function FriendSection({ targetUserId }: { targetUserId: string }
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseAuthClient.auth.getSession();
         setCurrentUserId(session?.user?.id || null);
       } catch (error) {
         setCurrentUserId(null);
