@@ -94,14 +94,57 @@ export default function StatsCard({
     });
   };
 
+  // Draw an image inverted by manipulating pixels manually
+  // This is more reliable than ctx.filter which doesn't work in all browsers
+  const drawInvertedImage = (
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number
+  ) => {
+    // Draw to a temp canvas
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = dw;
+    tempCanvas.height = dh;
+    const tempCtx = tempCanvas.getContext("2d");
+    if (!tempCtx) {
+      // Fallback: just draw normally
+      ctx.drawImage(img, dx, dy, dw, dh);
+      return;
+    }
+
+    tempCtx.drawImage(img, 0, 0, dw, dh);
+
+    try {
+      const imageData = tempCtx.getImageData(0, 0, dw, dh);
+      const pixels = imageData.data;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        // Only invert non-transparent pixels
+        if (pixels[i + 3] > 0) {
+          pixels[i] = 255 - pixels[i];     // R
+          pixels[i + 1] = 255 - pixels[i + 1]; // G
+          pixels[i + 2] = 255 - pixels[i + 2]; // B
+          // Alpha stays the same
+        }
+      }
+
+      tempCtx.putImageData(imageData, 0, 0);
+      ctx.drawImage(tempCanvas, dx, dy, dw, dh);
+    } catch {
+      // If pixel manipulation fails (CORS), fall back to normal draw
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+  };
+
   // Detect if an image should be inverted for visibility on dark canvas
-  // Uses multiple methods for reliability
   const shouldInvertAvatar = (img: HTMLImageElement, avatarUrl: string): boolean => {
     try {
       // Method 1: Check URL for known dark icon patterns
       if (avatarUrl) {
         const lowerUrl = avatarUrl.toLowerCase();
-        // If it's your site's favicon/icon or a gamepad PNG/SVG, invert it
         if (lowerUrl.includes('favicon') || lowerUrl.includes('gamepad') || lowerUrl.includes('icon')) {
           return true;
         }
@@ -109,7 +152,7 @@ export default function StatsCard({
 
       // Method 2: Pixel-based detection
       const tempCanvas = document.createElement("canvas");
-      const size = Math.min(img.width, img.height, 100); // Sample at smaller size
+      const size = Math.min(img.width, img.height, 100);
       tempCanvas.width = size;
       tempCanvas.height = size;
       const tempCtx = tempCanvas.getContext("2d");
@@ -123,28 +166,16 @@ export default function StatsCard({
       let opaquePixels = 0;
 
       for (let j = 0; j < pixels.length; j += 4) {
-        // Skip transparent pixels
         if (pixels[j + 3] < 128) continue;
-
-        const r = pixels[j];
-        const g = pixels[j + 1];
-        const b = pixels[j + 2];
-        totalBrightness += (r + g + b) / 3;
+        totalBrightness += (pixels[j] + pixels[j + 1] + pixels[j + 2]) / 3;
         opaquePixels++;
       }
 
       if (opaquePixels === 0) return false;
 
       const avgBrightness = totalBrightness / opaquePixels;
-      
-      // If average brightness < 80, it's mostly dark — invert for visibility
-      if (avgBrightness < 80) {
-        console.log(`[Avatar] Avg brightness: ${avgBrightness.toFixed(1)} — Inverting`);
-        return true;
-      }
-
-      console.log(`[Avatar] Avg brightness: ${avgBrightness.toFixed(1)} — Keeping original`);
-      return false;
+      console.log(`[Avatar] Avg brightness: ${avgBrightness.toFixed(1)} — Inverting`);
+      return avgBrightness < 80;
     } catch (err) {
       console.warn("[Avatar] Detection failed:", err);
       return false;
@@ -257,7 +288,6 @@ export default function StatsCard({
       if (avatarUrl) {
         const avatarImg = await loadImage(avatarUrl);
         if (avatarImg) {
-          // Check if this is a dark graphic that needs inverting
           const shouldInvert = shouldInvertAvatar(avatarImg, avatarUrl);
           console.log(`[Stats] Avatar invert: ${shouldInvert}`);
 
@@ -267,17 +297,14 @@ export default function StatsCard({
           ctx.clip();
 
           if (shouldInvert) {
-            // Try CSS filter first (modern browsers)
-            ctx.filter = "invert(1)";
+            // Manual pixel inversion — reliable across all browsers
+            drawInvertedImage(ctx, avatarImg, avatarX, avatarY, avatarSize, avatarSize);
+          } else {
+            ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
           }
 
-          ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
-          
-          // Reset filter
-          ctx.filter = "none";
           ctx.restore();
         } else {
-          console.warn("[Stats] Avatar image failed to load, using default");
           drawDefaultAvatar(ctx, avatarX, avatarY, avatarSize, displayName, accentHex);
         }
       } else {
