@@ -3,7 +3,7 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Loader2 } from "lucide-react";
+import { BarChart3, Download, Share2, Loader2 } from "lucide-react";
 
 type StatsCardProps = {
   userId: string;
@@ -46,12 +46,18 @@ export default function StatsCard({
 
   const accentHex = ACCENT_MAP[accentColour] || ACCENT_MAP.blue;
 
-  const loadImage = (src: string): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
+  const loadImage = (src: string): Promise<HTMLImageElement | null> => {
+    return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Failed to load ${src}`));
+      img.onerror = () => {
+        // Fallback: try without crossOrigin
+        const img2 = new Image();
+        img2.onload = () => resolve(img2);
+        img2.onerror = () => resolve(null);
+        img2.src = src;
+      };
       img.src = src;
     });
   };
@@ -82,13 +88,14 @@ export default function StatsCard({
     accent: string
   ) => {
     ctx.fillStyle = accent;
-    roundRect(ctx, x, y, size, size, size / 2);
+    ctx.beginPath();
+    ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${size * 0.45}px system-ui, -apple-system, sans-serif`;
+    ctx.font = `bold ${size * 0.4}px system-ui, -apple-system, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(name.slice(0, 1).toUpperCase(), x + size / 2, y + size / 2);
+    ctx.fillText(name.slice(0, 1).toUpperCase(), x + size / 2, y + size / 2 + 2);
     ctx.textBaseline = "alphabetic";
   };
 
@@ -97,23 +104,23 @@ export default function StatsCard({
     x: number,
     y: number,
     w: number,
-    h: number
+    h: number,
+    accent: string
   ) => {
-    ctx.fillStyle = "#333333";
-    ctx.fillRect(x, y, w, h);
-    // Draw a simple gamepad icon
-    const cx = x + w / 2;
-    const cy = y + h / 2;
-    ctx.strokeStyle = "#555555";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 20, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.fillStyle = "#555555";
-    ctx.font = "20px sans-serif";
+    // Gradient background
+    const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+    grad.addColorStop(0, "#2a2a2a");
+    grad.addColorStop(1, "#1a1a1a");
+    ctx.fillStyle = grad;
+    roundRect(ctx, x, y, w, h, 16);
+    ctx.fill();
+
+    // Gamepad emoji
+    ctx.font = "40px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("🎮", cx, cy);
+    ctx.fillStyle = "#555555";
+    ctx.fillText("🎮", x + w / 2, y + h / 2);
     ctx.textBaseline = "alphabetic";
   };
 
@@ -130,172 +137,229 @@ export default function StatsCard({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Background — dark gradient
+      // === BACKGROUND ===
       const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-      bgGrad.addColorStop(0, "#0f0f0f");
-      bgGrad.addColorStop(1, "#1a1a1a");
+      bgGrad.addColorStop(0, "#0a0a0a");
+      bgGrad.addColorStop(0.5, "#121212");
+      bgGrad.addColorStop(1, "#0a0a0a");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // Subtle accent glow in top-left
-      const glowGrad = ctx.createRadialGradient(120, 120, 0, 120, 120, 400);
-      glowGrad.addColorStop(0, accentHex + "22");
+      // Accent glow radiating from top-left
+      const glowGrad = ctx.createRadialGradient(150, 200, 0, 150, 200, 600);
+      glowGrad.addColorStop(0, accentHex + "20");
       glowGrad.addColorStop(1, "transparent");
       ctx.fillStyle = glowGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // === TOP LEFT: Avatar ===
-      const avatarSize = 140;
-      const avatarX = 60;
-      const avatarY = 60;
+      // Subtle accent line at very top
+      const topBar = ctx.createLinearGradient(0, 0, W, 0);
+      topBar.addColorStop(0, accentHex);
+      topBar.addColorStop(1, "transparent");
+      ctx.fillStyle = topBar;
+      ctx.fillRect(0, 0, W, 6);
+
+      // === HEADER SECTION (top area) ===
+      const padX = 70;
+      const headerY = 70;
+
+      // Avatar (top-left)
+      const avatarSize = 120;
+      const avatarX = padX;
+      const avatarY = headerY;
 
       if (avatarUrl) {
-        try {
-          const avatarImg = await loadImage(avatarUrl);
+        const avatarImg = await loadImage(avatarUrl);
+        if (avatarImg) {
           ctx.save();
-          roundRect(ctx, avatarX, avatarY, avatarSize, avatarSize, 70);
+          ctx.beginPath();
+          ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
           ctx.clip();
           ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
           ctx.restore();
-        } catch {
+        } else {
           drawDefaultAvatar(ctx, avatarX, avatarY, avatarSize, displayName, accentHex);
         }
       } else {
         drawDefaultAvatar(ctx, avatarX, avatarY, avatarSize, displayName, accentHex);
       }
 
-      // Avatar border ring in accent colour
+      // Avatar ring
       ctx.strokeStyle = accentHex;
-      ctx.lineWidth = 4;
-      roundRect(ctx, avatarX, avatarY, avatarSize, avatarSize, 70);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 3, 0, Math.PI * 2);
       ctx.stroke();
 
-      // === UNDER AVATAR: Display name + username ===
+      // Display name (under avatar, accent coloured)
       ctx.textAlign = "left";
-      
-      // Display name (larger, bold, accent colour)
       ctx.fillStyle = accentHex;
-      ctx.font = "bold 42px system-ui, -apple-system, sans-serif";
-      const dnText = displayName.length > 22 ? displayName.slice(0, 22) + "…" : displayName;
-      ctx.fillText(dnText, avatarX, avatarY + avatarSize + 50);
+      ctx.font = "bold 44px system-ui, -apple-system, sans-serif";
+      const dnText = displayName.length > 24 ? displayName.slice(0, 24) + "…" : displayName;
+      ctx.fillText(dnText, padX, avatarY + avatarSize + 55);
 
-      // Username (smaller, muted)
-      ctx.fillStyle = "#999999";
+      // Username (under display name, muted)
+      ctx.fillStyle = "#888888";
       ctx.font = "32px system-ui, -apple-system, sans-serif";
-      ctx.fillText(`@${username}`, avatarX, avatarY + avatarSize + 92);
+      ctx.fillText(`@${username}`, padX, avatarY + avatarSize + 95);
 
-      // === TOP MIDDLE: Games played stat ===
-      ctx.textAlign = "center";
+      // === GAMES PLAYED STAT (right side of header) ===
+      ctx.textAlign = "right";
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 56px system-ui, -apple-system, sans-serif";
-      ctx.fillText(`${gamesPlayed}`, W / 2, 130);
+      ctx.font = "bold 72px system-ui, -apple-system, sans-serif";
+      ctx.fillText(`${gamesPlayed}`, W - padX, headerY + 80);
 
-      ctx.fillStyle = "#999999";
-      ctx.font = "28px system-ui, -apple-system, sans-serif";
-      ctx.fillText("Games Played", W / 2, 168);
+      ctx.fillStyle = "#888888";
+      ctx.font = "26px system-ui, -apple-system, sans-serif";
+      ctx.fillText("GAMES PLAYED", W - padX, headerY + 115);
 
-      // Divider line under stat
+      // Underline for stat
+      ctx.strokeStyle = accentHex;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(W - padX - 180, headerY + 132);
+      ctx.lineTo(W - padX, headerY + 132);
+      ctx.stroke();
+
+      // === RECENTLY PLAYED SECTION ===
+      const sectionTitleY = avatarY + avatarSize + 180;
+
+      // Section title with accent
+      ctx.textAlign = "left";
+      ctx.fillStyle = accentHex;
+      ctx.font = "bold 16px system-ui, -apple-system, sans-serif";
+      ctx.fillText("RECENTLY PLAYED", padX, sectionTitleY - 20);
+
+      // Line after title
       ctx.strokeStyle = "#333333";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(W / 2 - 80, 185);
-      ctx.lineTo(W / 2 + 80, 185);
+      ctx.moveTo(padX + 200, sectionTitleY - 25);
+      ctx.lineTo(W - padX, sectionTitleY - 25);
       ctx.stroke();
 
-      // === MIDDLE: Recently played games (up to 5) ===
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#cccccc";
-      ctx.font = "bold 28px system-ui, -apple-system, sans-serif";
-      ctx.fillText("Recently Played", W / 2, 420);
-
+      // Game cards — vertical list (like Spotify Wrapped top songs)
       const gamesToShow = recentGames.slice(0, 5);
-      const cardW = 160;
-      const cardH = 160;
-      const gap = 20;
-      const totalWidth = gamesToShow.length * cardW + (gamesToShow.length - 1) * gap;
-      const startX = (W - totalWidth) / 2;
-      const startY = 460;
+      const cardStartY = sectionTitleY + 10;
+      const cardH = 110;
+      const cardGap = 18;
+      const cardW = W - padX * 2;
+
+      if (gamesToShow.length === 0) {
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#555555";
+        ctx.font = "28px system-ui, -apple-system, sans-serif";
+        ctx.fillText("No games played yet!", W / 2, cardStartY + 60);
+      }
 
       for (let i = 0; i < gamesToShow.length; i++) {
         const game = gamesToShow[i];
-        const gx = startX + i * (cardW + gap);
-        const gy = startY;
+        const gy = cardStartY + i * (cardH + cardGap);
 
         // Card background
-        ctx.fillStyle = "#222222";
-        roundRect(ctx, gx, gy, cardW, cardH, 12);
+        ctx.fillStyle = "#1a1a1a";
+        roundRect(ctx, padX, gy, cardW, cardH, 14);
         ctx.fill();
 
-        // Game image
+        // Accent left border
+        ctx.fillStyle = accentHex;
+        roundRect(ctx, padX, gy, 5, cardH, 2);
+        ctx.fill();
+
+        // Number (rank)
+        ctx.fillStyle = "#444444";
+        ctx.font = "bold 42px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`${i + 1}`, padX + 45, gy + cardH / 2 + 2);
+
+        // Game thumbnail
+        const thumbSize = 76;
+        const thumbX = padX + 80;
+        const thumbY = gy + (cardH - thumbSize) / 2;
+
         if (game.image) {
-          try {
-            const gameImg = await loadImage(game.image);
+          const gameImg = await loadImage(game.image);
+          if (gameImg) {
             ctx.save();
-            roundRect(ctx, gx, gy, cardW, cardH, 12);
+            roundRect(ctx, thumbX, thumbY, thumbSize, thumbSize, 12);
             ctx.clip();
-            ctx.drawImage(gameImg, gx, gy, cardW, cardH);
+            ctx.drawImage(gameImg, thumbX, thumbY, thumbSize, thumbSize);
             ctx.restore();
-          } catch {
-            drawGamePlaceholder(ctx, gx, gy, cardW, cardH);
+          } else {
+            drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize, accentHex);
           }
         } else {
-          drawGamePlaceholder(ctx, gx, gy, cardW, cardH);
+          drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize, accentHex);
         }
 
-        // Card border
+        // Thumbnail border
         ctx.strokeStyle = "#333333";
-        ctx.lineWidth = 2;
-        roundRect(ctx, gx, gy, cardW, cardH, 12);
+        ctx.lineWidth = 1;
+        roundRect(ctx, thumbX, thumbY, thumbSize, thumbSize, 12);
         ctx.stroke();
 
-        // Title under card
-        ctx.fillStyle = "#aaaaaa";
-        ctx.font = "20px system-ui, -apple-system, sans-serif";
-        ctx.textAlign = "center";
-        const titleText = game.title.length > 18 ? game.title.slice(0, 18) + "…" : game.title;
-        ctx.fillText(titleText, gx + cardW / 2, gy + cardH + 28);
+        // Game title
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 30px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        const titleText = game.title.length > 30 ? game.title.slice(0, 30) + "…" : game.title;
+        ctx.fillText(titleText, thumbX + thumbSize + 25, gy + cardH / 2 + 2);
+
+        ctx.textBaseline = "alphabetic";
       }
 
-      // === BOTTOM RIGHT: Game Portal branding ===
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      
-      // Gamepad icon (simple drawn version)
-      const brandX = W - 60;
-      const brandY = H - 60;
-      const iconSize = 36;
+      // === BOTTOM BRANDING ===
+      const brandY = H - 70;
 
-      // Draw a simple gamepad shape
-      ctx.strokeStyle = accentHex;
-      ctx.fillStyle = accentHex;
-      ctx.lineWidth = 2;
-      
-      // Gamepad body
-      const gpX = brandX - 160;
-      const gpY = brandY;
+      // Accent line above branding
+      const brandLineGrad = ctx.createLinearGradient(padX, 0, W - padX, 0);
+      brandLineGrad.addColorStop(0, "transparent");
+      brandLineGrad.addColorStop(0.5, accentHex + "44");
+      brandLineGrad.addColorStop(1, "transparent");
+      ctx.strokeStyle = brandLineGrad;
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(gpX - 18, gpY - 14, 36, 28, 8);
+      ctx.moveTo(padX, brandY - 25);
+      ctx.lineTo(W - padX, brandY - 25);
       ctx.stroke();
-      
-      // Left D-pad dot
+
+      // Gamepad icon drawn simply
+      const gpX = padX;
+      const gpCy = brandY;
+      ctx.strokeStyle = accentHex;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(gpX - 8, gpY, 3, 0, Math.PI * 2);
+      ctx.roundRect(gpX, gpCy - 16, 32, 32, 8);
+      ctx.stroke();
+
+      // D-pad dot
+      ctx.fillStyle = accentHex;
+      ctx.beginPath();
+      ctx.arc(gpX + 10, gpCy, 2.5, 0, Math.PI * 2);
       ctx.fill();
-      
+
       // Right buttons
       ctx.beginPath();
-      ctx.arc(gpX + 8, gpY - 4, 3, 0, Math.PI * 2);
+      ctx.arc(gpX + 22, gpCy - 5, 2.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(gpX + 8, gpY + 4, 3, 0, Math.PI * 2);
+      ctx.arc(gpX + 22, gpCy + 5, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
       // "Game Portal" text
       ctx.fillStyle = accentHex;
-      ctx.font = "bold 32px system-ui, -apple-system, sans-serif";
-      ctx.textAlign = "right";
+      ctx.font = "bold 28px system-ui, -apple-system, sans-serif";
+      ctx.textAlign = "left";
       ctx.textBaseline = "middle";
-      ctx.fillText("Game Portal", brandX, brandY);
+      ctx.fillText("Game Portal", gpX + 44, gpCy);
+
+      // URL
+      ctx.fillStyle = "#666666";
+      ctx.font = "22px system-ui, -apple-system, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText("fnfaw.es", W - padX, gpCy);
 
       ctx.textBaseline = "alphabetic";
 
@@ -361,16 +425,14 @@ export default function StatsCard({
           </>
         ) : (
           <>
-            <Share2 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-4 w-4 mr-2" />
             My Stats Card
           </>
         )}
       </Button>
 
-      {/* Hidden canvas for rendering */}
       <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      {/* Preview Modal */}
       {previewUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
