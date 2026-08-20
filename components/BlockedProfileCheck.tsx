@@ -1,4 +1,4 @@
-// components/BlockedProfileCheck.tsx - Tempory hard test version
+// components/BlockedProfileCheck.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,9 +9,6 @@ interface BlockedProfileCheckProps {
   children: React.ReactNode;
 }
 
-const TOM_HUGHES_ID = 'b58281d3-0f0c-4326-9f5a-5f6ec93f0881';
-const TEST_USER_ID = 'ea1dbd3e-42bb-4bf5-a869-715e3fe90294';
-
 export default function BlockedProfileCheck({ profileUserId, children }: BlockedProfileCheckProps) {
   const [isBlocked, setIsBlocked] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -21,12 +18,7 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
       try {
         const { data: { user } } = await supabaseAuthClient.auth.getUser();
         
-        if (profileUserId === TOM_HUGHES_ID && user?.id === TEST_USER_ID) {
-          setIsBlocked(true);
-          setLoading(false);
-          return;
-        }
-        
+        // Don't block if no user or viewing own profile
         if (!user || user.id === profileUserId) {
           setLoading(false);
           return;
