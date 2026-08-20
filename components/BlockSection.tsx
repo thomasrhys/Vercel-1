@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 import BlockUserButton from './BlockUserButton';
 
 interface BlockSectionProps {
@@ -17,7 +17,7 @@ export default function BlockSection({ targetUserId, targetUsername }: BlockSect
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseAuthClient.auth.getUser();
         setCurrentUserId(user?.id || null);
         setSameUser(user?.id === targetUserId);
       } catch (error) {
@@ -29,9 +29,8 @@ export default function BlockSection({ targetUserId, targetUsername }: BlockSect
     getCurrentUser();
   }, [targetUserId]);
 
-  // Don't render anything if not loaded yet
   if (currentUserId === null) {
-    return <div className="h-[64px]" />; // Placeholder to prevent layout shift
+    return <div className="h-[64px]" />;
   }
 
   if (!currentUserId) {
