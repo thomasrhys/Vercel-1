@@ -17,6 +17,7 @@ type StatsCardProps = {
     title: string;
     image?: string | null;
   }>;
+  statsLoading?: boolean;
 };
 
 const ACCENT_MAP: Record<string, string> = {
@@ -50,6 +51,7 @@ export default function StatsCard({
   accentColour,
   gamesPlayed,
   recentGames,
+  statsLoading = false,
 }: StatsCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -65,6 +67,7 @@ export default function StatsCard({
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = () => {
+        // Fallback: try without crossOrigin
         const img2 = new Image();
         img2.onload = () => resolve(img2);
         img2.onerror = () => resolve(null);
@@ -481,7 +484,7 @@ export default function StatsCard({
     <div className="w-full">
       <Button
         onClick={generate}
-        disabled={isGenerating}
+        disabled={isGenerating || statsLoading}
         variant="outline"
         className="w-full"
       >
@@ -489,6 +492,11 @@ export default function StatsCard({
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             Generating...
+          </>
+        ) : statsLoading ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Loading stats...
           </>
         ) : (
           <>
