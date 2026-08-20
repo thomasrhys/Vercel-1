@@ -196,20 +196,26 @@ export default function AccountPage() {
 
     const fetchStats = async () => {
       try {
-        // Fetch recently played + total count
-        const { data: recentData, count } = await supabaseAuthClient
+        // 1. Get total count of unique games played
+        const { count } = await supabaseAuthClient
           .from("recently_played")
-          .select("game_id", { count: "exact" })
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id);
+
+        setStatsGamesPlayed(count || 0);
+
+        // 2. Get the 5 most recent game records
+        const { data: recentData } = await supabaseAuthClient
+          .from("recently_played")
+          .select("game_id, last_played")
           .eq("user_id", user.id)
           .order("last_played", { ascending: false })
           .limit(5);
 
-        setStatsGamesPlayed(count || 0);
-
         if (recentData && recentData.length > 0) {
           const gameIds = recentData.map((r) => r.game_id);
 
-          // Fetch game details + images
+          // 3. Fetch game details and images
           const [gamesRes, imagesRes] = await Promise.all([
             fetch("/api/games").then((r) => r.json()),
             fetch("/api/game-images").then((r) => r.json()),
@@ -218,6 +224,7 @@ export default function AccountPage() {
           const allGames = Array.isArray(gamesRes) ? gamesRes : [];
           const images = imagesRes || {};
 
+          // 4. Match game IDs to titles and images
           const matched = gameIds
             .map((gid) => {
               const game = allGames.find((g: any) => g.id === gid);
@@ -231,6 +238,8 @@ export default function AccountPage() {
             .filter(Boolean) as Array<{ id: string; title: string; image?: string | null }>;
 
           setStatsRecentGames(matched);
+        } else {
+          setStatsRecentGames([]);
         }
       } catch (error) {
         console.error("Failed to fetch stats data:", error);
@@ -383,7 +392,7 @@ export default function AccountPage() {
       <ThemeToggle />
     </div>
 
-    <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile. No recently played games are tracked.</CardDescription></CardHeader><CardContent className="space-y-4">
+    <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile.</CardDescription></CardHeader><CardContent className="space-y-4">
       <Suspense fallback={null}>
         <OAuthErrorHandler />
       </Suspense>
