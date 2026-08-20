@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 
@@ -16,11 +16,10 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
   const [isOpen, setIsOpen] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
-  // Check if this user is already blocked
   useEffect(() => {
     const checkBlockStatus = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseAuthClient.auth.getSession();
         if (!session?.access_token) return;
 
         const res = await fetch(`/api/friend/is-blocked?targetUserId=${targetUserId}`, {
@@ -45,7 +44,7 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       
       if (!session?.access_token) {
         setIsOpen(false);
@@ -67,7 +66,6 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
       if (result.success) {
         setIsOpen(false);
         setIsBlocked(action === 'block');
-        // Reload to reflect changes (especially profile hiding)
         window.location.reload();
       } else {
         setIsOpen(false);
@@ -81,9 +79,8 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
     }
   };
 
-  const openDialog = (action: 'block' | 'unblock') => {
+  const openDialog = () => {
     setIsOpen(true);
-    // Store action in state or just handle based on button clicked
   };
 
   const getDialogText = () => {
@@ -109,7 +106,7 @@ export default function BlockUserButton({ targetUserId, targetUsername }: BlockU
   return (
     <>
       <Button
-        onClick={() => openDialog(isBlocked ? 'unblock' : 'block')}
+        onClick={openDialog}
         disabled={loading}
         className={`${isBlocked ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-red-600 hover:bg-red-700 text-white'}`}
       >
