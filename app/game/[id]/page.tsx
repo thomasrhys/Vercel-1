@@ -1,3 +1,5 @@
+//app/game/[id]/page.tsx
+
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import GamePageClient from "./GamePageClient";
