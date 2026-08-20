@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 import ThemeToggle from "@/components/theme-toggle";
+import StatsCard from "@/components/StatsCard";
 
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
@@ -40,7 +41,6 @@ interface ProfileData {
 function computeBadges(created_at: string | null | undefined, role: string | null | undefined, avatar_url: string | null | undefined, accent_colour: string | null | undefined): Array<{ emoji: string; name: string; description: string }> {
   const badges: Array<{ emoji: string; name: string; description: string }> = [];
   
-  // Early Bird: Profile created before August 2026
   if (created_at) {
     const createdDate = new Date(created_at);
     const earlyBirdDate = new Date('2026-08-01T00:00:00Z');
@@ -49,17 +49,14 @@ function computeBadges(created_at: string | null | undefined, role: string | nul
     }
   }
   
-  // Artist: Has custom avatar
   if (avatar_url && avatar_url.trim()) {
     badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
   }
   
-  // Customiser: Has custom accent colour (not system)
   if (accent_colour && accent_colour !== 'system') {
     badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
   }
   
-  // Owner role
   if (role === 'owner') {
     badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
   }
@@ -162,6 +159,10 @@ export default function AccountPage() {
   const [created_at, setCreatedAt] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
+  // Stats card data
+  const [statsGamesPlayed, setStatsGamesPlayed] = useState(0);
+  const [statsRecentGames, setStatsRecentGames] = useState<Array<{ id: string; title: string; image?: string | null }>>([]);
+
   const email = user?.email?.toLowerCase() || "";
   const isOwner = email === OWNER_EMAIL;
   const providers = (user?.identities || []).map((identity) => identity.provider);
@@ -173,7 +174,6 @@ export default function AccountPage() {
   const hasDiscord = providers.includes("discord");
   const profilePath = username ? `/${username}` : "";
   
-  // Compute badges from fetched data
   const badges = computeBadges(created_at, role, avatarUrl, accentColour);
 
   useEffect(() => {
@@ -190,17 +190,65 @@ export default function AccountPage() {
     });
   }, [user, isOwner]);
 
+  // Fetch recently played games for stats card
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchStats = async () => {
+      try {
+        // Fetch recently played + total count
+        const { data: recentData, count } = await supabaseAuthClient
+          .from("recently_played")
+          .select("game_id", { count: "exact" })
+          .eq("user_id", user.id)
+          .order("last_played", { ascending: false })
+          .limit(5);
+
+        setStatsGamesPlayed(count || 0);
+
+        if (recentData && recentData.length > 0) {
+          const gameIds = recentData.map((r) => r.game_id);
+
+          // Fetch game details + images
+          const [gamesRes, imagesRes] = await Promise.all([
+            fetch("/api/games").then((r) => r.json()),
+            fetch("/api/game-images").then((r) => r.json()),
+          ]);
+
+          const allGames = Array.isArray(gamesRes) ? gamesRes : [];
+          const images = imagesRes || {};
+
+          const matched = gameIds
+            .map((gid) => {
+              const game = allGames.find((g: any) => g.id === gid);
+              if (!game) return null;
+              return {
+                id: game.id,
+                title: game.title || gid,
+                image: images[gid] || game.image || null,
+              };
+            })
+            .filter(Boolean) as Array<{ id: string; title: string; image?: string | null }>;
+
+          setStatsRecentGames(matched);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats data:", error);
+      }
+    };
+
+    fetchStats();
+  }, [user]);
+
   const validateImageUrl = (url: string): string | null => {
     const trimmedUrl = url.trim();
     
     if (!trimmedUrl) return null;
     
-    // Reject data URIs (base64) - security risk
     if (trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
       return "Please use a direct image URL instead of embedded data.";
     }
     
-    // Check for valid http/https URL
     try {
       const parsedUrl = new URL(trimmedUrl);
       if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
@@ -218,7 +266,6 @@ export default function AccountPage() {
     setMessage("");
     const nextUsername = cleanUsername(username);
     
-    // Validate avatar URL format
     const urlError = validateImageUrl(nextAvatarUrl);
     if (urlError) return setMessage(urlError);
     
@@ -359,6 +406,19 @@ export default function AccountPage() {
       {badges.length === 0 && (
         <p className="text-xs text-muted-foreground italic pt-2 border-t border-border">No badges earned yet 🔰👑 coming soon!</p>
       )}
+
+      {/* Stats Card Generator */}
+      <div className="pt-2 border-t border-border">
+        <StatsCard
+          userId={user.id}
+          displayName={displayName || "Unnamed player"}
+          username={username || "player"}
+          avatarUrl={avatarUrl || null}
+          accentColour={accentColour}
+          gamesPlayed={statsGamesPlayed}
+          recentGames={statsRecentGames}
+        />
+      </div>
       
       <Input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Display name" />
       <Input value={username} onChange={(event) => setUsername(cleanUsername(event.target.value))} placeholder="username" />
