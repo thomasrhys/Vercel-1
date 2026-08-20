@@ -196,53 +196,76 @@ export default function AccountPage() {
 
     const fetchStats = async () => {
       try {
+        console.log("[Stats] Starting fetch for user:", user.id);
+        
         // 1. Get total count of unique games played
-        const { count } = await supabaseAuthClient
+        const { count, error: countError } = await supabaseAuthClient
           .from("recently_played")
           .select("*", { count: "exact", head: true })
           .eq("user_id", user.id);
 
+        console.log("[Stats] Count result:", { count: count, error: countError });
         setStatsGamesPlayed(count || 0);
 
         // 2. Get the 5 most recent game records
-        const { data: recentData } = await supabaseAuthClient
+        const { data: recentData, error: recentError } = await supabaseAuthClient
           .from("recently_played")
           .select("game_id, last_played")
           .eq("user_id", user.id)
           .order("last_played", { ascending: false })
           .limit(5);
 
+        console.log("[Stats] Recent games raw data:", { data: recentData, error: recentError });
+
         if (recentData && recentData.length > 0) {
           const gameIds = recentData.map((r) => r.game_id);
+          console.log("[Stats] Game IDs to fetch:", gameIds);
 
           // 3. Fetch game details and images
-          const [gamesRes, imagesRes] = await Promise.all([
-            fetch("/api/games").then((r) => r.json()),
-            fetch("/api/game-images").then((r) => r.json()),
-          ]);
+          try {
+            const [gamesRes, imagesRes] = await Promise.all([
+              fetch("/api/games").then((r) => {
+                console.log("[Stats] Games API status:", r.status);
+                return r.json();
+              }),
+              fetch("/api/game-images").then((r) => {
+                console.log("[Stats] Game images API status:", r.status);
+                return r.json();
+              }),
+            ]);
 
-          const allGames = Array.isArray(gamesRes) ? gamesRes : [];
-          const images = imagesRes || {};
+            const allGames = Array.isArray(gamesRes) ? gamesRes : [];
+            const images = imagesRes || {};
+            
+            console.log("[Stats] Total games in API:", allGames.length);
+            console.log("[Stats] Game images loaded:", Object.keys(images).length);
 
-          // 4. Match game IDs to titles and images
-          const matched = gameIds
-            .map((gid) => {
-              const game = allGames.find((g: any) => g.id === gid);
-              if (!game) return null;
-              return {
-                id: game.id,
-                title: game.title || gid,
-                image: images[gid] || game.image || null,
-              };
-            })
-            .filter(Boolean) as Array<{ id: string; title: string; image?: string | null }>;
+            // 4. Match game IDs to titles and images
+            const matched = gameIds
+              .map((gid) => {
+                const game = allGames.find((g: any) => g.id === gid);
+                console.log("[Stats] Matching game ID:", gid, "Found:", !!game, game?.title);
+                if (!game) return null;
+                return {
+                  id: game.id,
+                  title: game.title || gid,
+                  image: images[gid] || game.image || null,
+                };
+              })
+              .filter(Boolean) as Array<{ id: string; title: string; image?: string | null }>;
 
-          setStatsRecentGames(matched);
+            console.log("[Stats] Final matched games:", matched);
+            setStatsRecentGames(matched);
+          } catch (apiError) {
+            console.error("[Stats] Failed to fetch game APIs:", apiError);
+            setStatsRecentGames([]);
+          }
         } else {
+          console.log("[Stats] No recent games found");
           setStatsRecentGames([]);
         }
       } catch (error) {
-        console.error("Failed to fetch stats data:", error);
+        console.error("[Stats] Failed to fetch stats data:", error);
       }
     };
 
@@ -470,7 +493,7 @@ export default function AccountPage() {
       {email && <><Input type="password" value={oldPassword} onChange={(event) => setOldPassword(event.target.value)} disabled={!hasPassword} placeholder={hasPassword ? "Current password" : "Not needed until a password is set"} /><Input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder={hasPassword ? "New password" : "Set password"} /><Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm password" /><Button className="w-full" onClick={changePassword} disabled={busy}>{hasPassword ? "Update password" : "Set password"}</Button></>}
       <div className="grid grid-cols-1 gap-2">
         {hasDiscord ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><DiscordIcon /><Check className="h-4 w-4" />Discord Linked</Button> : <Button variant="outline" onClick={() => linkProvider("discord")} disabled={busy} className="justify-center gap-2"><DiscordIcon />Link Discord</Button>}
-        {hasGoogle ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><GoogleIcon /><Check className="h-4 w-4" />Google Linked</Button> : <Button variant="outline" onClick={() => linkProvider("google")} disabled={busy} className="justify-center gap-2"><GoogleIcon />Link Google</Button>}
+        {hasGoogle ? <Button variant="outline" disabled className="justify-center gap- neighbouring-2 border-green-500 text-green-700"><GoogleIcon /><Check className="h-4 w-4" />Google Linked</Button> : <Button variant="outline" onClick={() => linkProvider("google")} disabled={busy} className="justify-center gap-2"><GoogleIcon />Link Google</Button>}
         {hasGitHub ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><GitHubIcon /><Check className="h-4 w-4" />GitHub Linked</Button> : <Button variant="outline" onClick={() => linkProvider("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Link GitHub</Button>}
         {hasMicrosoft ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><MicrosoftIcon /><Check className="h-4 w-4" />Microsoft Linked</Button> : <Button variant="outline" onClick={() => linkProvider("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Link Microsoft</Button>}
         {hasTwitch ? <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700"><TwitchIcon /><Check className="h-4 w-4" />Twitch Linked</Button> : <Button variant="outline" onClick={() => linkProvider("twitch")} disabled={busy} className="justify-center gap-2"><TwitchIcon />Link Twitch</Button>}
