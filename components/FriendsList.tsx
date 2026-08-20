@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 
 const ACCENT_COLOUR_MAP: Record<string, string> = {
   purple: '#6d4aff',
@@ -80,7 +80,7 @@ export default function FriendsList({ userId, currentUserId, friendsVisible }: F
     if (!confirmed) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseAuthClient.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
       }
