@@ -1,14 +1,16 @@
 // app/game/[id]/GamePageClient.tsx
 // Auth migration: Clerk → Pure Supabase
+// Cloud Save integration
 
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useUser } from "@/lib/supabase-client"; // Removed Seperate Signout import
+import { useUser } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
-import { AlertTriangle, ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, RefreshCcw, Share2, Smartphone, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, CloudDownload, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, RefreshCcw, RotateCcw, Save, Share2, Smartphone, X } from "lucide-react";
+import { loadGame, saveGame } from "@/lib/cloud-save";
 
 type PortalGame = Game & {
   image?: string | null;
@@ -30,7 +32,14 @@ export default function GamePageClient({ id }: { id: string }) {
   const [shareMessage, setShareMessage] = useState("");
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [isFavouriteWorking, setIsFavouriteWorking] = useState(false);
+  
+  // Cloud save state
+  const [hasCloudSave, setHasCloudSave] = useState(false);
+  const [restoreData, setRestoreData] = useState<any>(null);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  
   const gameContainerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const loginUrl = `/auth/login?redirect_url=${encodeURIComponent(`/game/${id}`)}`;
 
   useEffect(() => {
@@ -59,6 +68,27 @@ export default function GamePageClient({ id }: { id: string }) {
 
     loadGameData();
   }, []);
+
+  // Load cloud save data when logged in
+  useEffect(() => {
+    if (!isSignedIn) {
+      setHasCloudSave(false);
+      setRestoreData(null);
+      setLastSaved(null);
+      return;
+    }
+
+    const checkForSave = async () => {
+      const saved = await loadGame(id);
+      if (saved) {
+        setHasCloudSave(true);
+        setRestoreData(saved);
+        setLastSaved(saved.timestamp || null);
+      }
+    };
+    
+    checkForSave();
+  }, [isSignedIn, id]);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -102,6 +132,54 @@ export default function GamePageClient({ id }: { id: string }) {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  // Handle messages from game iframe for save/restore
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.data || typeof event.data !== 'object') return;
+      
+      // Game requesting save
+      if (event.data.type === 'SAVE_GAME') {
+        saveGame(id, { ...event.data.payload, timestamp: new Date().toISOString() });
+        setHasCloudSave(true);
+        setLastSaved(new Date().toISOString());
+      }
+      
+      // Game requesting restore data
+      if (event.data.type === 'REQUEST_RESTORE' && restoreData) {
+        iframeRef.current?.contentWindow?.postMessage({ type: 'RESTORE_SAVE', data: restoreData }, '*');
+      }
+      
+      // Game loaded successfully
+      if (event.data.type === 'GAME_LOADED') {
+        // If we have restore data, send it after game loads
+        if (hasCloudSave && restoreData) {
+          setTimeout(() => {
+            iframeRef.current?.contentWindow?.postMessage({ type: 'RESTORE_SAVE', data: restoreData }, '*');
+          }, 1000);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [id, hasCloudSave, restoreData]);
+
+  // Expose save function to window for direct game calls
+  useEffect(() => {
+    if (!isSignedIn || !activeGame) return;
+    
+    const win = window as any;
+    win.saveGameProgress = (progressData: any) => {
+      saveGame(id, { ...progressData, timestamp: new Date().toISOString() });
+      setHasCloudSave(true);
+      setLastSaved(new Date().toISOString());
+    };
+    
+    return () => {
+      delete win.saveGameProgress;
+    };
+  }, [isSignedIn, activeGame, id]);
 
   const showShareMessage = (message: string) => {
     setShareMessage(message);
@@ -209,6 +287,18 @@ export default function GamePageClient({ id }: { id: string }) {
     setIsFullscreen(false);
   };
 
+  const handleRestoreSave = () => {
+    if (iframeRef.current?.contentWindow && restoreData) {
+      iframeRef.current.contentWindow.postMessage({ type: 'RESTORE_SAVE', data: restoreData }, '*');
+    }
+  };
+
+  const handleManualSave = () => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'REQUEST_SAVE' }, '*');
+    }
+  };
+
   const game = useMemo(() => games.find((item) => item.id === id) || null, [games, id]);
   const relatedGames = useMemo(() => {
     if (!game?.category) return [];
@@ -270,7 +360,7 @@ export default function GamePageClient({ id }: { id: string }) {
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => SignOut()} // ✅ Use signOut from hook
+                onClick={() => signOut()}
               >
                 Sign Out
               </Button>
@@ -318,6 +408,12 @@ export default function GamePageClient({ id }: { id: string }) {
                     <Smartphone className="h-4 w-4" /> Mobile Friendly
                   </span>
                 )}
+                {isSignedIn && (
+                  <span className="rounded-md bg-purple-500/20 px-3 py-1 text-sm font-medium text-purple-700 flex items-center gap-1">
+                    <CloudDownload className="h-4 w-4" /> Cloud Save
+                    {hasCloudSave && <span className="text-green-700 ml-1">✓ Saved</span>}
+                  </span>
+                )}
               </div>
 
               {game.description ? (
@@ -344,6 +440,20 @@ export default function GamePageClient({ id }: { id: string }) {
                 {isSignedIn ? (isFavourite ? "Favourited" : "Add to Favourites") : "Login to Favourite"}
               </Button>
 
+              {/* Cloud Save Controls */}
+              {isSignedIn && hasCloudSave && (
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" className="flex-1" onClick={handleRestoreSave}>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Restore Save
+                  </Button>
+                  <Button type="button" variant="outline" className="flex-1" onClick={handleManualSave}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Now
+                  </Button>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 <Button type="button" variant="outline" onClick={copyLink}>
                   <Copy className="h-4 w-4 mr-2" />
@@ -365,6 +475,12 @@ export default function GamePageClient({ id }: { id: string }) {
                   Request Update
                 </Button>
               </div>
+
+              {lastSaved && (
+                <p className="text-xs text-muted-foreground">
+                  Last saved: {new Date(lastSaved).toLocaleString()}
+                </p>
+              )}
 
               {shareMessage && (
                 <div className={`rounded-md p-3 text-sm flex items-center gap-2 ${shareMessage.includes("copied") || shareMessage.includes("favourites") ? "bg-green-500/20 text-green-700" : "bg-red-500/20 text-red-700"}`}>
@@ -426,6 +542,7 @@ export default function GamePageClient({ id }: { id: string }) {
             </div>
             <div className="flex-1 bg-black">
               <iframe
+                ref={iframeRef}
                 src={activeGame.url}
                 className="w-full h-full border-0"
                 allowFullScreen
