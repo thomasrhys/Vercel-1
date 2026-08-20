@@ -7,20 +7,15 @@ import FriendButton from './FriendButton';
 
 export default function FriendSection({ targetUserId }: { targetUserId: string }) {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [authToken, setAuthToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
         setCurrentUserId(session?.user?.id || null);
-        setAuthToken(session?.access_token || null);
       } catch (error) {
-        console.log('Auth check failed');
         setCurrentUserId(null);
-        setAuthToken(null);
       } finally {
         setLoading(false);
       }
@@ -36,7 +31,6 @@ export default function FriendSection({ targetUserId }: { targetUserId: string }
     <FriendButton 
       targetUserId={targetUserId} 
       currentUserId={currentUserId}
-      authToken={authToken}
     />
   );
 }
