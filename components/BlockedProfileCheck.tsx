@@ -1,15 +1,14 @@
-// components/BlockedProfileCheck.tsx - TEMPORARY HARDTEST VERSION
+// components/BlockedProfileCheck.tsx - Tempory hard test version
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabaseAuthClient } from '@/lib/supabase-auth';
 
 interface BlockedProfileCheckProps {
   profileUserId: string;
   children: React.ReactNode;
 }
 
-// HARDCODED: Tom Hughes' ID blocked test user's ID
 const TOM_HUGHES_ID = 'b58281d3-0f0c-4326-9f5a-5f6ec93f0881';
 const TEST_USER_ID = 'ea1dbd3e-42bb-4bf5-a869-715e3fe90294';
 
@@ -20,14 +19,9 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
   useEffect(() => {
     const checkBlockStatus = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseAuthClient.auth.getUser();
         
-        console.log('[BlockedProfileCheck] profileUserId:', profileUserId);
-        console.log('[BlockedProfileCheck] currentUserId:', user?.id);
-        
-        // HARDCODED TEST: Check if viewing Tom's profile while logged in as test
         if (profileUserId === TOM_HUGHES_ID && user?.id === TEST_USER_ID) {
-          console.log('[BlockedProfileCheck] HARDCODED: User IS BLOCKED!');
           setIsBlocked(true);
           setLoading(false);
           return;
@@ -38,20 +32,18 @@ export default function BlockedProfileCheck({ profileUserId, children }: Blocked
           return;
         }
 
-        const { data } = await supabase
+        const { data } = await supabaseAuthClient
           .from('blocks')
           .select('id')
           .eq('blocker_id', profileUserId)
           .eq('blocked_id', user.id)
           .maybeSingle();
         
-        console.log('[BlockedProfileCheck] Block check result:', data);
-        
         if (data) {
           setIsBlocked(true);
         }
       } catch (error) {
-        console.error('[BlockedProfileCheck] Error:', error);
+        console.error('BlockedProfileCheck error:', error);
       } finally {
         setLoading(false);
       }
