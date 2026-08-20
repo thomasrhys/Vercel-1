@@ -31,7 +31,7 @@ const ACCENT_MAP: Record<string, string> = {
   system: "#3b82f6",
 };
 
-// Lucide Gamepad2 SVG path data
+// Lucide Gamepad2 SVG
 const GAMEPAD2_SVG = (colour: string) => `
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${colour}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="6" y1="11" x2="10" y2="11"/>
@@ -55,8 +55,8 @@ export default function StatsCard({
   const [isGenerating, setIsGenerating] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const accentHex = ACCENT_MAP[accentColour] || ACCENT_MAP.blue;
-  // On dark canvas, black becomes invisible — swap to white
+  // On dark canvas, black accent becomes invisible — swap to white
+  const rawAccent = ACCENT_MAP[accentColour] || ACCENT_MAP.blue;
   const accentHex = rawAccent === "#000000" ? "#ffffff" : rawAccent;
 
   const loadImage = (src: string): Promise<HTMLImageElement | null> => {
@@ -89,6 +89,56 @@ export default function StatsCard({
       };
       img.src = url;
     });
+  };
+
+  // Detect if an image is a dark graphic icon (not a photo)
+  // Returns true if the image should be inverted (dark icon → white)
+  const shouldInvertAvatar = (img: HTMLImageElement, size: number): boolean => {
+    try {
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = size;
+      tempCanvas.height = size;
+      const tempCtx = tempCanvas.getContext("2d");
+      if (!tempCtx) return false;
+
+      tempCtx.drawImage(img, 0, 0, size, size);
+      const imageData = tempCtx.getImageData(0, 0, size, size);
+      const pixels = imageData.data;
+
+      let totalBrightness = 0;
+      let opaquePixels = 0;
+      const colourSet = new Set<string>();
+
+      for (let j = 0; j < pixels.length; j += 4) {
+        // Skip transparent pixels
+        if (pixels[j + 3] < 128) continue;
+
+        const r = pixels[j];
+        const g = pixels[j + 1];
+        const b = pixels[j + 2];
+        totalBrightness += (r + g + b) / 3;
+        opaquePixels++;
+
+        // Track unique colours (rounded to reduce noise)
+        const key = `${Math.round(r / 32)},${Math.round(g / 32)},${Math.round(b / 32)}`;
+        colourSet.add(key);
+      }
+
+      if (opaquePixels === 0) return false;
+
+      const avgBrightness = totalBrightness / opaquePixels;
+      const uniqueColours = colourSet.size;
+
+      // Dark + few unique colours = likely a graphic icon, not a photo
+      // Photos have hundreds of unique colours even when dark
+      if (avgBrightness < 60 && uniqueColours < 10) {
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
   };
 
   const roundRect = (
@@ -133,8 +183,7 @@ export default function StatsCard({
     x: number,
     y: number,
     w: number,
-    h: number,
-    accent: string
+    h: number
   ) => {
     const grad = ctx.createLinearGradient(x, y, x + w, y + h);
     grad.addColorStop(0, "#2a2a2a");
@@ -186,7 +235,7 @@ export default function StatsCard({
       ctx.fillStyle = topBar;
       ctx.fillRect(0, 0, W, 6);
 
-      // === HEADER SECTION (top area) ===
+      // === HEADER SECTION ===
       const padX = 70;
       const headerY = 70;
 
@@ -198,11 +247,21 @@ export default function StatsCard({
       if (avatarUrl) {
         const avatarImg = await loadImage(avatarUrl);
         if (avatarImg) {
+          // Check if this is a dark graphic icon that needs inverting
+          const invert = shouldInvertAvatar(avatarImg, avatarSize);
+
           ctx.save();
           ctx.beginPath();
           ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
           ctx.clip();
+
+          if (invert) {
+            // Invert dark icon to make it visible on dark background
+            ctx.filter = "invert(1)";
+          }
+
           ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
+          ctx.filter = "none";
           ctx.restore();
         } else {
           drawDefaultAvatar(ctx, avatarX, avatarY, avatarSize, displayName, accentHex);
@@ -265,7 +324,7 @@ export default function StatsCard({
       ctx.lineTo(W - padX, sectionTitleY - 25);
       ctx.stroke();
 
-      // Game cards — vertical list (like Spotify Wrapped top songs)
+      // Game cards
       const gamesToShow = recentGames.slice(0, 5);
       const cardStartY = sectionTitleY + 10;
       const cardH = 110;
@@ -314,10 +373,10 @@ export default function StatsCard({
             ctx.drawImage(gameImg, thumbX, thumbY, thumbSize, thumbSize);
             ctx.restore();
           } else {
-            drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize, accentHex);
+            drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize);
           }
         } else {
-          drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize, accentHex);
+          drawGamePlaceholder(ctx, thumbX, thumbY, thumbSize, thumbSize);
         }
 
         // Thumbnail border
@@ -337,7 +396,7 @@ export default function StatsCard({
         ctx.textBaseline = "alphabetic";
       }
 
-      // === BOTTOM BRANDING (right-aligned, Gamepad2 icon + Game Portal) ===
+      // === BOTTOM BRANDING (bottom-right, Gamepad2 icon + Game Portal) ===
       const brandY = H - 70;
 
       // Accent line above branding
@@ -352,14 +411,14 @@ export default function StatsCard({
       ctx.lineTo(W - padX, brandY - 25);
       ctx.stroke();
 
-      // Measure "Game Portal" text for positioning
+      // Draw "Game Portal" text (right-aligned)
       ctx.fillStyle = accentHex;
       ctx.font = "bold 28px system-ui, -apple-system, sans-serif";
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.fillText("Game Portal", W - padX, brandY);
 
-      // Draw Lucide Gamepad2 icon to the left of "Game Portal" text
+      // Draw Lucide Gamepad2 icon to the left of the text
       const gamepadImg = await loadSvgAsImage(GAMEPAD2_SVG(accentHex));
       if (gamepadImg) {
         const iconSize = 32;
