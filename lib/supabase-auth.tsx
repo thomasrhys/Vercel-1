@@ -88,6 +88,18 @@ export function UserButton() {
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [accentColour, setAccentColour] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [shouldInvert, setShouldInvert] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    checkDarkMode();
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -104,12 +116,72 @@ export function UserButton() {
       });
   }, [user]);
 
+  useEffect(() => {
+    if (!avatarUrl) {
+      setShouldInvert(false);
+      return;
+    }
+
+    const checkBrightness = async () => {
+      try {
+        const lowerUrl = avatarUrl.toLowerCase();
+        if (lowerUrl.includes('favicon') || lowerUrl.includes('gamepad') || lowerUrl.includes('icon')) {
+          setShouldInvert(true);
+          return;
+        }
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            const size = Math.min(img.width, img.height, 50);
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            ctx.drawImage(img, 0, 0, size, size);
+            const imageData = ctx.getImageData(0, 0, size, size);
+            const pixels = imageData.data;
+
+            let totalBrightness = 0;
+            let opaquePixels = 0;
+
+            for (let i = 0; i < pixels.length; i += 4) {
+              if (pixels[i + 3] < 128) continue;
+              totalBrightness += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+              opaquePixels++;
+            }
+
+            if (opaquePixels === 0) {
+              setShouldInvert(false);
+              return;
+            }
+
+            const avgBrightness = totalBrightness / opaquePixels;
+            setShouldInvert(avgBrightness < 80);
+          } catch {
+            setShouldInvert(false);
+          }
+        };
+        img.onerror = () => setShouldInvert(false);
+        img.src = avatarUrl;
+      } catch {
+        setShouldInvert(false);
+      }
+    };
+
+    checkBrightness();
+  }, [avatarUrl]);
+
   if (!user) return null;
   const label = displayName || user.email || user.phone || "Account";
   const subLabel = user.email || user.phone || "Signed in";
   const accentHex = getAccentHex(accentColour);
 
-  // Build style: only apply accent background when NO avatar is set
+  const invertAvatar = isDarkMode && shouldInvert;
+
   const avatarStyle = avatarUrl
     ? { backgroundColor: 'transparent', borderColor: 'transparent', color: 'inherit' }
     : accentHex
@@ -125,7 +197,16 @@ export function UserButton() {
         className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden border-2"
         style={avatarStyle}
       >
-        {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
+        {avatarUrl ? (
+          <img 
+            src={avatarUrl} 
+            alt="Profile avatar" 
+            className="h-full w-full object-cover"
+            style={invertAvatar ? { filter: 'invert(1)' } : undefined}
+          />
+        ) : (
+          label.slice(0, 1).toUpperCase()
+        )}
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 rounded-md border border-border bg-card shadow-lg z-50 overflow-hidden">
@@ -134,7 +215,16 @@ export function UserButton() {
               className="h-9 w-9 rounded-full text-sm font-semibold flex items-center justify-center overflow-hidden shrink-0 border-2"
               style={avatarStyle}
             >
-              {avatarUrl ? <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" /> : label.slice(0, 1).toUpperCase()}
+              {avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt="Profile avatar" 
+                  className="h-full w-full object-cover"
+                  style={invertAvatar ? { filter: 'invert(1)' } : undefined}
+                />
+              ) : (
+                label.slice(0, 1).toUpperCase()
+              )}
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{label}</p>
