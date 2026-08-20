@@ -30,7 +30,6 @@ function normalizeWebsite(value?: string | null) {
   return value.startsWith("http://") || value.startsWith("https://") ? value : `https://${value}`;
 }
 
-// Compute badges based on profile data
 function computeBadges(profile: any): Array<{ emoji: string; name: string; description: string }> {
   const badges: Array<{ emoji: string; name: string; description: string }> = [];
   
@@ -125,38 +124,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const accentBg = accentHex ? { backgroundColor: accentHex } : undefined;
   const accentBorder = accentHex ? { borderColor: accentHex } : undefined;
   const accentText = accentHex ? { color: accentHex } : undefined;
-  const accentHover = accentHex ? { ':hover': { borderColor: accentHex } } : undefined;
 
   const badges = computeBadges(profile);
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
       {profile.accent_colour && (
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            (function() {
-              var colourMap = {
-                purple: '#6d4aff',
-                blue: '#3b82f6',
-                green: '#22c55e',
-                pink: '#ec4899',
-                orange: '#f97316',
-                red: '#ef4444',
-                white: '#ffffff',
-                black: '#000000'
-              };
-              var accent = '${profile.accent_colour}';
-              var hex = colourMap[accent];
-              if (accent === 'system') {
-                hex = window.matchMedia('(prefers-color-scheme: dark)').matches ? '#ffffff' : '#000000';
-              }
-              if (hex) {
-                document.documentElement.style.setProperty('--accent', hex);
-                document.documentElement.style.setProperty('--primary', hex);
-                document.documentElement.style.setProperty('--primary-foreground', '#ffffff');
-              }
-            })();
-          `
+        <style dangerouslySetInnerHTML={{
+          __html: accentHex ? `
+            .accent-btn { border-color: ${accentHex} !important; color: ${accentHex} !important; }
+            .accent-btn:hover { background-color: ${accentHex}22 !important; }
+            .accent-text { color: ${accentHex} !important; }
+            .accent-border { border-color: ${accentHex} !important; }
+          ` : ''
         }} />
       )}
       <div className="max-w-xl mx-auto rounded-lg border border-border bg-card p-6 text-center space-y-4">
@@ -174,7 +154,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           {badges.length > 0 && (
             <div className="flex justify-center gap-2 mt-2 flex-wrap">
               {badges.map((badge) => (
-                <span key={badge.name} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={accentBg ? { backgroundColor: accentHex + '20', color: accentHex } : undefined}>
+                <span key={badge.name} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={accentHex ? { backgroundColor: accentHex + '20', color: accentHex } : undefined}>
                   <span>{badge.emoji}</span>
                   <span>{badge.name}</span>
                 </span>
@@ -186,17 +166,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </div>
 
         <div className="flex justify-center gap-4 py-4">
-          <FriendSection targetUserId={profile.user_id} accentHex={accentHex} />
+          <FriendSection targetUserId={profile.user_id} />
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
 
-        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} accentHex={accentHex} />
+        <FriendsList userId={profile.user_id} currentUserId={currentUserId} friendsVisible={profile.friends_visible ?? false} />
 
         <BlockSection 
           targetUserId={profile.user_id} 
-          targetUsername={profile.username}
-          accentHex={accentHex}
+          targetUsername={profile.username} 
         />
 
         {(country || website) && (
@@ -210,7 +189,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <div className="rounded-md border border-border p-4 text-left space-y-3">
             <h2 className="font-semibold text-foreground text-center">Favourite games</h2>
             <div className="flex flex-wrap justify-center gap-2">
-              {favouriteGames.map((game) => <span key={game} className="rounded-full px-3 py-1 text-xs text-foreground" style={accentBg ? { backgroundColor: accentHex + '20', color: accentHex, border: `1px solid ${accentHex}` } : undefined}>{game}</span>)}
+              {favouriteGames.map((game) => <span key={game} className="rounded-full px-3 py-1 text-xs text-foreground" style={accentHex ? { backgroundColor: accentHex + '20', color: accentHex, border: `1px solid ${accentHex}` } : undefined}>{game}</span>)}
             </div>
           </div>
         )}
