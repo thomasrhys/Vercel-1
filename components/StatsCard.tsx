@@ -31,6 +31,17 @@ const ACCENT_MAP: Record<string, string> = {
   system: "#3b82f6",
 };
 
+// Lucide Gamepad2 SVG path data
+const GAMEPAD2_SVG = (colour: string) => `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${colour}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="6" y1="11" x2="10" y2="11"/>
+  <line x1="8" y1="9" x2="8" y2="13"/>
+  <line x1="15" y1="12" x2="15.01" y2="12"/>
+  <line x1="18" y1="10" x2="18.01" y2="10"/>
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/>
+</svg>
+`;
+
 export default function StatsCard({
   userId,
   displayName,
@@ -52,13 +63,29 @@ export default function StatsCard({
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = () => {
-        // Fallback: try without crossOrigin
         const img2 = new Image();
         img2.onload = () => resolve(img2);
         img2.onerror = () => resolve(null);
         img2.src = src;
       };
       img.src = src;
+    });
+  };
+
+  const loadSvgAsImage = (svgString: string): Promise<HTMLImageElement | null> => {
+    return new Promise((resolve) => {
+      const blob = new Blob([svgString], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(null);
+      };
+      img.src = url;
     });
   };
 
@@ -107,7 +134,6 @@ export default function StatsCard({
     h: number,
     accent: string
   ) => {
-    // Gradient background
     const grad = ctx.createLinearGradient(x, y, x + w, y + h);
     grad.addColorStop(0, "#2a2a2a");
     grad.addColorStop(1, "#1a1a1a");
@@ -115,7 +141,6 @@ export default function StatsCard({
     roundRect(ctx, x, y, w, h, 16);
     ctx.fill();
 
-    // Gamepad emoji
     ctx.font = "40px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -310,7 +335,7 @@ export default function StatsCard({
         ctx.textBaseline = "alphabetic";
       }
 
-      // === BOTTOM BRANDING ===
+      // === BOTTOM BRANDING (right-aligned, Gamepad2 icon + Game Portal) ===
       const brandY = H - 70;
 
       // Accent line above branding
@@ -325,41 +350,22 @@ export default function StatsCard({
       ctx.lineTo(W - padX, brandY - 25);
       ctx.stroke();
 
-      // Gamepad icon drawn simply
-      const gpX = padX;
-      const gpCy = brandY;
-      ctx.strokeStyle = accentHex;
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.roundRect(gpX, gpCy - 16, 32, 32, 8);
-      ctx.stroke();
-
-      // D-pad dot
-      ctx.fillStyle = accentHex;
-      ctx.beginPath();
-      ctx.arc(gpX + 10, gpCy, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Right buttons
-      ctx.beginPath();
-      ctx.arc(gpX + 22, gpCy - 5, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(gpX + 22, gpCy + 5, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // "Game Portal" text
+      // Measure "Game Portal" text for positioning
       ctx.fillStyle = accentHex;
       ctx.font = "bold 28px system-ui, -apple-system, sans-serif";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      ctx.fillText("Game Portal", gpX + 44, gpCy);
-
-      // URL
-      ctx.fillStyle = "#666666";
-      ctx.font = "22px system-ui, -apple-system, sans-serif";
       ctx.textAlign = "right";
-      ctx.fillText("fnfaw.es", W - padX, gpCy);
+      ctx.textBaseline = "middle";
+      ctx.fillText("Game Portal", W - padX, brandY);
+
+      // Draw Lucide Gamepad2 icon to the left of "Game Portal" text
+      const gamepadImg = await loadSvgAsImage(GAMEPAD2_SVG(accentHex));
+      if (gamepadImg) {
+        const iconSize = 32;
+        const textWidth = ctx.measureText("Game Portal").width;
+        const iconX = W - padX - textWidth - 44;
+        const iconY = brandY - iconSize / 2;
+        ctx.drawImage(gamepadImg, iconX, iconY, iconSize, iconSize);
+      }
 
       ctx.textBaseline = "alphabetic";
 
