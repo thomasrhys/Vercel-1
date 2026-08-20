@@ -94,11 +94,22 @@ export default function StatsCard({
     });
   };
 
-  // Detect if an image is a dark graphic icon (not a photo)
-  // Returns true if the image should be inverted (dark icon → white)
-  const shouldInvertAvatar = (img: HTMLImageElement, size: number): boolean => {
+  // Detect if an image should be inverted for visibility on dark canvas
+  // Uses multiple methods for reliability
+  const shouldInvertAvatar = (img: HTMLImageElement, avatarUrl: string): boolean => {
     try {
+      // Method 1: Check URL for known dark icon patterns
+      if (avatarUrl) {
+        const lowerUrl = avatarUrl.toLowerCase();
+        // If it's your site's favicon/icon or a gamepad PNG/SVG, invert it
+        if (lowerUrl.includes('favicon') || lowerUrl.includes('gamepad') || lowerUrl.includes('icon')) {
+          return true;
+        }
+      }
+
+      // Method 2: Pixel-based detection
       const tempCanvas = document.createElement("canvas");
+      const size = Math.min(img.width, img.height, 100); // Sample at smaller size
       tempCanvas.width = size;
       tempCanvas.height = size;
       const tempCtx = tempCanvas.getContext("2d");
@@ -110,7 +121,6 @@ export default function StatsCard({
 
       let totalBrightness = 0;
       let opaquePixels = 0;
-      const colourSet = new Set<string>();
 
       for (let j = 0; j < pixels.length; j += 4) {
         // Skip transparent pixels
@@ -121,25 +131,22 @@ export default function StatsCard({
         const b = pixels[j + 2];
         totalBrightness += (r + g + b) / 3;
         opaquePixels++;
-
-        // Track unique colours (rounded to reduce noise)
-        const key = `${Math.round(r / 32)},${Math.round(g / 32)},${Math.round(b / 32)}`;
-        colourSet.add(key);
       }
 
       if (opaquePixels === 0) return false;
 
       const avgBrightness = totalBrightness / opaquePixels;
-      const uniqueColours = colourSet.size;
-
-      // Dark + few unique colours = likely a graphic icon, not a photo
-      // Photos have hundreds of unique colours even when dark
-      if (avgBrightness < 60 && uniqueColours < 10) {
+      
+      // If average brightness < 80, it's mostly dark — invert for visibility
+      if (avgBrightness < 80) {
+        console.log(`[Avatar] Avg brightness: ${avgBrightness.toFixed(1)} — Inverting`);
         return true;
       }
 
+      console.log(`[Avatar] Avg brightness: ${avgBrightness.toFixed(1)} — Keeping original`);
       return false;
-    } catch {
+    } catch (err) {
+      console.warn("[Avatar] Detection failed:", err);
       return false;
     }
   };
@@ -250,23 +257,27 @@ export default function StatsCard({
       if (avatarUrl) {
         const avatarImg = await loadImage(avatarUrl);
         if (avatarImg) {
-          // Check if this is a dark graphic icon that needs inverting
-          const invert = shouldInvertAvatar(avatarImg, avatarSize);
+          // Check if this is a dark graphic that needs inverting
+          const shouldInvert = shouldInvertAvatar(avatarImg, avatarUrl);
+          console.log(`[Stats] Avatar invert: ${shouldInvert}`);
 
           ctx.save();
           ctx.beginPath();
           ctx.arc(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
           ctx.clip();
 
-          if (invert) {
-            // Invert dark icon to make it visible on dark background
+          if (shouldInvert) {
+            // Try CSS filter first (modern browsers)
             ctx.filter = "invert(1)";
           }
 
           ctx.drawImage(avatarImg, avatarX, avatarY, avatarSize, avatarSize);
+          
+          // Reset filter
           ctx.filter = "none";
           ctx.restore();
         } else {
+          console.warn("[Stats] Avatar image failed to load, using default");
           drawDefaultAvatar(ctx, avatarX, avatarY, avatarSize, displayName, accentHex);
         }
       } else {
