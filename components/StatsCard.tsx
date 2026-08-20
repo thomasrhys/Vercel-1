@@ -56,6 +56,8 @@ export default function StatsCard({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const accentHex = ACCENT_MAP[accentColour] || ACCENT_MAP.blue;
+  // On dark canvas, black becomes invisible — swap to white
+  const accentHex = rawAccent === "#000000" ? "#ffffff" : rawAccent;
 
   const loadImage = (src: string): Promise<HTMLImageElement | null> => {
     return new Promise((resolve) => {
