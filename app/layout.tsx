@@ -1,7 +1,8 @@
+// app/layout.tsx
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import Script from "next/script";
 import V13Enhancer from "./V13Enhancer";
 import AuthFetchPatch from "./AuthFetchPatch";
 import FriendProvider from "@/components/FriendProvider";
@@ -13,9 +14,15 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Game Portal",
-  description: "Created by thomasrhys on GitHub",
+  title: {
+    default: "Game Portal",
+    template: "%s | Game Portal"
+  },
+  description: "Play games online. Created by Thomas Rhys.",
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       {
@@ -33,6 +40,30 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: "https://fnfaw.es",
+    siteName: "Game Portal",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Game Portal",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Game Portal",
+    description: "Play games online.",
+    images: ["/opengraph-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -43,7 +74,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Dynamic theme color that updates with dark/light mode */}
         <meta id="theme-color-meta" name="theme-color" content="#0a0a0a" />
         <link rel="manifest" href="/manifest.json" />
       </head>
@@ -65,7 +95,6 @@ export default function RootLayout({
           </AuthProvider>
         </ThemeProvider>
 
-        {/* Service Worker Registration */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -78,27 +107,22 @@ export default function RootLayout({
           }}
         />
 
-        {/* Dynamic Theme Color Sync */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Set initial theme color based on current theme
               function updateThemeColor() {
                 const isDark = document.documentElement.classList.contains('dark');
                 document.getElementById('theme-color-meta').setAttribute('content', isDark ? '#0a0a0a' : '#ffffff');
               }
 
-              // Run on load
               updateThemeColor();
 
-              // Listen for theme changes via localStorage (used by theme-provider)
               window.addEventListener('storage', (e) => {
                 if (e.key === 'theme') {
                   setTimeout(updateThemeColor, 50);
                 }
               });
 
-              // Also watch for direct class changes on html element
               const observer = new MutationObserver(updateThemeColor);
               observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
             `,
