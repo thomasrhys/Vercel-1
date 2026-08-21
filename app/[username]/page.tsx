@@ -5,6 +5,8 @@ import { createServerSupabase } from '@/lib/supabase-server';
 import FriendSection from "@/components/FriendSection";
 import FriendsList from "@/components/FriendsList";
 import BlockSection from "@/components/BlockSection";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +57,44 @@ function computeBadges(profile: any): Array<{ emoji: string; name: string; descr
   }
   
   return badges;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+  const { username } = await params;
+  const handle = username.trim().toLowerCase().replace(/^@+/, "");
+  
+  const dataClient = getDataClient();
+  const { data: profile } = await dataClient
+    .from("user_profiles")
+    .select("display_name, username, avatar_url, bio")
+    .ilike("username", handle)
+    .maybeSingle();
+
+  if (!profile) {
+    return { title: "User Not Found" };
+  }
+
+  const displayName = profile.display_name || "Unnamed player";
+  const bio = profile.bio || "Check out this Game Portal profile!";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://fnfaw.es";
+
+  return {
+    title: `${displayName} (@${profile.username})`,
+    description: bio,
+    openGraph: {
+      title: `${displayName} (@${profile.username}) | Game Portal`,
+      description: bio,
+      url: `${siteUrl}/${profile.username}`,
+      type: "profile",
+      images: profile.avatar_url ? [{ url: profile.avatar_url, alt: `${displayName}'s avatar` }] : [],
+    },
+    twitter: {
+      card: "summary",
+      title: `${displayName} (@${profile.username}) | Game Portal`,
+      description: bio,
+      images: profile.avatar_url ? [profile.avatar_url] : [],
+    },
+  };
 }
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
@@ -167,6 +207,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
         <div className="flex justify-center gap-4 py-4">
           <FriendSection targetUserId={profile.user_id} />
+        </div>
+
+        <div className="flex justify-center">
+          <CopyLinkButton username={profile.username} />
         </div>
 
         <p className="rounded-md bg-muted p-4 text-sm text-foreground">{profile.bio || "This player has not added a bio yet."}</p>
