@@ -3,7 +3,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Check, Upload } from "lucide-react";
+import { Check, Upload, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -158,6 +158,7 @@ export default function AccountPage() {
   const [accentColour, setAccentColour] = useState('system');
   const [created_at, setCreatedAt] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const [statsGamesPlayed, setStatsGamesPlayed] = useState(0);
   const [statsRecentGames, setStatsRecentGames] = useState<Array<{ id: string; title: string; image?: string | null }>>([]);
@@ -238,7 +239,7 @@ export default function AccountPage() {
           setStatsRecentGames([]);
         }
       } catch (error) {
-        // Silent failure for stats - doesn't break UX
+        // Silent failure for stats
       } finally {
         setStatsLoading(false);
       }
@@ -381,6 +382,18 @@ export default function AccountPage() {
     setBusy(false);
   };
 
+  const copyProfileLink = async () => {
+    if (!profilePath) return;
+    const fullUrl = `${window.location.origin}${profilePath}`;
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setMessage("Couldn't copy automatically. URL: " + fullUrl);
+    }
+  };
+
   if (!isLoaded) return <main className="min-h-screen bg-background flex items-center justify-center p-4">Loading account...</main>;
   if (!isSignedIn) return <main className="min-h-screen bg-background flex items-center justify-center p-4"><Card className="w-full max-w-md"><CardHeader><CardTitle>Account</CardTitle><CardDescription>Sign in to manage your account.</CardDescription></CardHeader><CardContent className="space-y-3"><Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/account")}>Login</Button><Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button></CardContent></Card></main>;
 
@@ -458,7 +471,12 @@ export default function AccountPage() {
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-muted"><Upload className="h-4 w-4" />{uploading ? "Uploading..." : "Upload avatar"}<input type="file" accept="image/*" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadAvatar(file); }} /></label>
       {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
       <Button className="w-full" onClick={() => saveProfile()} disabled={saving}>{saving ? "Saving..." : "Save profile"}</Button>
-      {profilePath && <Button variant="outline" className="w-full" onClick={() => (window.location.href = profilePath)}>View public profile</Button>}
+      {profilePath && <div className="flex gap-2">
+        <Button variant="outline" className="flex-1" onClick={() => (window.location.href = profilePath)}>View public profile</Button>
+        <Button variant="outline" onClick={copyProfileLink} title="Copy profile link">
+          {copied ? <Check className="h-4 w-4" /> : <LinkIcon className="h-4 w-4" />}
+        </Button>
+      </div>}
     </CardContent></Card>
 
     <Card><CardHeader><CardTitle>Manage account</CardTitle><CardDescription>Update your email, password, or linked sign-in methods.</CardDescription></CardHeader><CardContent className="space-y-4">
