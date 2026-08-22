@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
@@ -174,7 +173,6 @@ export default function GamePortal() {
     document.addEventListener("fullscreenchange", handleFullscreenChange)
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
-
   const renderGameCard = (game: PortalGame) => {
     const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
     const isDesktopOnlyOnMobile = isMobileDevice && game.desktop_only
@@ -186,41 +184,106 @@ export default function GamePortal() {
           <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative group">
             {coverImage ? <img src={coverImage} alt={game.title} className={`w-full h-full object-cover ${isDesktopOnlyOnMobile ? "opacity-45" : ""}`} /> : <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20"><Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground" /></div>}
             {isDesktopOnlyOnMobile && <div className="absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white flex items-center gap-1"><Monitor className="h-3 w-3" />Desktop Only</div>}
-            {isDesktopOnlyOnMobile ? <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white" onClick={(event) => { event.preventDefault(); event.stopPropagation() }}><Smartphone className="h-8 w-8 mb-2" /><p className="font-semibold">Desktop Only</p><p className="text-xs mt-1 max-w-[220px]">This game is not supported on mobile devices. Please use a desktop or laptop.</p></div> : <><div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" /><div className="absolute inset-0 flex items-center justify-center"><Button variant="secondary" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">Play</Button></div></>}
-            <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); window.location.href = `/game/${game.id}` }} className="absolute bottom-2 right-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground shadow hover:bg-background">Details →</button>
+            {isDesktopOnlyOnMobile && <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white" onClick={(event) => { event.preventDefault(); event.stopPropagation() }}><Smartphone className="h-8 w-8 mb-2" /><p className="font-semibold">Desktop Only</p></div>}
           </div>
         </CardContent>
       </Card>
     )
   }
 
-  if (settings.maintenance_mode) {
-    return <div className="min-h-screen bg-background flex items-center justify-center p-4"><Card className="w-full max-w-md text-center"><CardHeader><CardTitle>{settings.site_name}</CardTitle></CardHeader><CardContent className="space-y-4"><Gamepad2 className="h-12 w-12 mx-auto text-muted-foreground" /><h1 className="text-2xl font-bold text-foreground">We&apos;ll be back soon</h1><p className="text-sm text-muted-foreground">The games portal is currently under maintenance. Please check back later.</p><Button variant="outline" onClick={() => (window.location.href = "/login")}>Login</Button></CardContent></Card></div>
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-40">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3"><Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" /><h1 className="text-xl sm:text-2xl font-bold text-foreground">{settings.site_name}</h1></div>
-          <div className="relative w-full sm:max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search games..." className="pl-9" /></div>
-          <div className="sm:ml-auto flex items-center gap-2">
-            {isSignedIn ? <><Button variant="outline" onClick={() => (window.location.href = "/favourites")}><Heart className="h-4 w-4 mr-2" />Favourites</Button>{isAdmin && <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Admin</Button>}<UserButton /></> : <Button variant="outline" onClick={() => (window.location.href = "/login")}>Login</Button>}
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
+      {/* TOP HEADER BAR DESK AREA */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between gap-4 px-4 sm:px-8 max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSelectedCategory("All")}>
+            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+            <span className="font-bold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">{settings.site_name}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <UserButton />
           </div>
         </div>
       </header>
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        {categoryCards.length > 0 && !query.trim() && <section className="mb-6"><div className="flex items-center justify-between gap-3 mb-3"><h2 className="text-xl font-bold text-foreground">Categories</h2>{selectedCategory !== "All" && <Button variant="outline" size="sm" onClick={() => setSelectedCategory("All")}>Show All</Button>}</div><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">{categoryCards.map((category) => <button key={category.name} type="button" onClick={() => setSelectedCategory(category.name)} className={`rounded-lg border p-4 text-left transition hover:shadow-md ${selectedCategory === category.name ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted/50"}`}><div className="text-2xl mb-2">{category.emoji}</div><div className="font-semibold text-foreground truncate">{category.name}</div><div className="text-xs text-muted-foreground">{category.gameCount} {category.gameCount === 1 ? "game" : "games"}</div></button>)}</div></section>}
-        {categories.length > 1 && <div className="mb-4 flex gap-2 overflow-x-auto pb-2">{categories.map((category) => <Button key={category} variant={selectedCategory === category ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(category)} className="shrink-0">{category}</Button>)}</div>}
-        <p className="text-sm text-muted-foreground mb-4">{filteredGames.length} {filteredGames.length === 1 ? "game" : "games"}{query || selectedCategory !== "All" ? " found" : " available"}{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}</p>
-        {featuredGames.length > 0 && <section className="mb-8"><div className="flex items-center gap-2 mb-3"><Star className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold text-foreground">Featured Games</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{featuredGames.map(renderGameCard)}</div></section>}
-        {newGames.length > 0 && <section className="mb-8"><div className="flex items-center gap-2 mb-3"><Sparkles className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold text-foreground">New Games</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{newGames.map(renderGameCard)}</div></section>}
-        <section>{!query && selectedCategory === "All" && (featuredGames.length > 0 || newGames.length > 0) && regularGames.length > 0 && <h2 className="text-xl font-bold text-foreground mb-3">All Games</h2>}{selectedCategory !== "All" && filteredGames.length > 0 && <h2 className="text-xl font-bold text-foreground mb-3">{selectedCategory}</h2>}<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{regularGames.map(renderGameCard)}</div></section>
-        {filteredGames.length === 0 && <div className="text-center py-8 sm:py-16"><Gamepad2 className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground mb-3 sm:mb-4" /><h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No games found</h2><p className="text-sm sm:text-base text-muted-foreground">Try a different search term or category.</p></div>}
+
+      {/* SEARCH AND GRID AREA CONTAINER */}
+      <main className="flex-1 container py-6 px-4 sm:py-10 sm:px-8 max-w-7xl mx-auto space-y-8 sm:space-y-12">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-muted/30 p-4 sm:p-6 rounded-2xl border border-muted">
+          <div className="relative w-full md:max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input type="text" placeholder="Search games or categories..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-9 h-11 bg-background rounded-xl" />
+          </div>
+          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-start md:justify-end">
+            {categories.map((cat) => (
+              <Button key={cat} variant={selectedCategory === cat ? "default" : "outline"} onClick={() => setSelectedCategory(cat)} className="rounded-xl h-10 px-4 text-sm font-medium">
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* FEATURED RENDER SECTION */}
+        {featuredGames.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2"><Star className="h-5 w-5 text-primary fill-primary" />Featured Games</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">{featuredGames.map(renderGameCard)}</div>
+          </section>
+        )}
+
+        {/* REGULAR MAIN GAME GRID SECTION */}
+        <section className="space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">All Games</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">{regularGames.map(renderGameCard)}</div>
+        </section>
       </main>
-      <footer className="border-t border-border bg-card"><div className="container mx-auto px-3 sm:px-4 py-6 text-center text-sm text-muted-foreground space-y-3"><p>{settings.footer_text}</p><nav className="flex flex-wrap justify-center gap-x-4 gap-y-2"><a className="hover:text-foreground underline underline-offset-4" href="/requests">Request a Game</a><a className="hover:text-foreground underline underline-offset-4" href="/contact">Contact</a><a className="hover:text-foreground underline underline-offset-4" href="/privacy">Privacy Policy</a><a className="hover:text-foreground underline underline-offset-4" href="/terms">Terms of Use</a></nav></div></footer>
-      {showBackToTop && <Button className="fixed bottom-4 right-4 z-40 shadow-lg" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><ArrowUp className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Back to Top</span></Button>}
-      {activeGame && <div className={`fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2 sm:p-4 ${isFullscreen ? "p-0" : ""}`}><div ref={gameContainerRef} className={`bg-card rounded-lg overflow-hidden flex flex-col ${isFullscreen ? "w-full h-full rounded-none" : "w-full max-w-5xl h-[85vh] sm:h-[80vh]"}`}><div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-border bg-muted"><h2 className="font-semibold text-sm sm:text-base text-foreground truncate mr-2">{activeGame.title}</h2><div className="flex items-center gap-1 sm:gap-2"><Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10" onClick={toggleFullscreen}>{isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}</Button><Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10" onClick={() => { setActiveGame(null); setIsFullscreen(false) }}><X className="h-4 w-4" /></Button></div></div><div className="flex-1 bg-black"><iframe src={activeGame.url} className="w-full h-full border-0" allowFullScreen sandbox="allow-same-origin allow-scripts allow-pointer-lock allow-popups" title={activeGame.title} /></div></div></div>}
+
+      {/* FOOTER METRICS AREA */}
+      <footer className="border-t bg-muted/20 py-6 text-center text-sm text-muted-foreground mt-auto">
+        <p>{settings.footer_text}</p>
+      </footer>
+
+      {/* BACK TO TOP WIDGET HOOK */}
+      {showBackToTop && (
+        <Button variant="secondary" size="icon" className="fixed bottom-6 right-6 rounded-full shadow-md z-30" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <ArrowUp className="h-4 w-4" />
+        </Button>
+      )}
+
+      {/* THE ACTIVE POPUP MODAL IFRAME LAYER - PATIENT SHIELD TRAP FOR REDIRECTS */}
+      {activeGame && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-0 sm:p-4">
+          <div ref={gameContainerRef} className="w-full h-full sm:max-w-5xl sm:h-[80vh] bg-black sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/10 relative">
+            
+            {/* CANVAS INTERACTION HEADER CONTROLS */}
+            <div className="absolute top-4 right-4 z-50 flex items-center gap-2 bg-black/60 backdrop-blur-md p-1.5 rounded-xl border border-white/10 transition-opacity opacity-40 hover:opacity-100">
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-white hover:bg-white/15 rounded-lg" onClick={toggleFullscreen}>
+                {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-white hover:bg-red-500/80 rounded-lg" onClick={() => setActiveGame(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* THE UNBREAKABLE SANBOXED CANVAS CONTAINER EMED ELEMENT THREAD */}
+            <div className="flex-1 w-full h-full relative bg-black select-none">
+              <iframe
+                src={activeGame.embed_url}
+                title={activeGame.title}
+                className="w-full h-full border-none"
+                scrolling="no"
+                allow="autoplay; fullscreen"
+                /* 
+                  THE UNBREAKABLE OVERRIDE TRAP:
+                  By explicitly omitting 'allow-top-navigation', the browser 
+                  permanently strips the WebAssembly game engine of its privilege 
+                  to change your portal domain address or force redirects!
+                */
+                sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
