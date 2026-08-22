@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Game Portal",
     template: "%s | Game Portal"
   },
-  description: "Play games online. Created by Thomas Rhys.",
+  description: "Play games online. Game Portal",
   manifest: "/manifest.json",
   alternates: {
     canonical: "/",
