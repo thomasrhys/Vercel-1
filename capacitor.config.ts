@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.fnfaw.gamesportal',
+  appId: 'com.thomasrhys.gamesportal',
   appName: 'Game Portal',
   webDir: 'out',
   server: {
