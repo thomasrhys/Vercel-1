@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect, useMemo, Suspense } from "react" // Added Suspense import
 import { useSearchParams } from "next/navigation"
 import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth"
 import { Button } from "@/components/ui/button"
@@ -42,7 +42,16 @@ type Category = {
   emoji: string
 }
 
-export default function GamePortal() {
+// 1. We wrap your main component inside a Suspense wrapper for Vercel's build machine
+export default function GamePortalPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><Gamepad2 className="h-12 w-12 animate-pulse text-muted-foreground" /></div>}>
+      <GamePortal />
+    </Suspense>
+  )
+}
+
+function GamePortal() { // Changed to a standard inner function component
   const { isSignedIn, isAdmin } = useSupabaseAuth()
   const [games, setGames] = useState<PortalGame[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
