@@ -1,7 +1,7 @@
-// app/page.tsx
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
+import { useSearchParams } from "next/navigation"
 import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -60,6 +60,20 @@ export default function GamePortal() {
   })
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
+
+  const searchParams = useSearchParams()
+  const playGameId = searchParams.get('play')
+
+  useEffect(() => {
+    if (playGameId && games.length > 0) {
+      const targetGame = games.find(
+        (g) => g.id.toLowerCase() === playGameId.toLowerCase().trim()
+      )
+      if (targetGame && (!activeGame || activeGame.id !== targetGame.id)) {
+        openGame(targetGame)
+      }
+    }
+  }, [playGameId, games, activeGame])
 
   useEffect(() => {
     fetch("/api/site-settings")
@@ -174,7 +188,6 @@ export default function GamePortal() {
     document.addEventListener("fullscreenchange", handleFullscreenChange)
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
-
   const renderGameCard = (game: PortalGame) => {
     const coverImage = blobImages[game.id] || game.image || getGameImage(game.id)
     const isDesktopOnlyOnMobile = isMobileDevice && game.desktop_only
