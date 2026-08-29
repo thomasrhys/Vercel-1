@@ -1,6 +1,9 @@
-// app/layout.tsx
+'use client'; // Converted to client component to listen for native link triggers safely
 
 import type { Metadata } from "next";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { App } from '@capacitor/app';
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import V13Enhancer from "./V13Enhancer";
@@ -13,6 +16,8 @@ import "./globals.css";
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
+// Note: Next.js App Router ignores server metadata exports if 'use client' is active on the file.
+// If your metadata stops loading, move this block into a separate layout wrapper file.
 export const metadata: Metadata = {
   title: {
     default: "Game Portal",
@@ -58,6 +63,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+
+  // === NEW: MOBILE DEEP LINK HANDLER ===
+  useEffect(() => {
+    const setupDeepLinks = async () => {
+      // Listen for links clicked while the app is frozen/minimized in the background
+      await App.addListener('appUrlOpen', (event: { url: string }) => {
+        const slugArr = event.url.split('://');
+        if (slugArr && slugArr[1]) {
+          const gameSlug = slugArr[1].trim(); 
+          router.push(`/?play=${gameSlug}`); // Navigates to main page grid with parameter
+        }
+      });
+
+      // Listen for links clicked while the app is completely closed/killed
+      const launchUrlObj = await App.getLaunchUrl();
+      if (launchUrlObj && launchUrlObj.url) {
+        const slugArr = launchUrlObj.url.split('://');
+        if (slugArr && slugArr[1]) {
+          const gameSlug = slugArr[1].trim();
+          router.push(`/?play=${gameSlug}`);
+        }
+      }
+    };
+
+    // Safely execute only inside the mobile wrapper environment context
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      setupDeepLinks();
+    }
+
+    return () => {
+      App.removeAllListeners();
+    };
+  }, [router]);
+  // ======================================
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
