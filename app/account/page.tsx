@@ -133,11 +133,11 @@ function cleanUsername(value: string) {
 }
 
 const OAUTH_SCOPES: Record<string, string> = {
-  google: "email",
+  google: "openid profile email",
   github: "user:email",
   azure: "email openid profile",
   twitch: "user:read:email",
-  discord: "identify email",
+  discord: "identify email connections",
 };
 
 export default function AccountPage() {
