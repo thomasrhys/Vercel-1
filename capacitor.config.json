@@ -10,9 +10,10 @@
     "DeepLinks": {
       "schemes": ["GamesPortal"]
     },
-    "SafeArea": {
-      "detectViewportFitCoverChanges": false,
-      "initialViewportFitCover": false
+    "StatusBar": {
+      "overlaysWebView": false,
+      "backgroundColor": "#000000",
+      "style": "DARK"
     }
   }
 }
