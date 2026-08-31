@@ -9,6 +9,10 @@
   "plugins": {
     "DeepLinks": {
       "schemes": ["GamesPortal"]
+    },
+    "SafeArea": {
+      "detectViewportFitCoverChanges": false,
+      "initialViewportFitCover": false
     }
   }
 }
