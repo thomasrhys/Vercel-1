@@ -11,20 +11,23 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Target the physical system window controls
+        // 1. Grab full manual control of the physical app layout window
         Window window = getWindow();
         
-        // 2. Clear out any default white translucent or auto-theming status constraints safely
+        // 2. Clear out legacy translucent overlays to let our colors track cleanly
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         
-        // 3. Force the physical bar background canvas array to pure-black #000000
-        window.setStatusBarColor(0xFF000000);
+        // 3. Keep the background area behind the icons clean and transparent
+        window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
 
-        // 4. Force status icons (Clock, Battery, Wi-Fi) to turn bright white
+        // 4. FORCE SYSTEM BAR ICONS TO TURN BLACK
         View decorView = window.getDecorView();
         int flags = decorView.getSystemUiVisibility();
-        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; // Removes light bar mode to force white text/icons
+        
+        // This specific bit flag forces the clock, battery, and Wi-Fi icons to go deep black
+        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; 
+        
         decorView.setSystemUiVisibility(flags);
     }
 }
