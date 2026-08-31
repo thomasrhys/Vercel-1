@@ -10,9 +10,8 @@
     "DeepLinks": {
       "schemes": ["GamesPortal"]
     },
-    "StatusBar": {
-      "overlaysWebView": true,
-      "style": "LIGHT" 
+    "SystemBar": {
+      "style": "DEFAULT" 
     }
   }
 }
