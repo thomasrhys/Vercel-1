@@ -16,10 +16,22 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    
+
+    signingConfigs {
+        release {
+                storeFile file("../../gameportal.keystore")
+                storePassword "Hughes2345"
+                keyAlias "gameportal-alias"
+                keyPassword "Hughes2345"
+            }
+        }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
