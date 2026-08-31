@@ -62,6 +62,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta id="theme-color-meta" name="theme-color" content="#0a0a0a" />
+        {/* MERGED: Added viewport-fit=cover so your phone's status bar calculations work correctly */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
         <link rel="manifest" href="/manifest.json" />
       </head>
 
