@@ -1,0 +1,14 @@
+{
+  "appId": "com.trh.gamesportal",
+  "appName": "Game Portal",
+  "webDir": "out",
+  "server": {
+    "url": "https://fnfaw.es",
+    "cleartext": true
+  },
+  "plugins": {
+    "DeepLinks": {
+      "schemes": ["GamesPortal"]
+    }
+  }
+}
