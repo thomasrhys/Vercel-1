@@ -11,9 +11,8 @@
       "schemes": ["GamesPortal"]
     },
     "StatusBar": {
-      "overlaysWebView": false,
-      "backgroundColor": "#000000",
-      "style": "DARK"
+      "overlaysWebView": true,
+      "style": "LIGHT" 
     }
   }
 }
