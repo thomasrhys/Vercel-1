@@ -220,7 +220,7 @@ function GamePortal() { // Changed to a standard inner function component
     return <div className="min-h-screen bg-background flex items-center justify-center p-4"><Card className="w-full max-w-md text-center"><CardHeader><CardTitle>{settings.site_name}</CardTitle></CardHeader><CardContent className="space-y-4"><Gamepad2 className="h-12 w-12 mx-auto text-muted-foreground" /><h1 className="text-2xl font-bold text-foreground">We&apos;ll be back soon</h1><p className="text-sm text-muted-foreground">The games portal is currently under maintenance. Please check back later.</p><Button variant="outline" onClick={() => (window.location.href = "/login")}>Login</Button></CardContent></Card></div>
   }
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background max-sm:bg-white max-sm:dark:bg-[#0a0a0a]">
       {/* MERGED: Added pt-[env(safe-area-top,0px)] to push header below notches / status bar elements */}
       <header className="border-b border-border bg-card sticky top-0 z-40 max-sm:pt-12">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
