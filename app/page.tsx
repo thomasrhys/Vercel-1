@@ -222,7 +222,7 @@ function GamePortal() { // Changed to a standard inner function component
   return (
     <div className="min-h-screen bg-background">
       {/* MERGED: Added pt-[env(safe-area-top,0px)] to push header below notches / status bar elements */}
-      <header className="border-b border-border bg-card sticky top-0 z-40 pt-11">
+      <header className="border-b border-border bg-card sticky top-0 z-40 max-sm:pt-12">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-3"><Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" /><h1 className="text-xl sm:text-2xl font-bold text-foreground">{settings.site_name}</h1></div>
           <div className="relative w-full sm:max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search games..." className="pl-9" /></div>
