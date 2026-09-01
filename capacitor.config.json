@@ -6,11 +6,7 @@
     "url": "https://fnfaw.es",
     "cleartext": true,
     
-    // =================================================================
-    // TRUSTED DOMAINS & AUTHENTICATION SCOPE WHITELIST
-    // =================================================================
     "allowNavigation": [
-      // Your Core Website Deployments
       "*.fnfaw.es",
       "*.vercel.app",
       "*.pitstopyt.co.uk",
@@ -23,11 +19,9 @@
       "*.games-at-school.co.uk",
       "localhost",
 
-      // Supabase Ecosystem Data Handshakes
       "*.supabase.co",
       "*.supabase.net",
 
-      // Social OAuth Provider Redirect Matrix
       "*.google.com",
       "*.googleusercontent.com",
       "*.github.com",
