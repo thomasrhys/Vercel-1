@@ -4,21 +4,52 @@
   "webDir": "out",
   "server": {
     "url": "https://fnfaw.es",
-    "cleartext": true
+    "cleartext": true,
+    
+    // =================================================================
+    // TRUSTED DOMAINS & AUTHENTICATION SCOPE WHITELIST
+    // =================================================================
+    "allowNavigation": [
+      // Your Core Website Deployments
+      "*.fnfaw.es",
+      "*.vercel.app",
+      "*.pitstopyt.co.uk",
+      "*.mygameswales.co.uk",
+      "*.oldmadfut.co.uk",
+      "*.slidedown.co.uk",
+      "*.slidedown.me",
+      "*.slidedown.online",
+      "*.slidedown.store",
+      "*.games-at-school.co.uk",
+      "localhost",
+
+      // Supabase Ecosystem Data Handshakes
+      "*.supabase.co",
+      "*.supabase.net",
+
+      // Social OAuth Provider Redirect Matrix
+      "*.google.com",
+      "*.googleusercontent.com",
+      "*.github.com",
+      "*.githubusercontent.com",
+      "*.discord.com",
+      "*.discordapp.com",
+      "://live.com",
+      "*.microsoftonline.com"
+    ]
   },
   "plugins": {
     "DeepLinks": {
       "schemes": ["GamesPortal"]
-    },
-    "android": {
-      "buildOptions": {
-        "release": {
-          "keystorePath": "../gameportal.keystore",
-          "keystorePassword": "Hughes2345",
-          "keystoreAlias": "gameportal-alias",
-          "keyPassword": "Hughes2345",
-          "releaseType": "APK"
-        }
+    }
+  },
+  "android": {
+    "buildOptions": {
+      "release": {
+        "keystorePath": "../gameportal.keystore",
+        "keystoreAlias": "gameportal-alias",
+        "keystorePassword": "Hughes2345",
+        "keyPassword": "Hughes2345"
       }
     }
   }
