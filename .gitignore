@@ -18,3 +18,8 @@ node_modules
 
 # keystore
 *.keystore
+
+# stuff not needed in repo
+ios/
+android/
+capacitor.config.json
