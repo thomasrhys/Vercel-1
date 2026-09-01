@@ -10,8 +10,16 @@
     "DeepLinks": {
       "schemes": ["GamesPortal"]
     },
-    "SystemBar": {
-      "style": "DEFAULT" 
+    "android": {
+      "buildOptions": {
+        "release": {
+          "keystorePath": "../gameportal.keystore",
+          "keystorePassword": "Hughes2345",
+          "keystoreAlias": "gameportal-alias",
+          "keyPassword": "Hughes2345",
+          "releaseType": "APK"
+        }
+      }
     }
   }
 }
