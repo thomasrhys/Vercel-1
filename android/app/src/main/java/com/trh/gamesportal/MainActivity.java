@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -11,23 +13,32 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Grab full manual control of the physical app layout window
+        // =================================================================
+        // NATIVE URL INTERCEPTOR: FORCES THE GOOGLE NATIVE SHEET PROMPT
+        // =================================================================
+        // Catches the request before the web view loads it, leaving your main site untouched!
+        this.bridge.getWebView().setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && url.contains("provider=google") && !url.contains("native-auth")) {
+                    view.loadUrl("https://fnfaw.es");
+                    return true; // Blocks the web view from loading the standard web login
+                }
+                return false; // Allows all other standard site navigation to pass through normally
+            }
+        });
+
+        // =================================================================
+        // YOUR WORKING BLACK STATUS BAR PATIO CODE (UNTOUCHED)
+        // =================================================================
         Window window = getWindow();
-        
-        // 2. Clear out legacy translucent overlays to let our colors track cleanly
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        
-        // 3. Keep the background area behind the icons clean and transparent
         window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
 
-        // 4. FORCE SYSTEM BAR ICONS TO TURN BLACK
         View decorView = window.getDecorView();
         int flags = decorView.getSystemUiVisibility();
-        
-        // This specific bit flag forces the clock, battery, and Wi-Fi icons to go deep black
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR; 
-        
         decorView.setSystemUiVisibility(flags);
     }
 }
