@@ -8,7 +8,7 @@ export default function AndroidDownloadPage() {
          <p className="text-muted-foreground mb-6 text-sm">
            Get the official Game Portal app for your device.
          </p>
-         <a href="/android/game-portal.apk" download="GamePortal.apk" className="inline-flex items-center justify-center w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity mb-4">
+         <a href="/GamePortal.apk" download="GamePortal.apk" className="inline-flex items-center justify-center w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity mb-4">
            Download APK
          </a>
 
