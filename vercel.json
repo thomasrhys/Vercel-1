@@ -4,5 +4,14 @@
       "path": "/api/admin/cron-backup",
       "schedule": "0 3 * * *"
     }
-  ]
+  ],
+"routes": [
+  {
+    "src": "/game-portal.apk",
+    "headers": {
+      "content-type": "application/vnd.android.package-archive",
+      "content-deposition": "attachment; filename=\"GamePortal.apk\""
+     }
+   }
+ ]
 }
