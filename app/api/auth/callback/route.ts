@@ -36,8 +36,10 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)
     }
-  }
 
   // If something goes wrong, send them back to the account page with an error flag
-  return NextResponse.redirect(`${origin}/account?error=auth_exchange_failed`)
+  return NextResponse.redirect(`${origin}/account?error=${encodeURIComponent(error.message)}`)
+}
+
+return NextResponse.redirect(`${origin}/account`)
 }
