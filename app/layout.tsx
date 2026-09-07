@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import V13Enhancer from "./V13Enhancer";
 import AuthFetchPatch from "./AuthFetchPatch";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import FriendProvider from "@/components/FriendProvider";
 import { AuthProvider } from '@/lib/supabase-client';
 import { ThemeProvider } from "@/components/theme-provider";
@@ -83,6 +84,7 @@ export default function RootLayout({
               <CapacitorDeepLinkHandler /> 
               
               {process.env.NODE_ENV === "production" && <Analytics />}
+              {process.env.NODE_ENV === "production" && <SpeedInsights />}
               {children}
             </FriendProvider>
           </AuthProvider>
