@@ -1,3 +1,5 @@
+// app/V13Enhancer.tsx
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -21,6 +23,7 @@ type RecentItem = {
 export default function V13Enhancer() {
   const { isSignedIn } = useSupabaseAuth();
   const [games, setGames] = useState<PortalGame[]>([]);
+  const [blobImages, setBlobImages] = useState<Record<string, string>>({});
   const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
   const [recentSlot, setRecentSlot] = useState<HTMLElement | null>(null);
@@ -37,6 +40,17 @@ export default function V13Enhancer() {
         if (Array.isArray(data)) setGames(data);
       })
       .catch(() => undefined);
+  }, [isHomePage]);
+
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    fetch("/api/game-images")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && typeof data === "object") setBlobImages(data);
+      })
+      .catch(() => setBlobImages({}));
   }, [isHomePage]);
 
   useEffect(() => {
@@ -233,7 +247,7 @@ export default function V13Enhancer() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {recentGames.map(({ game, play_count }) => {
-              const coverImage = game.image || getGameImage(game.id);
+              const coverImage = blobImages[game.id] || game.image || getGameImage(game.id);
               return (
                 <a key={game.id} href={`/game/${game.id}`} className="rounded-lg border border-border bg-card overflow-hidden hover:bg-muted/50 transition">
                   <div className="aspect-video bg-muted">
