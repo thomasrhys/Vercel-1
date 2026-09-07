@@ -1,0 +1,50 @@
+{
+  "appId": "com.trh.gamesportal",
+  "appName": "Game Portal",
+  "webDir": "out",
+  "server": {
+    "url": "https://fnfaw.es",
+    "cleartext": true,
+    
+    "allowNavigation": [
+      "*.fnfaw.es",
+      "*.vercel.app",
+      "*.pitstopyt.co.uk",
+      "*.mygameswales.co.uk",
+      "*.oldmadfut.co.uk",
+      "*.slidedown.co.uk",
+      "*.slidedown.me",
+      "*.slidedown.online",
+      "*.slidedown.store",
+      "*.games-at-school.co.uk",
+      "localhost",
+
+      "*.supabase.co",
+      "*.supabase.net",
+
+      "*.google.com",
+      "*.googleusercontent.com",
+      "*.github.com",
+      "*.githubusercontent.com",
+      "*.discord.com",
+      "*.discordapp.com",
+      "://live.com",
+      "*.microsoftonline.com"
+    ]
+  },
+  "plugins": {
+    "DeepLinks": {
+      "schemes": ["GamesPortal"]
+    }
+  },
+  "android": {
+    "buildOptions": {
+      "release": {
+        "keystorePath": "../gameportal.keystore",
+        "keystoreAlias": "gameportal-alias",
+        "keystorePassword": "Hughes2345",
+        "keyPassword": "Hughes2345"
+      }
+    }
+  }
+}
