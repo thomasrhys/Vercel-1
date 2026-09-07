@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSupabaseAuth } from "@/lib/supabase-auth";
-import { Heart } from "lucide-react";
+import { Gamepad2 } from "lucide-react";
 import { getGameImage, type Game } from "@/lib/games";
 
 type PortalGame = Game & {
@@ -242,7 +242,7 @@ export default function V13Enhancer() {
     ? createPortal(
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Gamepad2Icon />
+            <Gamepad2 className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold text-foreground">Continue Playing</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -255,7 +255,7 @@ export default function V13Enhancer() {
                       <img src={coverImage} alt={game.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Heart className="h-8 w-8 text-muted-foreground" />
+                        <Gamepad2 className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -277,17 +277,5 @@ export default function V13Enhancer() {
       {randomButton}
       {recentSection}
     </>
-  );
-}
-
-function Gamepad2Icon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-      <line x1="6" x2="10" y1="11" y2="11" />
-      <line x1="8" x2="8" y1="9" y2="13" />
-      <line x1="15" x2="15.01" y1="12" y2="12" />
-      <line x1="18" x2="18.01" y1="10" y2="10" />
-      <path d="M17.32 5H6.68a4 4 0 0 0-3.97 3.59c-.32 3.01-.08 5.88.73 8.5A3 3 0 0 0 6.35 19h.01a3 3 0 0 0 2.12-.88L10.6 16h2.8l2.12 2.12a3 3 0 0 0 2.12.88h.01a3 3 0 0 0 2.91-1.91c.81-2.62 1.05-5.49.73-8.5A4 4 0 0 0 17.32 5Z" />
-    </svg>
   );
 }
