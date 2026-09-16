@@ -17,9 +17,9 @@ const thirdPartyServices = [
     href: "https://supabase.com/privacy",
   },
   {
-    name: "Resend",
-    purpose: "Email delivery for game request notifications",
-    href: "https://resend.com/legal/privacy-policy",
+    name: "Cloudflare",
+    purpose: "DNS and Email delivery",
+    href: "https://www.cloudflare.com/policies/privacy/",
   },
 ];
 
