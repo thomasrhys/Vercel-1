@@ -22,18 +22,18 @@ async function sendRequestEmail({
   comments: string;
   requestCount: number;
 }) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const authSecret = process.env.AUTH_SECRET;
   const to = process.env.REQUEST_EMAIL_TO;
   const from = process.env.REQUEST_EMAIL_FROM;
 
-  if (!apiKey || !to || !from) {
+  if (!authSecret || !to || !from) {
     return;
   }
 
-  await fetch("https://api.resend.com/emails", {
+  await fetch("https://mail.fnfaw.es", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${authSecret}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -42,7 +42,7 @@ async function sendRequestEmail({
       subject: `New game request: ${gameName}`,
       text: [
         "New game request",
-        "",
+        "...",
         `Game: ${gameName}`,
         `Request count: ${requestCount}`,
         gameLink ? `Link: ${gameLink}` : "Link: not provided",
