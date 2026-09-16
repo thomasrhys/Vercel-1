@@ -21,7 +21,7 @@ async function notifyUpdateRequest(request: Record<string, string | null>) {
   const from = process.env.REQUEST_EMAIL_FROM;
   const to = process.env.REQUEST_EMAIL_TO;
 
-  if (!apiKey || !from) return;
+  if (!authSecret || !from) return;
 
   await fetch("https://mail.fnfaw.es", {
     method: "POST",
