@@ -21,10 +21,10 @@ export default function ContactPage() {
               Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.
             </p>
             <a
-              href="mailto:tom@requests.fnfaw.es"
+              href="mailto:contact@fnfaw.es"
               className="inline-block text-primary underline underline-offset-4 break-all"
             >
-              tom@requests.fnfaw.es
+              contact@fnfaw.es
             </a>
           </div>
 
@@ -37,10 +37,10 @@ export default function ContactPage() {
               Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.
             </p>
             <a
-              href="mailto:copyright@requests.fnfaw.es"
+              href="mailto:copyright@fnfaw.es"
               className="inline-block text-primary underline underline-offset-4 break-all"
             >
-              copyright@requests.fnfaw.es
+              copyright@fnfaw.es
             </a>
           </div>
         </section>
