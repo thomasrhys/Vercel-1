@@ -15,9 +15,9 @@ const thirdPartyServices = [
     href: "https://supabase.com/terms",
   },
   {
-    name: "Resend",
-    purpose: "Email delivery for game request notifications",
-    href: "https://resend.com/legal/terms-of-service",
+    name: "Cloudflare",
+    purpose: "DNS and Email delivery",
+    href: "https://www.cloudflare.com/website-terms/",
   },
 ];
 
