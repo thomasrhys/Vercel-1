@@ -17,16 +17,16 @@ function getSupabase() {
 }
 
 async function notifyProblemReport(report: Record<string, string | null>) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const authSecret = process.env.AUTH_SECRET;
   const from = process.env.REQUEST_EMAIL_FROM;
-  const to = process.env.PROBLEM_REPORT_EMAIL_TO || "reportproblems@requests.fnfaw.es";
+  const to = process.env.REQUEST_EMAIL_TO;
 
-  if (!apiKey || !from) return;
+  if (!authSecret || !from) return;
 
-  await fetch("https://api.resend.com/emails", {
+  await fetch("https://mail.fnfaw.es", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${authSecret}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
