@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Back to Account": "Back to Account",
+    "Loading profile extras...": "Loading profile extras...",
+    "Sign in to edit your public profile extras.": "Sign in to edit your public profile extras.",
     "Saving...": "Saving...",
     "Save profile extras": "Save profile extras",
     "Profile extras": "Profile extras"
@@ -56,6 +59,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Share": "Share",
   },
   cy: {
+    "Back to Account": "Yn ôl i'r Cyfrif",
+    "Loading profile extras...": "Wrthi'n llwytho ychwanegion proffil...",
+    "Sign in to edit your public profile extras.": "Mewngofnodwch i olygu ychwanegion eich proffil cyhoeddus.",
     "Saving...": "Wrthi'n cadw...",
     "Save profile extras": "Cadw manylion ychwanegol y proffil",
     "Profile extras": "Ychwanegiadau Proffil",
