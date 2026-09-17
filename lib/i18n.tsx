@@ -6,6 +6,11 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Saving...": "Saving...",
+    "Save profile extras": "Save profile extras",
+    "Profile extras": "Profile extras"
+    "Add optional public profile details. Recently played games are not tracked.": "Add optional public profile details. Recently played games are not tracked.",
+    "Something went wrong.": "Something went wrong.",
     "Internal Server Error": "Internal Server Error",
     "We're sorry, something went wrong while loading this profile. Please try again later.": "We're sorry, something went wrong while loading this profile. Please try again later.",
     "Retry": "Retry",
@@ -51,6 +56,11 @@ const translations: Record<Language, Record<string, string>> = {
     "Share": "Share",
   },
   cy: {
+    "Saving...": "Wrthi'n cadw...",
+    "Save profile extras": "Cadw manylion ychwanegol y proffil",
+    "Profile extras": "Ychwanegiadau Proffil",
+    "Add optional public profile details. Recently played games are not tracked.": "Ychwanegwch fanylion proffil cyhoeddus dewisol. Ni chaiff gemau a chwaraewyd yn ddiweddar eu holrhain.",
+    "Something went wrong.": "Aeth rhywbeth o'i le.",
     "Internal Server Error": "Gwall Gweinydd Mewnol",
     "We're sorry, something went wrong while loading this profile. Please try again later.": "Mae'n ddrwg gennym, aeth rhywbeth o'i le wrth lwytho'r proffil hwn. Rhowch gynnig arall arni yn nes ymlaen.",
     "Retry": "Ceisiwch Eto",
