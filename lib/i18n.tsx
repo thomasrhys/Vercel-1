@@ -129,9 +129,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
-export function useLanguage() {
-  return useContext(LanguageContext);
-}
 
 export function t(key: string) {
   const lang =
