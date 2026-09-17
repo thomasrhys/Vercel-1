@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 import ThemeToggle from "@/components/theme-toggle";
 import StatsCard from "@/components/StatsCard";
-import LanguageSelector from "@/componets/language-selector"
+import LanguageSelector from "@/components/language-selector"
 
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
