@@ -14,7 +14,7 @@ export default function Error({
       <div className="max-w-md w-full text-center space-y-4">
         <h1 className="text-4xl font-bold text-foreground">500</h1>
         <p className="text-muted-foreground text-lg">
-          Internal Server Error
+          {t("Internal Server Error")}
         </p>
         <p className="text-sm text-muted-foreground">
           {t("We're sorry, something went wrong while loading this profile. Please try again later.")}
