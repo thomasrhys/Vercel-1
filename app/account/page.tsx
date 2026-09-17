@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 import ThemeToggle from "@/components/theme-toggle";
 import StatsCard from "@/components/StatsCard";
+import LanguageSelector from "@/componets/language-selector"
 
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
@@ -401,7 +402,11 @@ export default function AccountPage() {
   return <main className="min-h-screen bg-background p-4 sm:p-8"><div className="max-w-md mx-auto space-y-6">
     <div className="flex justify-between items-center mb-2">
       <h1 className="text-2xl font-bold">Account Settings</h1>
-      <ThemeToggle />
+
+      <div className="flex items-center gap-2">
+        <LanguageSelector />
+        <ThemeToggle />
+      </div>
     </div>
 
     <Card><CardHeader><CardTitle>Profile</CardTitle><CardDescription>Choose what appears on your public profile.</CardDescription></CardHeader><CardContent className="space-y-4">
