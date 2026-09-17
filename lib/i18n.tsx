@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "We're sorry, something went wrong while loading this profile. Please try again later.": "We're sorry, something went wrong while loading this profile. Please try again later."
+    "Retry": "Retry",
     "Account Settings": "Account Settings",
     "Profile": "Profile",
     "Choose what appears on your public profile.": "Choose what appears on your public profile.",
@@ -48,6 +50,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Share": "Share",
   },
   cy: {
+    "We're sorry, something went wrong while loading this profile. Please try again later.": "Mae'n ddrwg gennym, aeth rhywbeth o'i le wrth lwytho'r proffil hwn. Rhowch gynnig arall arni yn nes ymlaen."
+    "Retry": "Ceisiwch Eto",
     "Account Settings": "Gosodiadau Cyfrif",
     "Profile": "Proffil",
     "Choose what appears on your public profile.": "Dewiswch beth sy'n ymddangos ar eich proffil cyhoeddus.",
