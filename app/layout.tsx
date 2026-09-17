@@ -8,6 +8,7 @@ import FriendProvider from "@/components/FriendProvider";
 import { AuthProvider } from '@/lib/supabase-client';
 import { ThemeProvider } from "@/components/theme-provider";
 import CapacitorDeepLinkHandler from "./CapacitorDeepLinkHandler"; // 1. Import the new client handler
+import { I18nProvider } from "@/lib/i18n";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -69,6 +70,7 @@ export default function RootLayout({
       </head>
 
       <body className="font-sans antialiased">
+        <I18nProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -89,6 +91,7 @@ export default function RootLayout({
             </FriendProvider>
           </AuthProvider>
         </ThemeProvider>
+        </I18nProvider>
 
         <script
           dangerouslySetInnerHTML={{
