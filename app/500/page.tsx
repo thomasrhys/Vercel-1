@@ -24,7 +24,7 @@ export default function Error({
             href="/"
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            {t("Back To All Games")}
+            {t("Back to All Games")}
           </a>
           <button
             onClick={reset}
