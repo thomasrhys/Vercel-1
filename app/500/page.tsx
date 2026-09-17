@@ -1,5 +1,6 @@
 // app/[username]/error.tsx
 'use client';
+import { t } from "@/lib/i18n":
 
 export default function Error({
   error,
@@ -16,20 +17,20 @@ export default function Error({
           Internal Server Error
         </p>
         <p className="text-sm text-muted-foreground">
-          We're sorry, something went wrong while loading this profile. Please try again later.
+          {t("We're sorry, something went wrong while loading this profile. Please try again later.")}
         </p>
         <div className="flex gap-3 justify-center mt-4">
           <a
             href="/"
             className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            Go Home
+            {t("Back To All Games")}
           </a>
           <button
             onClick={reset}
             className="px-4 py-2 rounded-md bg-muted text-foreground hover:bg-muted/80"
           >
-            Retry
+            {t("Retry")}
           </button>
         </div>
       </div>
