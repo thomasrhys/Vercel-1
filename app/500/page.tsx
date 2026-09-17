@@ -1,6 +1,6 @@
 // app/[username]/error.tsx
 'use client';
-import { t } from "@/lib/i18n":
+import { t } from "@/lib/i18n";
 
 export default function Error({
   error,
