@@ -11,7 +11,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Sign in to edit your public profile extras.": "Sign in to edit your public profile extras.",
     "Saving...": "Saving...",
     "Save profile extras": "Save profile extras",
-    "Profile extras": "Profile extras"
+    "Profile extras": "Profile extras",
     "Add optional public profile details. Recently played games are not tracked.": "Add optional public profile details. Recently played games are not tracked.",
     "Something went wrong.": "Something went wrong.",
     "Internal Server Error": "Internal Server Error",
