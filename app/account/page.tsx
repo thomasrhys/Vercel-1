@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 import ThemeToggle from "@/components/theme-toggle";
 import StatsCard from "@/components/StatsCard";
-import LanguageSelector from "@/components/language-selector"
+import LanguageSelector from "@/components/language-selector";
+import { t } from "@/lib/i18n";
 
 const OWNER_EMAIL = "thomasrhyshughes29@gmail.com";
 const OWNER_NAMES = ["owner", "pitstopyt"];
@@ -46,20 +47,20 @@ function computeBadges(created_at: string | null | undefined, role: string | nul
     const createdDate = new Date(created_at);
     const earlyBirdDate = new Date('2026-08-01T00:00:00Z');
     if (createdDate < earlyBirdDate) {
-      badges.push({ emoji: '🔰', name: 'Early Bird', description: 'Joined before August 2026' });
+      badges.push({ emoji: "🔰", name: t("Early Bird"), description: t("Joined before August 2026") });
     }
   }
   
   if (avatar_url && avatar_url.trim()) {
-    badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
+    badges.push({ emoji: "🖼️", name: t("Artist"), description: t("Custom avatar uploaded") });
   }
   
   if (accent_colour && accent_colour !== 'system') {
-    badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
+    badges.push({ emoji: "🎨", name: t("Customiser"), description: t("Personalised profile colours") });
   }
   
   if (role === 'owner') {
-    badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
+    badges.push({ emoji: "👑", name: t("Owner"), description: t("Site administrator") });
   }
   
   return badges;
@@ -126,7 +127,7 @@ function msg(error: unknown) {
     if (value.status) return `Request failed with status ${String(value.status)}`;
     try { const json = JSON.stringify(error); if (json && json !== "{}") return json; } catch {}
   }
-  return "Supabase returned an empty error. Check Auth email settings, SMTP, and rate limits.";
+  return t("Supabase returned an empty error. Check Auth email settings, SMTP, and rate limits.");
 }
 
 function cleanUsername(value: string) {
@@ -255,16 +256,16 @@ export default function AccountPage() {
     if (!trimmedUrl) return null;
     
     if (trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
-      return "Please use a direct image URL instead of embedded data.";
+      return t("Please use a direct image URL instead of embedded data.");
     }
     
     try {
       const parsedUrl = new URL(trimmedUrl);
       if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-        return "Please enter a valid image URL starting with http:// or https://";
+        return t("Please enter a valid image URL starting with http:// or https://");
       }
     } catch {
-      return "That doesn't look like a valid URL. Please enter a direct image link.";
+      return t("That doesn't look like a valid URL. Please enter a direct image link.");
     }
     
     return null;
@@ -278,9 +279,9 @@ export default function AccountPage() {
     const urlError = validateImageUrl(nextAvatarUrl);
     if (urlError) return setMessage(urlError);
     
-    if (nextUsername && !/^[a-z0-9_]{3,20}$/.test(nextUsername)) return setMessage("Username must be 3-20 characters using letters, numbers, or underscores.");
-    if (!isOwner && (OWNER_NAMES.includes(nextUsername) || RESERVED.includes(nextUsername))) return setMessage("That username is reserved.");
-    if (isOwner && nextUsername && !OWNER_NAMES.includes(nextUsername) && RESERVED.includes(nextUsername)) return setMessage("That username is reserved.");
+    if (nextUsername && !/^[a-z0-9_]{3,20}$/.test(nextUsername)) return setMessage(t("Username must be 3-20 characters using letters, numbers, or underscores."));
+    if (!isOwner && (OWNER_NAMES.includes(nextUsername) || RESERVED.includes(nextUsername))) return setMessage(t("That username is reserved."));
+    if (isOwner && nextUsername && !OWNER_NAMES.includes(nextUsername) && RESERVED.includes(nextUsername)) return setMessage(t("That username is reserved."));
     setSaving(true);
     try {
       const { error } = await supabaseAuthClient.from("user_profiles").upsert({
@@ -297,15 +298,15 @@ export default function AccountPage() {
       if (error) return setMessage(msg(error));
       setUsername(nextUsername);
       setAvatarUrl(nextAvatarUrl);
-      setMessage("Profile saved.");
+      setMessage(t("Profile saved."));
     } catch (error) { setMessage(msg(error)); } finally { setSaving(false); }
   };
 
   const uploadAvatar = async (file: File) => {
     if (!user) return;
     setMessage("");
-    if (!file.type.startsWith("image/")) return setMessage("Please choose an image file.");
-    if (file.size > 2 * 1024 * 1024) return setMessage("Avatar must be under 2MB.");
+    if (!file.type.startsWith("image/")) return setMessage(t("Please choose an image file."));
+    if (file.size > 2 * 1024 * 1024) return setMessage(t("Avatar must be under 2MB."));
     setUploading(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "png";
@@ -339,15 +340,15 @@ export default function AccountPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) return setMessage(msg(data?.error || data));
       setNewEmail(""); setNewPassword(""); setConfirmPassword("");
-      setMessage(data?.message || "Verification email sent. Verify the email address before using email/password login.");
+      setMessage(data?.message || t("Verification email sent. Verify the email address before using email/password login."));
     } catch (error) { setMessage(msg(error)); } finally { setBusy(false); }
   };
 
   const changePassword = async () => {
     setMessage("");
-    if (!user || !email) return setMessage("This account does not have an email address for password login. Add an email first.");
-    if (!newPassword || !confirmPassword) return setMessage("Enter your new password and confirmation.");
-    if (hasPassword && !oldPassword) return setMessage("Enter your current password.");
+    if (!user || !email) return setMessage(t("This account does not have an email address for password login. Add an email first."));
+    if (!newPassword || !confirmPassword) return setMessage(t("Enter your new password and confirmation."));
+    if (hasPassword && !oldPassword) return setMessage(t("Enter your current password."));
     if (newPassword.length < 6) return setMessage("New password must be at least 6 characters long.");
     if (newPassword !== confirmPassword) return setMessage("New passwords do not match.");
     setBusy(true);
