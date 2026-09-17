@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabaseAuthClient } from "@/lib/supabase-auth";
+import { t } from "@/lib/i18n";
 
 function splitGames(value: string) {
   return value.split(",").map((game) => game.trim()).filter(Boolean).slice(0, 12);
@@ -13,7 +14,7 @@ function splitGames(value: string) {
 function errorMessage(error: unknown) {
   if (error instanceof Error && error.message) return error.message;
   if (typeof error === "object" && error && "message" in error) return String((error as { message?: unknown }).message);
-  return "Something went wrong.";
+  return t("Something went wrong.");
 }
 
 export default function ProfileExtrasCard({ userId }: { userId: string }) {
@@ -61,15 +62,15 @@ export default function ProfileExtrasCard({ userId }: { userId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile extras</CardTitle>
-        <CardDescription>Add optional public profile details. Recently played games are not tracked.</CardDescription>
+        <CardTitle>{t("Profile extras")}</CardTitle>
+        <CardDescription>{t("Add optional public profile details. Recently played games are not tracked.")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <Input value={country} onChange={(event) => setCountry(event.target.value)} placeholder="Country" />
         <Input value={websiteUrl} onChange={(event) => setWebsiteUrl(event.target.value)} placeholder="Website URL" />
         <textarea value={favouriteGames} onChange={(event) => setFavouriteGames(event.target.value)} placeholder="Favourite games, separated by commas" className="w-full min-h-20 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground" />
         {message && <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">{message}</div>}
-        <Button className="w-full" onClick={saveExtras} disabled={saving}>{saving ? "Saving..." : "Save profile extras"}</Button>
+        <Button className="w-full" onClick={saveExtras} disabled={saving}>{saving ? t("Saving...") : t("Save profile extras")}</Button>
       </CardContent>
     </Card>
   );
