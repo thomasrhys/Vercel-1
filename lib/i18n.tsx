@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 type TranslationMap = Record<string, string>;
 
 const english: TranslationMap = {
+  "Profile": "Profile",
   "Back to Account": "Back to Account",
   "Loading profile extras...": "Loading profile extras...",
   "Sign in to edit your public profile extras.": "Sign in to edit your public profile extras.",
@@ -107,6 +108,7 @@ const english: TranslationMap = {
 
 const welsh: TranslationMap = {
   ...english,
+  "Profile": "Proffil",
   "Back to Account": "Yn ôl i'r Cyfrif",
   "Loading profile extras...": "Wrthi'n llwytho ychwanegion proffil...",
   "Sign in to edit your public profile extras.": "Mewngofnodwch i olygu ychwanegion eich proffil cyhoeddus.",
