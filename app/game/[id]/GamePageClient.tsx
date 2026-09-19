@@ -1,5 +1,6 @@
 // app/game/[id]/GamePageClient.tsx
 // Auth migration: Clerk → Pure Supabase
+// Line 344 for continue translations
 
 "use client";
 
@@ -337,8 +338,7 @@ export default function GamePageClient({ id }: { id: string }) {
                   {t("Play Game")}
                 </Button>
               )}
-
-              // Pick up here for translations
+              
               <Button type="button" variant={isFavourite ? "default" : "outline"} className="w-full" onClick={toggleFavourite} disabled={isFavouriteWorking}>
                 <Heart className={`h-4 w-4 mr-2 ${isFavourite ? "fill-current" : ""}`} />
                 {isSignedIn ? (isFavourite ? "Favourited" : "Add to Favourites") : "Login to Favourite"}
