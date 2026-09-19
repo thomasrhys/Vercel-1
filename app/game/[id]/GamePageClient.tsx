@@ -324,7 +324,7 @@ export default function GamePageClient({ id }: { id: string }) {
                 <p className="text-sm leading-6 text-muted-foreground whitespace-pre-wrap">{game.description}</p>
               ) : (
                 <p className="text-sm leading-6 text-muted-foreground">
-                  Play {game.title} online for free.
+                  {t("Play {game.title} online for free.")}
                 </p>
               )}
 
