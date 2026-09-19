@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "No pending friend requests": "No pending friend requests",
+    "Loading Requests": "Loading Requests",
     "Friends Requests": "Friends Requests",
     "Back to Account": "Back to Account",
     "Loading profile extras...": "Loading profile extras...",
@@ -124,6 +126,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "No pending friend requests": "Dim ceisiadau ffrind sydd ar y gweill",
+    "Loading Requests": "Llwytho Ceisiadau",
     "Friends Requests": "Ceisiadau Ffrindiau",
     "Back to Account": "Yn ôl i'r Cyfrif",
     "Loading profile extras...": "Wrthi'n llwytho ychwanegion proffil...",
