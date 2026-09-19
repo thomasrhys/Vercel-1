@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Profile Extras": "Profile Extras",
     "Uploading...": "Uploading...",
     "Upload Avatar": "Upload Avatar",
     "play2": "Play",
@@ -138,6 +139,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Profile Extras": "Ychwanegiadau Proffil",
     "Uploading...": "Wrthi'n uwchlwytho...",
     "Upload Avatar": "Uwchlwythwch Avatar",
     "play2": "Chwaraewch",
