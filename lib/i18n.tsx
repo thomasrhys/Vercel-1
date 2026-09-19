@@ -120,7 +120,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Personalised profile colours": "Personalised profile colours",
     "Owner": "Owner",
     "Site administrator": "Site administrator",
-    "Reserved for you:": "Reserved for you:",
+    "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
     "Back to Account": "Yn ôl i'r Cyfrif",
@@ -237,7 +237,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Personalised profile colours": "Lliwiau proffil personol",
     "Owner": "Perchennog",
     "Site administrator": "Gweinyddwr y wefan",
-    "Reserved for you:": "Wedi'i gadw i chi:",
+    "Reserved for you: /owner and /pitstopyt.": "Wedi'i gadw i chi: /owner and /pitstopyt.",
   },
 };
 
