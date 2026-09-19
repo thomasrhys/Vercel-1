@@ -4,6 +4,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Download, Share2, Loader2 } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 type StatsCardProps = {
   userId: string;
