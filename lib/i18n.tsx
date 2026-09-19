@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "play2": "Play",
     "online for free.": "online for free.",
     "Play Game": "Play Game",
     "This game is marked desktop-only and may not work properly on phones or tablets.": "This game is marked desktop-only and may not work properly on phones or tablets.",
@@ -135,6 +136,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "play2": "Chwaraewch",
     "online for free.": "ar-lein am ddim.",
     "Play Game": "Chwarae Gêm",
     "This game is marked desktop-only and may not work properly on phones or tablets.": "Mae'r gêm hon wedi'i marcio ar gyfer bwrdd gwaith yn unig ac efallai na fydd yn gweithio'n iawn ar ffonau na thabledi.",
