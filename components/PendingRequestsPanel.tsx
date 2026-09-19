@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabaseAuthClient } from '@/lib/supabase-auth';
+import { t } from '@/lib/i18n';
 
 interface PendingRequest {
   id: string;
@@ -89,13 +90,13 @@ export default function PendingRequestsPanel() {
   };
 
   if (loading) {
-    return <div className="text-sm text-muted-foreground">Loading requests...</div>;
+    return <div className="text-sm text-muted-foreground">{t("Loading requests...")}</div>;
   }
 
   if (requests.length === 0) {
     return (
       <div className="text-sm text-muted-foreground text-center py-2">
-        No pending friend requests
+        {t("No pending friend requests")}
       </div>
     );
   }
@@ -103,7 +104,7 @@ export default function PendingRequestsPanel() {
   return (
     <div className="bg-card rounded-lg border border-border p-4 space-y-3">
       <h3 className="font-semibold text-foreground flex items-center justify-between">
-        Friend Requests
+        {t("Friend Requests")}
         <span className="text-sm font-normal text-muted-foreground">
           {requests.length}
         </span>
