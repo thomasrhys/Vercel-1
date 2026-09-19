@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getGameImage, type Game } from "@/lib/games";
 import { AlertTriangle, ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, RefreshCcw, Share2, Smartphone, X } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 type PortalGame = Game & {
   image?: string | null;
