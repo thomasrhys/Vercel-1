@@ -733,9 +733,13 @@ export default function AccountPage() {
                 {message}
               </div>
             )}
-
+            
             <Button className="w-full" onClick={() => saveProfile()} disabled={saving}>
               {saving ? t("Saving...") : t("Save profile")}
+            </Button>
+
+            <Button className="w-full" onClick={() => router.push('/account/profile-extras')}>
+              {t("Profile Extras")}
             </Button>
 
             {profilePath && (
