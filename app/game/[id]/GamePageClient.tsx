@@ -229,7 +229,7 @@ export default function GamePageClient({ id }: { id: string }) {
         <Card className="w-full max-w-md text-center">
           <CardContent className="p-8">
             <Gamepad2 className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-            <p className="text-muted-foreground">Loading game...</p>
+            <p className="text-muted-foreground">{t("Loading game...")}</p>
           </CardContent>
         </Card>
       </main>
@@ -240,11 +240,11 @@ export default function GamePageClient({ id }: { id: string }) {
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md text-center">
           <CardHeader>
-            <CardTitle>Game not found</CardTitle>
+            <CardTitle>{t("Game not found")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">This game may have been removed or hidden.</p>
-            <Button onClick={() => (window.location.href = "/")}>Back to All Games</Button>
+            <p className="text-sm text-muted-foreground">{t("This game may have been removed or hidden.")}</p>
+            <Button onClick={() => (window.location.href = "/")}>{t("Back to All Games")}</Button>
           </CardContent>
         </Card>
       </main>
@@ -256,7 +256,7 @@ export default function GamePageClient({ id }: { id: string }) {
         <div className="flex items-center justify-between gap-3">
           <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to All Games
+            {t("Back to All Games")}
           </Button>
           {isSignedIn ? (
             <div className="flex items-center gap-2">
@@ -270,11 +270,11 @@ export default function GamePageClient({ id }: { id: string }) {
                 size="sm" 
                 onClick={() => signOut()}
               >
-                Sign Out
+                {t("Sign Out")}
               </Button>
             </div>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>Login</Button>
+            <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>{t(Login)}</Button>
           )}
         </div>
 
@@ -304,16 +304,16 @@ export default function GamePageClient({ id }: { id: string }) {
                 )}
                 {game.featured && (
                   <span className="rounded-md bg-yellow-500/20 px-3 py-1 text-sm font-medium text-yellow-700">
-                    Featured
+                    {t("Featured")}
                   </span>
                 )}
                 {game.desktop_only ? (
                   <span className="rounded-md bg-blue-500/20 px-3 py-1 text-sm font-medium text-blue-700 flex items-center gap-1">
-                    <Monitor className="h-4 w-4" /> Desktop Only
+                    <Monitor className="h-4 w-4" /> {t("Desktop Only")}
                   </span>
                 ) : (
                   <span className="rounded-md bg-green-500/20 px-3 py-1 text-sm font-medium text-green-700 flex items-center gap-1">
-                    <Smartphone className="h-4 w-4" /> Mobile Friendly
+                    <Smartphone className="h-4 w-4" /> {t("Mobile Friendly")}
                   </span>
                 )}
               </div>
@@ -328,15 +328,16 @@ export default function GamePageClient({ id }: { id: string }) {
 
               {isDesktopOnlyOnMobile ? (
                 <div className="rounded-md border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
-                  This game is marked desktop-only and may not work properly on phones or tablets.
+                  {t(This game is marked desktop-only and may not work properly on phones or tablets.)}
                 </div>
               ) : (
                 <Button size="lg" className="w-full" onClick={() => setActiveGame(game)}>
                   <Play className="h-5 w-5 mr-2" />
-                  Play Game
+                  {t(Play Game)}
                 </Button>
               )}
 
+              // Pick up here for translations
               <Button type="button" variant={isFavourite ? "default" : "outline"} className="w-full" onClick={toggleFavourite} disabled={isFavouriteWorking}>
                 <Heart className={`h-4 w-4 mr-2 ${isFavourite ? "fill-current" : ""}`} />
                 {isSignedIn ? (isFavourite ? "Favourited" : "Add to Favourites") : "Login to Favourite"}
