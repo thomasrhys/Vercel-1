@@ -8,6 +8,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     "No pending friend requests": "No pending friend requests",
     "Loading requests...": "Loading requests...",
+    "Friend Requests": "Friend Requests",
     "Friends Requests": "Friends Requests",
     "Back to Account": "Back to Account",
     "Loading profile extras...": "Loading profile extras...",
@@ -128,6 +129,7 @@ const translations: Record<Language, Record<string, string>> = {
   cy: {
     "No pending friend requests": "Dim ceisiadau ffrind sydd ar y gweill",
     "Loading requests...": "Llwytho ceisiadau...",
+    "Friend Requests": "Ceisiadau Ffrind",
     "Friends Requests": "Ceisiadau Ffrindiau",
     "Back to Account": "Yn ôl i'r Cyfrif",
     "Loading profile extras...": "Wrthi'n llwytho ychwanegion proffil...",
