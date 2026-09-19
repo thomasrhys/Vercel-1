@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 import PendingRequestsPanel from './PendingRequestsPanel';
+import { t } from "@/lib/i18n";
 
 interface PendingRequestsModalProps {
   isOpen: boolean;
@@ -52,7 +53,7 @@ export default function PendingRequestsModal({ isOpen, onClose }: PendingRequest
         {/* Header */}
         <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">
-            Friend Requests
+            {t("Friend Requests")}
           </h2>
           <button
             onClick={onClose}
