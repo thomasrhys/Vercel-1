@@ -487,17 +487,17 @@ export default function StatsCard({
         {isGenerating ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Generating...
+            {t("Generating...")}
           </>
         ) : statsLoading ? (
           <>
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Loading stats...
+            {t("Loading stats...")}
           </>
         ) : (
           <>
             <BarChart3 className="h-4 w-4 mr-2" />
-            My Stats Card
+            {t("My Stats Card")}
           </>
         )}
       </Button>
