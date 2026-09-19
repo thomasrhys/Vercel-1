@@ -9,7 +9,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Play Game": "Play Game",
     "This game is marked desktop-only and may not work properly on phones or tablets.": "This game is marked desktop-only and may not work properly on phones or tablets.",
     "Mobile Friendly": "Mobile Friendly",
-    "Sign Out": "Sign Out,
+    "Sign Out": "Sign Out",
     "Continue Playing": "Continue Playing",
     "🎲 Random": "🎲 Random",
     "No pending friend requests": "No pending friend requests",
