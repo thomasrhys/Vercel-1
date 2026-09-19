@@ -329,12 +329,12 @@ export default function GamePageClient({ id }: { id: string }) {
 
               {isDesktopOnlyOnMobile ? (
                 <div className="rounded-md border border-border bg-muted/50 p-4 text-sm text-muted-foreground">
-                  {t(This game is marked desktop-only and may not work properly on phones or tablets.)}
+                  {t("This game is marked desktop-only and may not work properly on phones or tablets.")}
                 </div>
               ) : (
                 <Button size="lg" className="w-full" onClick={() => setActiveGame(game)}>
                   <Play className="h-5 w-5 mr-2" />
-                  {t(Play Game)}
+                  {t("Play Game")}
                 </Button>
               )}
 
