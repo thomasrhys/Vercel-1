@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createBrowserClient } from '@supabase/ssr';
 import type { Session, User } from "@supabase/supabase-js";
+import { t } from "@/lib/i18n";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -238,7 +239,7 @@ export function UserButton() {
               className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted" 
               onClick={() => { setIsOpen(false); window.location.href = `/${username}`; }}
             >
-              View public profile
+              {t("View public profile")}
             </button>
           )}
           <button 
@@ -246,14 +247,14 @@ export function UserButton() {
             className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-muted" 
             onClick={() => { setIsOpen(false); window.location.href = "/account"; }}
           >
-            Manage account
+            {t("Manage account")}
           </button>
           <button 
             type="button" 
             className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-muted" 
             onClick={signOut}
           >
-            Logout
+            {t("Logout")}
           </button>
         </div>
       )}
