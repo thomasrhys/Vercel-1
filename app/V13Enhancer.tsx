@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { useSupabaseAuth } from "@/lib/supabase-auth";
 import { Gamepad2 } from "lucide-react";
 import { getGameImage, type Game } from "@/lib/games";
+import { t } from "@/lib/i18n";
 
 type PortalGame = Game & {
   image?: string | null;
