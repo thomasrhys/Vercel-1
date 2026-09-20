@@ -20,7 +20,7 @@ export default function Error({
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md text-center space-y-6">
         <div className="text-8xl font-bold text-muted-foreground/20 select-none">
-          <TriangleAlert size={256} strokeWidth={2.25} />
+          <TriangleAlert size={256} color="#232323" />
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-foreground">
