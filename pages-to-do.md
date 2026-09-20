@@ -1,0 +1,10 @@
+app/requests/page.tsx
+app/contact/page.tsx
+app/privacy/page.tsx
+app/report-problem/page.tsx
+app/request-update/page.tsx
+app/requests/page.tsx
+app/terms/page.tsx
+app/error.tsx
+app/global-error.tsx
+app/not-found.tsx
