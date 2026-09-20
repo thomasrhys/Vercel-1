@@ -34,7 +34,7 @@ export default async function PrivacyPage() {
     <main className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Privacy Policy</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("Privacy Policy")}</h1>
           <p className="text-sm text-muted-foreground mt-2">
             Effective Date: 1 July 2026
             <br />
