@@ -15,7 +15,7 @@ export default function LanguageSelector() {
         className="rounded border border-border bg-background px-1.5 py-1 text-foreground outline-none"
         aria-label="Language"
       >
-        <option value="en">{t("English<")}/option>
+        <option value="en">{t("English")}</option>
         <option value="cy">{t("Welsh")}</option>
       </select>
     </label>
