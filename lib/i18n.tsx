@@ -142,7 +142,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   cy: {
     "Login to Favourite": "Mewngofnodwch i ffefrio",
-    "Favourited": "Ffafrio",
+    "Favourited": "Wedi'i ffafrio",
     "Profile Extras": "Ychwanegiadau Proffil",
     "Uploading...": "Wrthi'n uwchlwytho...",
     "Upload avatar": "Uwchlwythwch avatar",
