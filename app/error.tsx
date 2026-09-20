@@ -3,7 +3,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { TriangleAlert } from "lucide-react",
+import { TriangleAlert } from "lucide-react";
 
 export default function Error({
   error,
