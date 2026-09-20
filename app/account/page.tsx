@@ -736,7 +736,7 @@ export default function AccountPage() {
               {saving ? t("Saving...") : t("Save profile")}
             </Button>
 
-            <Button variant="outline" className="flex-1" onClick={() => router.push('/account/profile-extras')}>
+            <Button variant="outline" className="w-full" onClick={() => router.push('/account/profile-extras')}>
               {t("Profile Extras")}
             </Button>
 
