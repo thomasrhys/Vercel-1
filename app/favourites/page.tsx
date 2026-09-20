@@ -1,5 +1,3 @@
-// Line 111 to continue translations
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -68,7 +66,7 @@ export default function FavouritesPage() {
   };
 
   if (!isLoaded || loading) {
-    return <main className="min-h-screen bg-background flex items-center justify-center p-4">Loading favourites...</main>;
+    return <main className="min-h-screen bg-background flex items-center justify-center p-4">{t("Loading favourites...")}</main>;
   }
 
   if (!isSignedIn) {
