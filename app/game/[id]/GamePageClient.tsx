@@ -358,11 +358,11 @@ export default function GamePageClient({ id }: { id: string }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Button type="button" variant="outline" onClick={() => openRequestForm("broken")}>
                   <AlertTriangle className="h-4 w-4 mr-2" />
-                  Report Problem
+                  {t("Report Problem")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => openRequestForm("update")}>
                   <RefreshCcw className="h-4 w-4 mr-2" />
-                  Request Update
+                  {t("Request Update")}
                 </Button>
               </div>
 
@@ -395,7 +395,7 @@ export default function GamePageClient({ id }: { id: string }) {
                     </div>
                     <div className="p-3">
                       <p className="font-medium text-foreground truncate">{relatedGame.title}</p>
-                      {relatedGame.featured && <p className="text-xs text-primary mt-1">Featured</p>}
+                      {relatedGame.featured && <p className="text-xs text-primary mt-1">{t("Featured)}</p>}
                     </div>
                   </a>
                 );
