@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Tap the heart on a game card or game page to save it here.": "Tap the heart on a game card or game page to save it here.",
+    "No favourites yet": "No favourites yet",
     "Category": "Category",
     "Recently added": "Recently added",
     "Search favourites...": "Search favourites...",
@@ -150,6 +152,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Tap the heart on a game card or game page to save it here.": "Tapiwch y galon ar gerdyn gêm neu dudalen gêm i'w chadw yma.",
+    "No favourites yet": "Dim ffefrynnau eto",
     "Category": "Categori",
     "Recently added": "Ychwanegwyd yn ddiweddar",
     "Search favourites...": "Chwilio Ffefrynnau...",
