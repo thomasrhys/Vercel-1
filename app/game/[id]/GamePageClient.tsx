@@ -395,7 +395,7 @@ export default function GamePageClient({ id }: { id: string }) {
                     </div>
                     <div className="p-3">
                       <p className="font-medium text-foreground truncate">{relatedGame.title}</p>
-                      {relatedGame.featured && <p className="text-xs text-primary mt-1">{t("Featured)}</p>}
+                      {relatedGame.featured && <p className="text-xs text-primary mt-1">{t("Featured")}</p>}
                     </div>
                   </a>
                 );
