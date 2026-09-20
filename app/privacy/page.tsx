@@ -35,7 +35,7 @@ export default async function PrivacyPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Effective Date: 27 June 2026
+            Effective Date: 1 July 2026
             <br />
             Last Updated: 1 July 2026
           </p>
