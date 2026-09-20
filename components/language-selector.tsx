@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, t } from "@/lib/i18n";
 
 export default function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
