@@ -1,6 +1,6 @@
 // app/game/[id]/GamePageClient.tsx
 // Auth migration: Clerk → Pure Supabase
-// Line 350 for continue translations
+// Line 361 for continue translations
 
 "use client";
 
@@ -347,11 +347,11 @@ export default function GamePageClient({ id }: { id: string }) {
               <div className="grid grid-cols-2 gap-2">
                 <Button type="button" variant="outline" onClick={copyLink}>
                   <Copy className="h-4 w-4 mr-2" />
-                  Copy Link
+                  {t("Copy Link")}
                 </Button>
                 <Button type="button" variant="outline" onClick={shareGame}>
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share
+                  {t("Share")}
                 </Button>
               </div>
 
