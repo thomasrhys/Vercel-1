@@ -146,8 +146,8 @@ const translations: Record<Language, Record<string, string>> = {
   },
   cy: {
     "Featured": "Sylw",
-    "Request Update": "Cais am Ddiweddariad",
-    "Report Problem": "Rhoi gwybod am Broblem",
+    "Request Update": "Cais ddiweddariad",
+    "Report Problem": "Adrodd problem",
     "Copy Link": "Copïo Dolen",
     "Login to Favourite": "Mewngofnodwch i ffefrio",
     "Favourited": "Wedi'i ffafrio",
