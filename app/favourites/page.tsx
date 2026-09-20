@@ -1,3 +1,5 @@
+// Line 105 to continue translations
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -7,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { authFetch, UserButton, useSupabaseAuth } from "@/lib/supabase-auth";
 import { getGameImage, type Game } from "@/lib/games";
 import { ArrowLeft, Gamepad2, Heart, Search, Trash2 } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 type PortalGame = Game & { image?: string | null; category?: string | null; hidden?: boolean };
 type SortMode = "recent" | "az" | "category";
@@ -72,10 +75,10 @@ export default function FavouritesPage() {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md text-center">
-          <CardHeader><CardTitle>Sign in to view favourites</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t("Sign in to view favourites")}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/favourites")}>Login</Button>
-            <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
+            <Button className="w-full" onClick={() => (window.location.href = "/login?redirect_url=/favourites")}>{t("Login")}</Button>
+            <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>{t("Back to Games")}</Button>
           </CardContent>
         </Card>
       </main>
@@ -86,12 +89,12 @@ export default function FavouritesPage() {
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 sm:py-10 max-w-5xl">
         <div className="flex items-center justify-between gap-3 mb-6">
-          <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}><ArrowLeft className="h-4 w-4 mr-2" />Back to All Games</Button>
+          <Button variant="outline" size="sm" onClick={() => (window.location.href = "/")}><ArrowLeft className="h-4 w-4 mr-2" />{t("Back to All Games")}</Button>
           <UserButton />
         </div>
 
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2"><Heart className="h-7 w-7 fill-current" />My Favourites</h1>
+          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2"><Heart className="h-7 w-7 fill-current" />{t("My Favourites")}</h1>
           <p className="text-muted-foreground mt-2">{favouriteIds.length} saved {favouriteIds.length === 1 ? "game" : "games"}.</p>
         </div>
 
