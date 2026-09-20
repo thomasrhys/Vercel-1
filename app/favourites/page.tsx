@@ -1,4 +1,4 @@
-// Line 105 to continue translations
+// Line 111 to continue translations
 
 "use client";
 
@@ -102,8 +102,8 @@ export default function FavouritesPage() {
 
         {favouriteIds.length > 0 && (
           <div className="flex flex-col sm:flex-row gap-3 mb-5">
-            <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search favourites..." className="pl-9" /></div>
-            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="px-3 py-2 border border-border rounded-md bg-background text-foreground"><option value="recent">Recently added</option><option value="az">A-Z</option><option value="category">Category</option></select>
+            <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Search favourites...")} className="pl-9" /></div>
+            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} className="px-3 py-2 border border-border rounded-md bg-background text-foreground"><option value="recent">{t("Recently added")}</option><option value="az">A-Z</option><option value="category">{t("Category")}</option></select>
           </div>
         )}
 
