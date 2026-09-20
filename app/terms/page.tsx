@@ -1,3 +1,6 @@
+"use client";
+import { t } from "@/lib/i18n";
+
 const thirdPartyServices = [
   {
     name: "GitHub",
