@@ -230,11 +230,9 @@ export default function AccountPage() {
   const [created_at, setCreatedAt] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-
   const [statsGamesPlayed, setStatsGamesPlayed] = useState(0);
   const [statsRecentGames, setStatsRecentGames] = useState<Array<{ id: string; title: string; image?: string | null }>>([]);
   const [statsLoading, setStatsLoading] = useState(true);
-
   const email = user?.email?.toLowerCase() || "";
   const isOwner = email === OWNER_EMAIL;
   const providers = (user?.identities || []).map((identity) => identity.provider);
@@ -245,8 +243,8 @@ export default function AccountPage() {
   const hasTwitch = providers.includes("twitch");
   const hasDiscord = providers.includes("discord");
   const profilePath = username ? `/${username}` : "";
-
   const badges = computeBadges(created_at, role, avatarUrl, accentColour);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
