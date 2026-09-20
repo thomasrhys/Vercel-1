@@ -1,16 +1,13 @@
+// Line 84 to continue Translation
+
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gamepad2, Send, CheckCircle2 } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 function RequestsPageContent() {
   const searchParams = useSearchParams();
@@ -79,9 +76,9 @@ function RequestsPageContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700">
                 <CheckCircle2 className="h-6 w-6" />
-                Request Submitted
+                {t("Request Submitted")}
               </CardTitle>
-              <CardDescription>Thanks! Your game request has been received.</CardDescription>
+              <CardDescription>{t("Thanks! Your game request has been received.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">✓ Submitted</div>
