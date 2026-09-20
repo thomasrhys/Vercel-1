@@ -108,9 +108,9 @@ export default function FavouritesPage() {
         )}
 
         {favouriteIds.length === 0 ? (
-          <Card><CardContent className="p-8 text-center space-y-4"><Heart className="h-12 w-12 mx-auto text-primary" /><h2 className="text-xl font-semibold text-foreground">No favourites yet</h2><p className="text-sm text-muted-foreground">Tap the heart on a game card or game page to save it here.</p><Button onClick={() => (window.location.href = "/")}>Browse Games</Button></CardContent></Card>
+          <Card><CardContent className="p-8 text-center space-y-4"><Heart className="h-12 w-12 mx-auto text-primary" /><h2 className="text-xl font-semibold text-foreground">{t("No favourites yet")}</h2><p className="text-sm text-muted-foreground">{t("Tap the heart on a game card or game page to save it here.")}</p><Button onClick={() => (window.location.href = "/")}>{t("Browse Games")}</Button></CardContent></Card>
         ) : favouriteGames.length === 0 ? (
-          <Card><CardContent className="p-8 text-center space-y-3"><Search className="h-10 w-10 mx-auto text-muted-foreground" /><h2 className="text-xl font-semibold text-foreground">No matching favourites</h2><Button variant="outline" onClick={() => setQuery("")}>Clear Search</Button></CardContent></Card>
+          <Card><CardContent className="p-8 text-center space-y-3"><Search className="h-10 w-10 mx-auto text-muted-foreground" /><h2 className="text-xl font-semibold text-foreground">{t("No matching favourites")}</h2><Button variant="outline" onClick={() => setQuery("")}>{t("Clear Search")}</Button></CardContent></Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
             {favouriteGames.map((game) => {
@@ -118,7 +118,7 @@ export default function FavouritesPage() {
               return (
                 <div key={game.id} className="rounded-lg border border-border bg-card overflow-hidden hover:bg-muted/50 transition">
                   <a href={`/game/${game.id}`}><div className="aspect-video bg-muted">{coverImage ? <img src={coverImage} alt={game.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Gamepad2 className="h-10 w-10 text-muted-foreground" /></div>}</div></a>
-                  <div className="p-3 space-y-3"><div><p className="font-semibold text-foreground truncate">{game.title}</p>{game.category && <p className="text-xs text-muted-foreground mt-1 truncate">{game.category}</p>}</div><div className="flex gap-2"><Button size="sm" className="flex-1" onClick={() => (window.location.href = `/game/${game.id}`)}>Open</Button><Button size="sm" variant="outline" onClick={() => removeFavourite(game.id)}><Trash2 className="h-4 w-4" /></Button></div></div>
+                  <div className="p-3 space-y-3"><div><p className="font-semibold text-foreground truncate">{game.title}</p>{game.category && <p className="text-xs text-muted-foreground mt-1 truncate">{game.category}</p>}</div><div className="flex gap-2"><Button size="sm" className="flex-1" onClick={() => (window.location.href = `/game/${game.id}`)}>{t("Open")}</Button><Button size="sm" variant="outline" onClick={() => removeFavourite(game.id)}><Trash2 className="h-4 w-4" /></Button></div></div>
                 </div>
               );
             })}
