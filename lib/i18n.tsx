@@ -8,7 +8,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     "Profile Extras": "Profile Extras",
     "Uploading...": "Uploading...",
-    "Upload Avatar": "Upload Avatar",
+    "Upload avatar": "Upload avatar",
     "play2": "Play",
     "online for free.": "online for free.",
     "Play Game": "Play Game",
@@ -141,7 +141,7 @@ const translations: Record<Language, Record<string, string>> = {
   cy: {
     "Profile Extras": "Ychwanegiadau Proffil",
     "Uploading...": "Wrthi'n uwchlwytho...",
-    "Upload Avatar": "Uwchlwythwch Avatar",
+    "Upload avatar": "Uwchlwythwch avatar",
     "play2": "Chwaraewch",
     "online for free.": "ar-lein am ddim.",
     "Play Game": "Chwarae Gêm",
