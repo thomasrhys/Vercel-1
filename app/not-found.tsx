@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md text-center space-y-6">
-        <div className="text-8xl font-bold text-muted-foreground/20 select-none">
+        <div className="text-8xl font-bold text-muted-foreground/20 select-none text-[#232323]">
           404
         </div>
         <div className="space-y-2">
