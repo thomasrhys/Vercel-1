@@ -1,4 +1,4 @@
-// Line 84 to continue Translation
+// Line 94 to continue Translation
 
 "use client";
 
@@ -82,8 +82,8 @@ function RequestsPageContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">✓ Submitted</div>
-              <Button className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
-              <Button variant="outline" className="w-full" onClick={() => { setSubmitted(false); setMessage(""); }}>Submit Another Request</Button>
+              <Button className="w-full" onClick={() => (window.location.href = "/")}>{t("Back to Games")}</Button>
+              <Button variant="outline" className="w-full" onClick={() => { setSubmitted(false); setMessage(""); }}>{t("Submit Another Request")}</Button>
             </CardContent>
           </>
         ) : (
