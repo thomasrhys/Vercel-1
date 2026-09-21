@@ -1,4 +1,4 @@
-// Line 94 to continue Translation
+// Line 100 to continue Translation
 
 "use client";
 
@@ -91,9 +91,9 @@ function RequestsPageContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Gamepad2 className="h-6 w-6" />
-                Request a Game
+                {t("Request a Game")}
               </CardTitle>
-              <CardDescription>Tell us what game you would like to see added to the portal.</CardDescription>
+              <CardDescription>{t("Tell us what game you would like to see added to the portal.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
