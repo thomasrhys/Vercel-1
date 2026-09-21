@@ -93,7 +93,7 @@ function RequestsPageContent() {
                 <Gamepad2 className="h-6 w-6" />
                 {t("Request a Game")}
               </CardTitle>
-              <CardDescription>t("Tell us what game you would like to see added to the portal.")</CardDescription>
+              <CardDescription>{t("Tell us what game you would like to see added to the portal.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
