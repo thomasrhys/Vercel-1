@@ -164,7 +164,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   cy: {
     "Request a Game": "Gofyn am gêm",
-    "Tell us what game you would like to see added to the portal.": "Tell us what game you would like to see added to the portal.",
+    "Tell us what game you would like to see added to the portal.": "Dywedwch wrthym pa gêm yr hoffech ei gweld yn cael ei hychwanegu at y porth.",
     "✓ Submitted": "✓ Cyflwynwyd",
     "Submit Another Request": "Cyflwyno cais arall",
     "Thanks! Your game request has been received.": "Diolch! Mae eich cais am gêm wedi dod i law.",
