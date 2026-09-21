@@ -1,4 +1,4 @@
-// Line 100 to continue Translation
+// Line 104 to continue Translation
 
 "use client";
 
@@ -97,8 +97,8 @@ function RequestsPageContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Game name</label>
-                <input value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder="Enter game name" maxLength={120} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Game name")}</label>
+                <input value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder={t("Enter game name")} maxLength={120} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Optional link</label>
