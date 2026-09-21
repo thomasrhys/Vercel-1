@@ -81,7 +81,7 @@ function RequestsPageContent() {
               <CardDescription>{t("Thanks! Your game request has been received.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">✓ Submitted</div>
+              <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">{t("✓ Submitted")}</div>
               <Button className="w-full" onClick={() => (window.location.href = "/")}>{t("Back to Games")}</Button>
               <Button variant="outline" className="w-full" onClick={() => { setSubmitted(false); setMessage(""); }}>{t("Submit Another Request")}</Button>
             </CardContent>
