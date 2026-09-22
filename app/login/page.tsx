@@ -8,6 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Gamepad2 } from "lucide-react";
 import { supabaseAuthClient, useSupabaseAuth } from "@/lib/supabase-auth";
 
+function VercelIcon() {
+  return (
+    <svg viewBox="0 0 116 100" className="h-5 w-5" aria-hidden="true">
+      <path fill="currentColor" d="M57.5 0L115 100H0L57.5 0Z" />
+    </svg>
+  );
+}
+
 function DiscordIcon() {
   return (
     <svg viewBox="0 0 127.14 96.36" className="h-5 w-5" aria-hidden="true">
@@ -81,7 +89,7 @@ function messageFrom(error: unknown) {
 }
 
 type AuthMode = "login" | "signup";
-type OAuthProvider = "discord" | "google" | "github" | "azure" | "twitch";
+type OAuthProvider = "discord" | "google" | "github" | "azure" | "twitch" | "custom:VERCEL";
 
 function LoginPageContent() {
   const { isSignedIn } = useSupabaseAuth();
