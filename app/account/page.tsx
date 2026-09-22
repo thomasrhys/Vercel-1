@@ -121,6 +121,14 @@ function OAuthErrorHandler() {
   return <div className="text-xs text-orange-600 mb-2">⚠️ {errorMessage}</div>;
 }
 
+function VercelIcon() {
+  return (
+    <svg viewBox="0 0 116 100" className="h-5 w-5" aria-hidden="true">
+      <path fill="currentColor" d="M57.5 0L115 100H0L57.5 0Z" />
+    </svg>
+  );
+}
+
 function DiscordIcon() {
   return (
     <svg viewBox="0 0 127.14 96.36" className="h-5 w-5" aria-hidden="true">
@@ -209,6 +217,7 @@ const OAUTH_SCOPES: Record<string, string> = {
   azure: "email openid profile",
   twitch: "user:read:email",
   discord: "identify email connections",
+  "custom:VERCEL": "email openid profile",
 };
 
 export default function AccountPage() {
@@ -242,6 +251,7 @@ export default function AccountPage() {
   const hasMicrosoft = providers.includes("azure");
   const hasTwitch = providers.includes("twitch");
   const hasDiscord = providers.includes("discord");
+  const hasVercel = providers.includes("custom:VERCEL");
   const profilePath = username ? `/${username}` : "";
   const badges = computeBadges(created_at, role, avatarUrl, accentColour);
   const router = useRouter();
@@ -490,7 +500,7 @@ export default function AccountPage() {
     }
   };
 
-  const linkProvider = async (provider: "google" | "github" | "azure" | "twitch" | "discord") => {
+  const linkProvider = async (provider: "google" | "github" | "azure" | "twitch" | "discord" | "custom:VERCEL") => {
     setMessage("");
     setBusy(true);
 
@@ -914,6 +924,25 @@ export default function AccountPage() {
                   {t("Link Twitch")}
                 </Button>
               )}
+
+              {hasVercel ? (
+                <Button variant="outline" disabled className="justify-center gap-2 border-green-500 text-green-700">
+                  <VercelIcon />
+                  <Check className="h-4 w-4" />
+                  {t("Vercel Linked")}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => linkProvider("custom:VERCEL")}
+                  disabled={busy}
+                  className="justify-center gap-2"
+                >
+                  <VercelIcon />
+                  {t("Link Vercel")}
+                </Button>
+              )}
+              
             </div>
 
             <p className="text-xs text-muted-foreground pt-2">
