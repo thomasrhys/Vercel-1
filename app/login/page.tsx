@@ -173,6 +173,7 @@ function LoginPageContent() {
             <Button variant="outline" onClick={() => oauth("github")} disabled={busy} className="justify-center gap-2"><GitHubIcon />Continue with GitHub</Button>
             <Button variant="outline" onClick={() => oauth("azure")} disabled={busy} className="justify-center gap-2"><MicrosoftIcon />Continue with Microsoft</Button>
             <Button variant="outline" onClick={() => oauth("twitch")} disabled={busy} className="justify-center gap-2"><TwitchIcon />Continue with Twitch</Button>
+            <Button variant="outline" onClick={() => oauth("custom:VERCEL")} disabled={busy} className="justify-center gap-2"><VercelIcon />Continue with Vercel</Button>
           </div>
           <Button variant="outline" className="w-full" onClick={() => (window.location.href = redirectUrl)}>Back</Button>
         </CardContent>
