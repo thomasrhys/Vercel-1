@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Vercel Linked": "Vercel Linked",
+    "Link Vercel": "Link Vercel",
     "Game name": "Game name",
     "Enter game name": "Enter game name",
     "Request a Game": "Request a Game",
@@ -306,6 +308,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Twitch Linked": "Twitch wedi'i gysylltu",
     "Link Twitch": "Cysylltu Twitch",
     "Unlink Twitch": "Datgysylltu Twitch",
+    "Link Vercel": "Cysylltu Vercel",
+    "Vercel Linked": "Vercel wedi'i gysylltu",
     "An OAuth error occurred": "Digwyddodd gwall OAuth",
     "My Stats Card": "Fy ngherdyn ystadegau",
     "Your Stats Card": "Eich cerdyn ystadegau",
