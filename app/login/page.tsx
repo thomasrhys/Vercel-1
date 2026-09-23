@@ -132,15 +132,35 @@ function LoginPageContent() {
     }
   };
 
-  const oauth = async (provider: OAuthProvider) => {
-    setMessage("");
-    setBusy(true);
-    const { error } = await supabaseAuthClient.auth.signInWithOAuth({ provider, options: { redirectTo: redirectTo() } });
-    if (error) {
-      setMessage(messageFrom(error));
-      setBusy(false);
-    }
+const oauth = async (provider: OAuthProvider) => {
+  setMessage("");
+  setBusy(true);
+
+  // 1. Build your base options
+  const authOptions: any = {
+    redirectTo: redirectTo(),
   };
+
+  // 2. Inject Xbox branding dynamically if the azure provider is chosen
+  if (provider === 'azure') {
+    authOptions.queryParams = {
+      id_content: 'xbox',
+    };
+    authOptions.scopes = 'openid email profile xboxlive.signin';
+  }
+
+  // 3. Trigger the signing flow
+  const { error } = await supabaseAuthClient.auth.signInWithOAuth({ 
+    provider, 
+    options: authOptions 
+  });
+
+  if (error) {
+    setMessage(messageFrom(error));
+    setBusy(false);
+  }
+};
+
 
   if (isSignedIn) {
     return (
