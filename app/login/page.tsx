@@ -146,7 +146,7 @@ const oauth = async (provider: OAuthProvider) => {
     authOptions.queryParams = {
       id_content: 'xbox',
     };
-    authOptions.scopes = 'openid email profile xboxlive.signin';
+    authOptions.scopes = 'openid email profile';
   }
 
   // 3. Trigger the signing flow
