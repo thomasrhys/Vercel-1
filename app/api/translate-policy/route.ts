@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 async function translateText(englishText: string): Promise<string> {
   try {
-    const res = await fetch("https://techiaith.cymru", {
+    const res = await fetch("https://api.techiaith.cymru/translate/v2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: englishText, src: "en", tgt: "cy" }),
