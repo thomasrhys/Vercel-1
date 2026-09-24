@@ -4,10 +4,10 @@
 import React, { useEffect, useState } from "react";
 
 const thirdPartyServices = [
-  { name: "GitHub", enPurpose: "Source code hosting and version control", href: "https://github.com" },
-  { name: "Vercel", enPurpose: "Website hosting, deployments, and Blob storage", href: "https://vercel.com" },
-  { name: "Supabase", enPurpose: "Database, login, sign up, authentication, and backend services", href: "https://supabase.com" },
-  { name: "Cloudflare", enPurpose: "DNS and Email delivery", href: "https://cloudflare.com" },
+  { name: "GitHub", enPurpose: "Source code hosting and version control", href: "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" },
+  { name: "Vercel", enPurpose: "Website hosting, deployments, and Blob storage", href: "https://vercel.com/legal/privacy-policy" },
+  { name: "Supabase", enPurpose: "Database, login, sign up, authentication, and backend services", href: "https://supabase.com/privacy" },
+  { name: "Cloudflare", enPurpose: "DNS and Email delivery", href: "https://cloudflare.com/policies/privacy" },
 ];
 
 export default function PrivacyPage() {
