@@ -1,4 +1,4 @@
-// app/privacy/page.tsx
+// app/privacybkp/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
     useText: isWelsh ? welshData.paragraphs.useText : "Game request information is used to review possible games to add to the portal, count how many times a game has been requested, and send a notification email to the site administrator.",
     loginText: isWelsh ? welshData.paragraphs.loginText : "Account login, sign up, and authentication are provided using Supabase. You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future.",
     gamesText: isWelsh ? welshData.paragraphs.gamesText : "Some games may be embedded from third-party websites. Those websites may have their own privacy policies, cookies, analytics, or tracking. We do not control third-party game providers.",
-    emailText: isWelsh ? welshData.paragraphs.emailText : "Game requests may send an email notification to the site owner using Resend. The content of the request may be included in that notification.",
+    emailText: isWelsh ? welshData.paragraphs.emailText : "Game requests may send an email notification to the site owner using Cloudflare. The content of the request may be included in that notification.",
     childrenText: isWelsh ? welshData.paragraphs.childrenText : "Game Portal is not specifically directed at children. We do not knowingly collect personal information from children. The Request a Game form should not be used to submit personal information. If we become aware that personal information has been submitted by a child, we will take reasonable steps to remove it.",
     retentionText: isWelsh ? welshData.paragraphs.retentionText : "Game requests may be stored until they are reviewed, completed, or removed by an administrator.",
     thirdPartyText: isWelsh ? welshData.paragraphs.thirdPartyText : "This website relies on trusted third-party services to operate. These services operate independently and process information according to their own privacy policies.",
