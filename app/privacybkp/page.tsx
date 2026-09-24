@@ -147,8 +147,8 @@ export default function PrivacyPage() {
           </div>
 
           <h2 className="text-xl font-semibold text-foreground">{headings.contact}</h2>
-          <p>{headings.contactText} <a className="text-primary underline underline-offset-4" href="mailto:tom@requests.fnfaw.es">tom@requests.fnfaw.es</a>.</p>
-          <p>{headings.copyrightText} <a className="text-primary underline underline-offset-4" href="mailto:copyright@requests.fnfaw.es">copyright@requests.fnfaw.es</a>.</p>
+          <p>{headings.contactText} <a className="text-primary underline underline-offset-4" href="mailto:contact@fnfaw.es">contact@fnfaw.es</a>.</p>
+          <p>{headings.copyrightText} <a className="text-primary underline underline-offset-4" href="mailto:copyright@fnfaw.es">copyright@fnfaw.es</a>.</p>
         </section>
 
         <a href="/" className="inline-block px-4 py-2 rounded-md border border-border text-sm">{headings.btnBack}</a>
