@@ -6,7 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
-    "games": "games"
+    "games": "games",
     "game": "game",
     "saved": "saved",
     "Vercel Linked": "Vercel Linked",
