@@ -93,7 +93,7 @@ export default function FavouritesPage() {
 
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2"><Heart className="h-7 w-7 fill-current" />{t("My Favourites")}</h1>
-          <p className="text-muted-foreground mt-2">{favouriteIds.length} saved {favouriteIds.length === 1 ? "game" : "games"}.</p>
+          <p className="text-muted-foreground mt-2">{favouriteIds.length} {t("saved")} {favouriteIds.length === 1 ? {t("game")} : {t("games")}}.</p>
         </div>
 
         {message && <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm mb-4">✗ {message}</div>}
