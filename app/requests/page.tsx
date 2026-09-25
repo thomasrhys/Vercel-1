@@ -101,7 +101,7 @@ function RequestsPageContent() {
                 <input value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder={t("Enter game name")} maxLength={120} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Optional link</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Optional link")}</label>
                 <input value={gameLink} onChange={(event) => setGameLink(event.target.value)} placeholder="Paste a link if you have one" maxLength={500} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
               <div>
