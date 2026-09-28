@@ -8,7 +8,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     "Optional comments": "Optional comments",
     "Paste a link if you have one": "Paste a link if you have one",
-    "Anything else we should know?": Anything else we should know?",
+    "Anything else we should know?": "Anything else we should know?",
     "Optional link": "Optional link",
     "games": "games",
     "game": "game",
