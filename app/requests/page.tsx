@@ -102,11 +102,11 @@ function RequestsPageContent() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">{t("Optional link")}</label>
-                <input value={gameLink} onChange={(event) => setGameLink(event.target.value)} placeholder="Paste a link if you have one" maxLength={500} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <input value={gameLink} onChange={(event) => setGameLink(event.target.value)} placeholder={t("Paste a link if you have one")} maxLength={500} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Optional comments</label>
-                <textarea value={comments} onChange={(event) => setComments(event.target.value)} placeholder="Anything else we should know?" maxLength={1000} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Optional comments")}</label>
+                <textarea value={comments} onChange={(event) => setComments(event.target.value)} placeholder={t("Anything else we should know?")} maxLength={1000} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
               {message && <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm">✗ {message}</div>}
               <Button className="w-full" onClick={submitRequest} disabled={isSubmitting || !gameName.trim()}>
