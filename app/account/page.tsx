@@ -508,7 +508,7 @@ export default function AccountPage() {
     const { error } = await supabaseAuthClient.auth.linkIdentity({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=/account`,
+        redirectTo: `${window.location.origin}/account`,
         ...(scopes ? { scopes } : {}),
       },
     });
