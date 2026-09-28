@@ -111,9 +111,9 @@ function RequestsPageContent() {
               {message && <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm">✗ {message}</div>}
               <Button className="w-full" onClick={submitRequest} disabled={isSubmitting || !gameName.trim()}>
                 <Send className="h-4 w-4 mr-2" />
-                {isSubmitting ? "Submitting..." : "Submit Request"}
+                {isSubmitting ? {t("Submitting...")} : {t("Submit Request")}}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to Games</Button>
+              <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>{t("Back to Games")}</Button>
             </CardContent>
           </>
         )}
@@ -124,7 +124,7 @@ function RequestsPageContent() {
 
 export default function RequestsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">{t("Loading...")}</div>}>
       <RequestsPageContent />
     </Suspense>
   );
