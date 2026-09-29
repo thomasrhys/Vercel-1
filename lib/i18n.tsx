@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Use the correct email address below so your message reaches the right place.": "Use the correct email address below so your message reaches the right place.",
     "Submitting...": "Submitting...",
     "Submit Request": "Submit Request",
     "Optional comments": "Optional comments",
@@ -176,6 +177,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Use the correct email address below so your message reaches the right place.": "Defnyddiwch y cyfeiriad e-bost cywir isod fel bod eich neges yn cyrraedd y lle iawn.",
     "Submitting...": "Wrthi'n gyflwyno...",
     "Submit Request": "Cyflwyno cais",
     "Paste a link if you have one": "Gludwch ddolen os oes gennych un",
