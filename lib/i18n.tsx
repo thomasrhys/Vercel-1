@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Copyright Enquiries": "Copyright Enquiries",
+    "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.": "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.",
+    "General Enquiries": "General Enquiries",
     "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.": "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.",
     "Use the correct email address below so your message reaches the right place.": "Use the correct email address below so your message reaches the right place.",
     "Submitting...": "Submitting...",
@@ -178,6 +181,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Copyright Enquiries": "Ymholiadau Hawlfraint",
+    "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.": "Defnyddiwch yr e-bost hwn ar gyfer cwestiynau cyffredinol, adborth, adroddiadau am fygiau, ymholiadau preifatrwydd ac awgrymiadau.",
+    "General Enquiries": "Ymholiadau Cyffredinol",
     "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.": "Ein nod yw ymateb i ymholiadau mor gyflym ag sy'n rhesymol bosibl. Rhoddir blaenoriaeth i ymholiadau ynghylch hawlfraint a chael gwared ar gynnwys, lle bo hynny'n briodol.",
     "Use the correct email address below so your message reaches the right place.": "Defnyddiwch y cyfeiriad e-bost cywir isod fel bod eich neges yn cyrraedd y lle iawn.",
     "Submitting...": "Wrthi'n gyflwyno...",
