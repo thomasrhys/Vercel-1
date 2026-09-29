@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.": "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.",
     "Use the correct email address below so your message reaches the right place.": "Use the correct email address below so your message reaches the right place.",
     "Submitting...": "Submitting...",
     "Submit Request": "Submit Request",
@@ -177,6 +178,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.": "Ein nod yw ymateb i ymholiadau mor gyflym ag sy'n rhesymol bosibl. Rhoddir blaenoriaeth i ymholiadau ynghylch hawlfraint a chael gwared ar gynnwys, lle bo hynny'n briodol.",
     "Use the correct email address below so your message reaches the right place.": "Defnyddiwch y cyfeiriad e-bost cywir isod fel bod eich neges yn cyrraedd y lle iawn.",
     "Submitting...": "Wrthi'n gyflwyno...",
     "Submit Request": "Cyflwyno cais",
