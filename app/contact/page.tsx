@@ -49,14 +49,13 @@ export default function ContactPage() {
         </section>
 
         <p className="text-sm text-muted-foreground leading-6">
-          We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.
+          {t("We aim to respond to enquiries as quickly as reasonably possible. Copyright and content removal enquiries are reviewed with priority where appropriate.")}
         </p>
 
         <a
           href="/"
-          className="inline-block px-4 py-2 rounded-md border border-border text-sm"
-        >
-          Back to Games
+          className="inline-block px-4 py-2 rounded-md border border-border text-sm">
+          {t("Back to Games")}
         </a>
       </div>
     </main>
