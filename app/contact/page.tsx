@@ -18,10 +18,10 @@ export default function ContactPage() {
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold text-foreground">General Enquiries</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t("General Enquiries")}</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-6">
-              Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.
+              {t("Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.")}
             </p>
             <a
               href="mailto:contact@fnfaw.es"
@@ -34,7 +34,7 @@ export default function ContactPage() {
           <div className="rounded-lg border border-border bg-card p-5 space-y-3">
             <div className="flex items-center gap-2">
               <ShieldAlert className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold text-foreground">Copyright Enquiries</h2>
+              <h2 className="text-xl font-semibold text-foreground">{t("Copyright Enquiries")}</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-6">
               Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.
