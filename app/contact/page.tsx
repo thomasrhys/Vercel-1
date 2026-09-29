@@ -8,7 +8,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Contact</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("Contact")}</h1>
           <p className="text-sm text-muted-foreground mt-2">
             {t("Use the correct email address below so your message reaches the right place.")}
           </p>
