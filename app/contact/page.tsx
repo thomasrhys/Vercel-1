@@ -1,4 +1,7 @@
+// LINE 21 to continu adding t
+
 import { Mail, ShieldAlert } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 export default function ContactPage() {
   return (
@@ -7,7 +10,7 @@ export default function ContactPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Contact</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Use the correct email address below so your message reaches the right place.
+            {t("Use the correct email address below so your message reaches the right place.")}
           </p>
         </div>
 
