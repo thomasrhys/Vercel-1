@@ -1,4 +1,4 @@
-// LINE 21 to continu adding t
+"use client";
 
 import { Mail, ShieldAlert } from "lucide-react";
 import { t } from "@/lib/i18n";
