@@ -37,7 +37,7 @@ export default function ContactPage() {
               <h2 className="text-xl font-semibold text-foreground">{t("Copyright Enquiries")}</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-6">
-              Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.
+              {t("Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.")}
             </p>
             <a
               href="mailto:copyright@fnfaw.es"
