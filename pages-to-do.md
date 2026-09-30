@@ -1,4 +1,3 @@
-app/contact/page.tsx
 app/report-problem/page.tsx
 app/request-update/page.tsx
 app/terms/page.tsx
