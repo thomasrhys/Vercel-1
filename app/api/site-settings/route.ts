@@ -20,6 +20,6 @@ export async function GET() {
   return Response.json({
     site_name: settings.site_name || "Game Portal",
     footer_text: settings.footer_text || "© 2026 Game Portal",
-    maintenance_mode: settings.maintenance_mode === "true",
+    maintenance_mode: settings.maintenance_mode === "false",
   });
 }
