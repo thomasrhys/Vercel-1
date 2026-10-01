@@ -54,7 +54,7 @@ function GamePortal() { // Changed to a standard inner function component
   const [settings, setSettings] = useState<PublicSettings>({
     site_name: t("Game Portal"),
     footer_text: t("© 2026 Game Portal"),
-    maintenance_mode: false,
+    maintenance_mode: true,
   })
 
   const gameContainerRef = useRef<HTMLDivElement>(null)
