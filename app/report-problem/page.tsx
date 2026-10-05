@@ -66,9 +66,9 @@ function ReportProblemContent() {
               <CardDescription>{t("Thanks! The problem report has been received.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">✓ Submitted</div>
-              <Button className="w-full" onClick={() => (window.location.href = gameId ? `/game/${gameId}` : "/")}>Back to Game</Button>
-              <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>Back to All Games</Button>
+              <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">{t("✓ Submitted")}</div>
+              <Button className="w-full" onClick={() => (window.location.href = gameId ? `/game/${gameId}` : "/")}>{t("Back to Game")}</Button>
+              <Button variant="outline" className="w-full" onClick={() => (window.location.href = "/")}>{t("Back to All Games")}</Button>
             </CardContent>
           </>
         ) : (
