@@ -61,9 +61,9 @@ function ReportProblemContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700">
                 <CheckCircle2 className="h-6 w-6" />
-                Problem Report Submitted
+                {t("Problem Report Submitted")}
               </CardTitle>
-              <CardDescription>Thanks! The problem report has been received.</CardDescription>
+              <CardDescription>{t("Thanks! The problem report has been received.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">✓ Submitted</div>
