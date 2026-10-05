@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Thanks! The problem report has been received.": "Thanks! The problem report has been received.",
+    "Problem Report Submitted": "Problem Report Submitted",
     "Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.": "Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.",
     "Copyright Enquiries": "Copyright Enquiries",
     "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.": "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.",
@@ -182,6 +184,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Thanks! The problem report has been received.": "Diolch! Mae'r adroddiad problem wedi'i dderbyn.",
+    "Problem Report Submitted": "Adroddiad Broblem Wedi'i Gyflwyno",
     "Use this email for copyright concerns, DMCA notices, trademark concerns, ownership disputes, or requests to remove games or content.": "Defnyddiwch yr e-bost hwn ar gyfer pryderon hawlfraint, hysbysiadau DMCA, pryderon nodau masnach, anghydfodau perchnogaeth, neu geisiadau i gael gwared ar gemau neu gynnwys.",
     "Copyright Enquiries": "Ymholiadau Hawlfraint",
     "Use this email for general questions, feedback, bug reports, privacy enquiries, and suggestions.": "Defnyddiwch yr e-bost hwn ar gyfer cwestiynau cyffredinol, adborth, adroddiadau am fygiau, ymholiadau preifatrwydd ac awgrymiadau.",
