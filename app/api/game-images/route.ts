@@ -1,17 +1,18 @@
-import { list } from "@vercel/blob";
+// app/api/game-images/route.ts
+import { listCoverImages } from "@/lib/r2-client";
 
 export async function GET() {
   try {
-    const { blobs } = await list({
-      prefix: "covers/",
-    });
+    const objects = await listCoverImages("covers/");
 
     const images: Record<string, string> = {};
 
-    for (const blob of blobs) {
-      const filename = blob.pathname.replace("covers/", "");
+    for (const obj of objects) {
+      if (!obj.Key) continue;
+
+      const filename = obj.Key.replace("covers/", "");
       const gameId = filename.split("__")[0];
-      images[gameId] = blob.url;
+      images[gameId] = `${process.env.CLOUDFLARE_BUCKET_URL}/${obj.Key}`;
     }
 
     return Response.json(images);
