@@ -1,9 +1,14 @@
 // app/api/admin/upload/route.ts
 // Auth migration: Clerk → Supabase role-based (via requireSupabaseAdmin)
+// Storage migration: Vercel Blob → Cloudflare R2
 
 import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 import { createClient } from "@supabase/supabase-js";
-import { del, list, put } from "@vercel/blob";
+import {
+  deleteCoverImage,
+  listCoverImages,
+  uploadCoverImage,
+} from "@/lib/r2-client";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,21 +34,17 @@ export async function POST(request: Request) {
 
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "-");
 
-    const existing = await list({
-      prefix: `covers/${gameId}__`,
-    });
-
-    if (existing.blobs.length > 0) {
-      await del(existing.blobs.map((blob) => blob.url));
+    // List and delete existing covers for this game
+    const existing = await listCoverImages(`covers/${gameId}__`);
+    for (const obj of existing) {
+      if (obj.Key) {
+        await deleteCoverImage(obj.Key);
+      }
     }
 
-    const blob = await put(
-      `covers/${gameId}__${Date.now()}__${safeFileName}`,
-      file,
-      {
-        access: "public",
-      }
-    );
+    // Upload new cover
+    const key = `covers/${gameId}__${Date.now()}__${safeFileName}`;
+    const imageUrl = await uploadCoverImage(key, file);
 
     await supabase.from("activity_log").insert({
       action: "cover_uploaded",
@@ -52,11 +53,11 @@ export async function POST(request: Request) {
 
     return Response.json({
       success: true,
-      imageUrl: blob.url,
+      imageUrl,
       message: `Replaced cover for ${gameId}`,
     });
   } catch (error) {
-    console.error("[v0] Upload error:", error);
+    console.error("[R2] Upload error:", error);
 
     return Response.json(
       { error: error instanceof Error ? error.message : "Upload failed" },
