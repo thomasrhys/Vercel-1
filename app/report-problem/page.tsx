@@ -76,7 +76,7 @@ function ReportProblemContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-6 w-6" />
-                Report a Problem
+                {t("Report a Problem")}
               </CardTitle>
               <CardDescription>Tell us what is wrong so it can be checked.</CardDescription>
             </CardHeader>
