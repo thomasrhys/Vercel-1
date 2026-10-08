@@ -276,7 +276,7 @@ export default function GamePageClient({ id }: { id: string }) {
               </Button>
             </div>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>{t(Login)}</Button>
+            <Button variant="outline" size="sm" onClick={() => (window.location.href = loginUrl)}>{t("Login")}</Button>
           )}
         </div>
 
