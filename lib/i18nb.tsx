@@ -5,22 +5,37 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 export type Language = "en" | "cy";
 
 const welshCache: Record<string, string> = {};
-let loadingPromise: Promise<void> | null = null;
+const inFlight = new Set<string>();
 
-async function loadWelshTranslations() {
-  if (Object.keys(welshCache).length > 0) return;
-  if (loadingPromise) return loadingPromise;
+async function translateText(text: string) {
+  if (!text || inFlight.has(text)) return;
 
-  loadingPromise = (async () => {
-    try {
-      // Collect all strings from the app and send to Techiaith
-      // For now, we load on-demand as strings are used
-    } catch {
-      // fallback to English
+  inFlight.add(text);
+
+  try {
+    const res = await fetch("/api/translate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        texts: [text],
+      }),
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const translated = data.translations?.[0];
+
+    if (translated) {
+      welshCache[text] = translated;
     }
-  })();
-
-  return loadingPromise;
+  } catch {
+    // fallback to English
+  } finally {
+    inFlight.delete(text);
+  }
 }
 
 type LanguageContextValue = {
@@ -39,22 +54,15 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const saved = window.localStorage.getItem("site-language");
     const initial = saved === "cy" || saved === "en" ? saved : "en";
+
     setLanguageState(initial);
     document.documentElement.lang = initial;
-
-    if (initial === "cy") {
-      void loadWelshTranslations();
-    }
   }, []);
 
-  const setLanguage = async (next: Language) => {
+  const setLanguage = (next: Language) => {
     setLanguageState(next);
     window.localStorage.setItem("site-language", next);
     document.documentElement.lang = next;
-
-    if (next === "cy") {
-      await loadWelshTranslations();
-    }
   };
 
   const value = useMemo(() => ({ language, setLanguage }), [language]);
@@ -63,13 +71,19 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function t(key: string) {
+  if (typeof window === "undefined") return key;
+
   const lang =
-    typeof window !== "undefined"
-      ? (window.localStorage.getItem("site-language") || "en")
-      : "en";
+    window.localStorage.getItem("site-language") === "cy" ? "cy" : "en";
 
   if (lang === "en") return key;
-  return welshCache[key] ?? key;
+
+  if (welshCache[key]) return welshCache[key];
+
+  // Trigger async translation if not cached yet
+  void translateText(key);
+
+  return key;
 }
 
 export function useLanguage() {
