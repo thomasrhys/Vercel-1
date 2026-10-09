@@ -1,32 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, ReactNode, } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 
 export type Language = "en" | "cy";
 
 const cache = new Map<string, string>();
-
-async function fetchTranslation(text: string): Promise<string> {
-  if (!text || cache.has(text)) return cache.get(text) || text;
-
-  try {
-    const res = await fetch("/api/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ texts: [text] }),
-    });
-
-    if (!res.ok) return text;
-
-    const data = await res.json();
-    const translated = data?.translations?.[0] ?? text;
-
-    cache.set(text, translated);
-    return translated;
-  } catch {
-    return text;
-  }
-}
+const allStringsUsed = new Set<string>();
 
 type I18nContextType = {
   language: Language;
@@ -56,12 +35,28 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem("site-language", next);
     document.documentElement.lang = next;
 
-    if (next === "cy") {
-      // Start loading translations and re-render as they arrive
-      const allTexts = Array.from(cache.keys());
-      for (const text of allTexts) {
-        await fetchTranslation(text);
-        setVersion((v) => v + 1); // Force re-render
+    if (next === "cy" && allStringsUsed.size > 0) {
+      try {
+        const textsToTranslate = Array.from(allStringsUsed).filter(t => !cache.has(t));
+        
+        if (textsToTranslate.length > 0) {
+          const res = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ texts: textsToTranslate }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            data.translations?.forEach((translated: string, index: number) => {
+              cache.set(textsToTranslate[index], translated);
+            });
+          }
+        }
+
+        setVersion(v => v + 1);
+      } catch (error) {
+        console.error("Translation error:", error);
       }
     }
   };
@@ -77,20 +72,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 }
 
 export function t(key: string): string {
-  // Access context to force re-render when language changes
-  useContext(I18nContext);
+  const context = useContext(I18nContext);
+  allStringsUsed.add(key);
 
-  if (typeof window === "undefined") return key;
+  if (context.language === "en") return key;
 
-  const lang =
-    window.localStorage.getItem("site-language") === "cy" ? "cy" : "en";
-
-  if (lang === "en") return key;
-
-  if (cache.has(key)) return cache.get(key)!;
-
-  // Trigger fetch in background
-  void fetchTranslation(key);
-
-  return key; // Return English while fetching
+  return cache.get(key) ?? key;
 }
