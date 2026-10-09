@@ -78,7 +78,7 @@ function ReportProblemContent() {
                 <AlertTriangle className="h-6 w-6" />
                 {t("Report a Problem")}
               </CardTitle>
-              <CardDescription>Tell us what is wrong so it can be checked.</CardDescription>
+              <CardDescription>{t("Tell us what is wrong so it can be checked.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
