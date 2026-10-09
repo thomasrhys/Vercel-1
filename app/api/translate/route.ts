@@ -1,20 +1,24 @@
+// app/api/translate/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-async function translateText(englishText: string): Promise<string> {
+async function translateOne(text: string) {
   try {
     const res = await fetch("https://api.techiaith.cymru/translate/v2", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: englishText, src: "en", tgt: "cy" }),
-      next: { revalidate: 86400 }, // Cache for 24 hours
+      body: JSON.stringify({
+        text,
+        src: "en",
+        tgt: "cy",
+      }),
     });
 
-    if (!res.ok) throw new Error("Techiaith API failed");
+    if (!res.ok) return text;
+
     const data = await res.json();
-    return data.text || englishText;
-  } catch (error) {
-    console.error("Techiaith translation error:", error);
-    return englishText; // Fallback to English
+    return data.text || text;
+  } catch {
+    return text;
   }
 }
 
@@ -22,16 +26,14 @@ export async function POST(request: NextRequest) {
   try {
     const { texts } = await request.json();
 
-    if (!Array.isArray(texts) || texts.length === 0) {
+    if (!Array.isArray(texts)) {
       return NextResponse.json({ translations: [] });
     }
 
-    // Translate all texts via Techiaith
-    const translations = await Promise.all(texts.map(translateText));
+    const translations = await Promise.all(texts.map(translateOne));
 
     return NextResponse.json({ translations });
-  } catch (error) {
-    console.error("Translation API error:", error);
+  } catch {
     return NextResponse.json({ translations: [] }, { status: 500 });
   }
 }
