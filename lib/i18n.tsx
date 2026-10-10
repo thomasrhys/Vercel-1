@@ -402,12 +402,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function t(key: string) {
-  const lang =
-    typeof window !== "undefined"
-      ? (window.localStorage.getItem("site-language") || "en")
-      : "en";
-
-  return translations[lang as Language]?.[key] ?? key;
+  const { language } = useContext(LanguageContext);
+  return translations[language]?.[key] ?? key;
 }
 
 export function useLanguage() {
