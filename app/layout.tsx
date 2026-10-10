@@ -9,7 +9,7 @@ import { AuthProvider } from '@/lib/supabase-client';
 import { ThemeProvider } from "@/components/theme-provider";
 import CapacitorDeepLinkHandler from "./CapacitorDeepLinkHandler"; // 1. Import the new client handler
 import { I18nProvider } from "@/lib/i18n";
-import { I18nProvider as I18nbProvider } from "@/lib/i18nb;
+import { I18nProvider as I18nbProvider } from "@/lib/i18nb";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
