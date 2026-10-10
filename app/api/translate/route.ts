@@ -13,9 +13,13 @@ async function translateOne(text: string) {
       }),
     });
 
-    if (!res.ok) return text;
+    if (!res.ok) {
+      console.error("techiaith status:", res.status, await res.text());
+      return text;
+    }
 
     const data = await res.json();
+    console.log("techiaith raw response:", JSON.stringify(data)); // <-- add this line
     return data.text || text;
   } catch {
     return text;
