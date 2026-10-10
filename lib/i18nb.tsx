@@ -79,3 +79,8 @@ export function t(key: string): string {
 
   return cache.get(key) ?? key;
 }
+
+// add to the bottom of i18nb.tsx
+export function useLanguage() {
+  return useContext(I18nContext);
+}
