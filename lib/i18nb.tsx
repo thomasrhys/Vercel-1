@@ -1,3 +1,4 @@
+// i18nb.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
@@ -5,7 +6,39 @@ import { createContext, useContext, useEffect, useMemo, useState, ReactNode } fr
 export type Language = "en" | "cy";
 
 const cache = new Map<string, string>();
-const allStringsUsed = new Set<string>();
+const pendingKeys = new Set<string>();
+
+let notifyTranslated: (() => void) | null = null;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function translateBatch(keys: string[]) {
+  if (keys.length === 0) return;
+  try {
+    const res = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts: keys }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      data.translations?.forEach((translated: string, index: number) => {
+        cache.set(keys[index], translated);
+      });
+      notifyTranslated?.();
+    }
+  } catch (error) {
+    console.error("Translation error:", error);
+  }
+}
+
+function scheduleTranslate() {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    const batch = Array.from(pendingKeys);
+    pendingKeys.clear();
+    translateBatch(batch);
+  }, 50);
+}
 
 type I18nContextType = {
   language: Language;
@@ -24,41 +57,24 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
+    notifyTranslated = () => setVersion(v => v + 1);
+    return () => {
+      notifyTranslated = null;
+    };
+  }, []);
+
+  useEffect(() => {
     const saved = window.localStorage.getItem("site-language");
     const initial = saved === "cy" || saved === "en" ? saved : "en";
     setLanguageState(initial);
     document.documentElement.lang = initial;
   }, []);
 
-  const setLanguage = async (next: Language) => {
+  const setLanguage = (next: Language) => {
     setLanguageState(next);
     window.localStorage.setItem("site-language", next);
     document.documentElement.lang = next;
-
-    if (next === "cy" && allStringsUsed.size > 0) {
-      try {
-        const textsToTranslate = Array.from(allStringsUsed).filter(t => !cache.has(t));
-        
-        if (textsToTranslate.length > 0) {
-          const res = await fetch("/api/translate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ texts: textsToTranslate }),
-          });
-
-          if (res.ok) {
-            const data = await res.json();
-            data.translations?.forEach((translated: string, index: number) => {
-              cache.set(textsToTranslate[index], translated);
-            });
-          }
-        }
-
-        setVersion(v => v + 1);
-      } catch (error) {
-        console.error("Translation error:", error);
-      }
-    }
+    setVersion(v => v + 1); // forces immediate re-check of every t() call
   };
 
   const value = useMemo(
@@ -73,14 +89,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function t(key: string): string {
   const context = useContext(I18nContext);
-  allStringsUsed.add(key);
 
   if (context.language === "en") return key;
+
+  if (!cache.has(key) && !pendingKeys.has(key)) {
+    pendingKeys.add(key);
+    scheduleTranslate();
+  }
 
   return cache.get(key) ?? key;
 }
 
-// add to the bottom of i18nb.tsx
 export function useLanguage() {
   return useContext(I18nContext);
 }
