@@ -19,7 +19,7 @@ async function translateOne(text: string) {
     }
 
     const data = await res.json();
-    console.log("techiaith raw response:", JSON.stringify(data)); // <-- add this line
+    console.log("RAW TECHIAITH RESPONSE FOR:", text, JSON.stringify(data)); // <-- new line, right here
     return data.text || text;
   } catch {
     return text;
