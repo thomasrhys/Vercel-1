@@ -19,9 +19,10 @@ async function translateOne(text: string) {
     }
 
     const data = await res.json();
-    console.log("RAW TECHIAITH RESPONSE FOR:", text, JSON.stringify(data)); // <-- new line, right here
+    console.log("RAW TECHIAITH RESPONSE FOR:", text, JSON.stringify(data));
     return data.text || text;
-  } catch {
+  } catch (err) {
+    console.error("translateOne threw:", err); // <-- was a bare catch with nothing, now logs the real error
     return text;
   }
 }
