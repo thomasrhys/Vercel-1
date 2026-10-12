@@ -92,7 +92,7 @@ function ReportProblemContent() {
                   <option>{t("Won't load")}</option>
                   <option>{t("Black screen")}</option>
                   <option>{t("Stuck loading")}</option>
-                  <option>Controls don't work</option>
+                  <option>{t("Controls don't work")}</option>
                   <option>Mobile issue</option>
                   <option>Wrong game</option>
                   <option>Other</option>
