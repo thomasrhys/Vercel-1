@@ -61,9 +61,9 @@ function RequestUpdateContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700">
                 <CheckCircle2 className="h-6 w-6" />
-                Update Request Submitted
+                {t("Update Request Submitted")}
               </CardTitle>
-              <CardDescription>Thanks! The update request has been received.</CardDescription>
+              <CardDescription>{t("Thanks! The update request has been received.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-md bg-green-500/20 text-green-700 p-3 text-sm">{t("✓ Submitted")}</div>
@@ -76,9 +76,9 @@ function RequestUpdateContent() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <RefreshCcw className="h-6 w-6" />
-                Request an Update
+                {t("Request an Update")}
               </CardTitle>
-              <CardDescription>Suggest a newer version, better mirror, or improvement for this game.</CardDescription>
+              <CardDescription>{t("Suggest a newer version, better mirror, or improvement for this game.")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -87,7 +87,7 @@ function RequestUpdateContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Update type</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Update type")}</label>
                 <select value={updateType} onChange={(event) => setUpdateType(event.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground">
                   <option>New version</option>
                   <option>Better quality</option>
