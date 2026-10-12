@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "An unexpected error occurred. Try refreshing the page or returning home.": "An unexpected error occurred. Try refreshing the page or returning home.",
+    "Something Went Wrong": "Something Went Wrong",
+    "Try Again": "Try Again",
     "What should be updated?": "What should be updated?",
     "Details": "Details",
     "Suggested link, optional": "Suggested link, optional",
@@ -221,6 +224,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "An unexpected error occurred. Try refreshing the page or returning home.": "Digwyddodd gwall annisgwyl. Rhowch gynnig ar adnewyddu'r dudalen neu ddychwelyd adref.",
+    "Something Went Wrong": "Aeth rhywbeth o'i le",
+    "Try Again": "Rhowch Gynnig Arall",
     "What should be updated?": "Beth ddylid ei ddiweddaru?",
     "Details": "Manylion",
     "Suggested link, optional": "Dolen awgrymedig, dewisol",
