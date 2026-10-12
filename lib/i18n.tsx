@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Submitting...": "Submitting...",
+    "Submit Problem Report": "Submit Problem Report",
+    "Cancel": "Cancel",
     "Loading...": "Loading...",
     "Only if you want us to contact you": "Only if you want us to contact you",
     "Email, optional": "Email, optional",
@@ -204,6 +207,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Submitting...": "Cyflwyno...",
+    "Submit Problem Report": "Cyflwyno Adroddiad Problem",
+    "Cancel": "Cancel",
     "Loading...": "Wrthi'n llwytho...",
     "Only if you want us to contact you": "Dim ond os ydych chi eisiau i ni gysylltu â chi",
     "Email, optional": "E-bost, dewisol",
