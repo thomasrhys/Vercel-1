@@ -6,6 +6,11 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Loading...": "Loading...",
+    "Only if you want us to contact you": "Only if you want us to contact you",
+    "Email, optional": "Email, optional",
+    "Example: Chrome on Android": "Example: Chrome on Android",
+    "Device/browser, optional": "Device/browser, optional",
     "Describe the issue...": "Describe the issue...",
     "What happened?": "What happened?",
     "Other": "Other",
@@ -199,6 +204,11 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Loading...": "Wrthi'n llwytho...",
+    "Only if you want us to contact you": "Dim ond os ydych chi eisiau i ni gysylltu â chi",
+    "Email, optional": "E-bost, dewisol",
+    "Example: Chrome on Android": "Enghraifft: Chrome ar Android",
+    "Device/browser, optional": "Dyfais/porwr, dewisol",
     "Describe the issue...": "Disgrifiwch y broblem...",
     "What happened?": "Beth ddigwyddodd?",
     "Other": "Arall",
