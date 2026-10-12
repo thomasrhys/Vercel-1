@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Mobile issue": "Mobile issue",
     "Controls don't work": "Controls don't work",
     "Stuck loading": "Stuck loading",
     "Black screen": "Black screen",
@@ -193,6 +194,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Mobile issue": "Mater ffon symudol",
     "Controls don't work": "Nid yw'r rheolyddion yn gweithio",
     "Stuck loading": "Wedi'i lwytho'n sownd",
     "Black screen": "Sgrin ddu",
