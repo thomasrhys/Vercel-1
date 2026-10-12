@@ -106,13 +106,13 @@ function ReportProblemContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Device/browser, optional</label>
-                <input value={device} onChange={(event) => setDevice(event.target.value)} placeholder="Example: Chrome on Android" maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Device/browser, optional")}</label>
+                <input value={device} onChange={(event) => setDevice(event.target.value)} placeholder={t("Example: Chrome on Android")} maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Email, optional</label>
-                <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Only if you want us to contact you" maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Email, optional")}</label>
+                <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("Only if you want us to contact you")} maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               {message && <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm">✗ {message}</div>}
@@ -132,7 +132,7 @@ function ReportProblemContent() {
 
 export default function ReportProblemPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">{t("Loading...")}</div>}>
       <ReportProblemContent />
     </Suspense>
   );
