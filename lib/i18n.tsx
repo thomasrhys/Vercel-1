@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Update type": "Update type",
+    "Suggest a newer version, better mirror, or improvement for this game.": "Suggest a newer version, better mirror, or improvement for this game.",
+    "Request an Update": "Request an Update",
     "Thanks! The update request has been received.": "Thanks! The update request has been received.",
     "Update Request Submitted": "Update Request Submitted",
     "Submit Update Request": "Submit Update Request",
@@ -210,6 +213,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Update type": "Update type",
+    "Suggest a newer version, better mirror, or improvement for this game.": "Awgrymwch fersiwn newydd, drych gwell, neu welliant ar gyfer y gêm hon.",
+    "Request an Update": "Request an Update",
     "Thanks! The update request has been received.": "Thanks! The update request has been received.",
     "Update Request Submitted": "Cais Diweddaru Wedi'i Gyflwyno",
     "Submit Update Request": "Cyflwyno Cais am Ddiweddariad",
