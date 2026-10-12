@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 export default function Error({
   error,
