@@ -83,7 +83,7 @@ function ReportProblemContent() {
             <CardContent className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">{t("Game name")}</label>
-                <input value={gameName} onChange={(event) => setGameName(event.target.value)} maxLength={120} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <input value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder={t("Game name")} maxLength={120} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               <div>
