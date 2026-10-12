@@ -89,12 +89,12 @@ function RequestUpdateContent() {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">{t("Update type")}</label>
                 <select value={updateType} onChange={(event) => setUpdateType(event.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground">
-                  <option>New version</option>
-                  <option>Better quality</option>
-                  <option>New mirror</option>
-                  <option>Mobile support</option>
-                  <option>Fix controls</option>
-                  <option>Other</option>
+                  <option>{t("New version")}</option>
+                  <option>{t("Better quality")}</option>
+                  <option>{t("New mirror")}</option>
+                  <option>{t("Mobile support")}</option>
+                  <option>{t("Fix controls")}</option>
+                  <option>{t("Other")}</option>
                 </select>
               </div>
 
