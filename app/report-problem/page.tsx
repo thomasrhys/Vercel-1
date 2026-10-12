@@ -119,7 +119,7 @@ function ReportProblemContent() {
 
               <Button className="w-full" onClick={submitReport} disabled={isSubmitting || !gameName.trim()}>
                 <Send className="h-4 w-4 mr-2" />
-                {isSubmitting ? t("Submitting...") : {t("Submit Problem Report")}}
+                {isSubmitting ? t("Submitting...") : t("Submit Problem Report")}
               </Button>
               <Button variant="outline" className="w-full" onClick={() => (window.location.href = gameId ? `/game/${gameId}` : "/")}>{t("Cancel")}</Button>
             </CardContent>
