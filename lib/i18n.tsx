@@ -6,6 +6,11 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Fix controls": "Fix controls",
+    "Mobile support": "Mobile support",
+    "New mirror": "New mirror",
+    "Better quality": "Better quality",
+    "New version": "New version",
     "Update type": "Update type",
     "Suggest a newer version, better mirror, or improvement for this game.": "Suggest a newer version, better mirror, or improvement for this game.",
     "Request an Update": "Request an Update",
@@ -213,6 +218,11 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Fix controls": "Trwsio rheolyddion",
+    "Mobile support": "Cymorth symudol",
+    "New mirror": "Drych newydd",
+    "Better quality": "Ansawdd gwell",
+    "New version": "Fersiwn newydd",
     "Update type": "Update type",
     "Suggest a newer version, better mirror, or improvement for this game.": "Awgrymwch fersiwn newydd, drych gwell, neu welliant ar gyfer y gêm hon.",
     "Request an Update": "Request an Update",
