@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "What should be updated?": "What should be updated?",
+    "Details": "Details",
+    "Suggested link, optional": "Suggested link, optional",
     "Fix controls": "Fix controls",
     "Mobile support": "Mobile support",
     "New mirror": "New mirror",
@@ -218,6 +221,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "What should be updated?": "Beth ddylid ei ddiweddaru?",
+    "Details": "Manylion",
+    "Suggested link, optional": "Dolen awgrymedig, dewisol",
     "Fix controls": "Trwsio rheolyddion",
     "Mobile support": "Cymorth symudol",
     "New mirror": "Drych newydd",
