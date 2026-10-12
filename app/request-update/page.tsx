@@ -117,9 +117,9 @@ function RequestUpdateContent() {
 
               <Button className="w-full" onClick={submitUpdateRequest} disabled={isSubmitting || !gameName.trim()}>
                 <Send className="h-4 w-4 mr-2" />
-                {isSubmitting ? "Submitting..." : "Submit Update Request"}
+                {isSubmitting ? t("Submitting...") : t("Submit Update Request")}
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => (window.location.href = gameId ? `/game/${gameId}` : "/")}>Cancel</Button>
+              <Button variant="outline" className="w-full" onClick={() => (window.location.href = gameId ? `/game/${gameId}` : "/")}>{t("Cancel")}</Button>
             </CardContent>
           </>
         )}
@@ -130,7 +130,7 @@ function RequestUpdateContent() {
 
 export default function RequestUpdatePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center p-4">{t("Loading...")}</div>}>
       <RequestUpdateContent />
     </Suspense>
   );
