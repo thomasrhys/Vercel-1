@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Won't load": "Won't load",
     "Problem type": "Problem type",
     "Game name": "Game name",
     "Tell us what is wrong so it can be checked.": "Tell us what is wrong so it can be checked.",
@@ -189,6 +190,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Won't load": "Ddim yn llwytho",
     "Problem type": "Math o broblem",
     "Game name": "Enw'r gêm",
     "Tell us what is wrong so it can be checked.": "Dywedwch wrthym beth sy'n bod fel y gellir ei wirio.",
