@@ -101,8 +101,8 @@ function ReportProblemContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">What happened?</label>
-                <textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Describe the issue..." maxLength={1500} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("What happened?")}</label>
+                <textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder={t("Describe the issue...")} maxLength={1500} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               <div>
