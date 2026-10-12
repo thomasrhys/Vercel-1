@@ -209,7 +209,7 @@ const translations: Record<Language, Record<string, string>> = {
   cy: {
     "Submitting...": "Cyflwyno...",
     "Submit Problem Report": "Cyflwyno Adroddiad Problem",
-    "Cancel": "Cancel",
+    "Cancel": "Canslo",
     "Loading...": "Wrthi'n llwytho...",
     "Only if you want us to contact you": "Dim ond os ydych chi eisiau i ni gysylltu â chi",
     "Email, optional": "E-bost, dewisol",
