@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Thanks! The update request has been received.": "Thanks! The update request has been received.",
+    "Update Request Submitted": "Update Request Submitted",
     "Submit Update Request": "Submit Update Request",
     "Submitting...": "Submitting...",
     "Submit Problem Report": "Submit Problem Report",
@@ -208,6 +210,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Thanks! The update request has been received.": "Thanks! The update request has been received.",
+    "Update Request Submitted": "Cais Diweddaru Wedi'i Gyflwyno",
     "Submit Update Request": "Cyflwyno Cais am Ddiweddariad",
     "Submitting...": "Cyflwyno...",
     "Submit Problem Report": "Cyflwyno Adroddiad Problem",
