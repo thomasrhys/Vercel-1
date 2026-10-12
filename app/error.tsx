@@ -24,24 +24,22 @@ export default function Error({
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-foreground">
-            Something Went Wrong
+            {t("Something Went Wrong")}
           </h1>
           <p className="text-muted-foreground text-sm">
-            An unexpected error occurred. Try refreshing the page or returning home.
+            {t("An unexpected error occurred. Try refreshing the page or returning home.")}
           </p>
         </div>
         <div className="flex gap-3 justify-center">
           <Link
             href="/"
-            className="inline-block rounded-md border border-border px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            Back to Games
+            className="inline-block rounded-md border border-border px-6 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+            {t("Back to Games")}
           </Link>
           <button
             onClick={reset}
-            className="inline-block rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Try Again
+            className="inline-block rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+            {t("Try Again")}
           </button>
         </div>
       </div>
