@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, RefreshCcw, Send } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 function RequestUpdateContent() {
   const searchParams = useSearchParams();
