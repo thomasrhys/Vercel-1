@@ -1,6 +1,8 @@
 // app/global-error.tsx
 'use client';
 
+import { t } from "@/lib/i18n";
+
 export default function GlobalError({
   error,
   reset,
@@ -15,16 +17,16 @@ export default function GlobalError({
           <div className="max-w-md w-full text-center space-y-4">
             <h1 className="text-4xl font-bold text-foreground">500</h1>
             <p className="text-muted-foreground text-lg">
-              Internal Server Error
+              {t("Internal Server Error")}
             </p>
             <p className="text-sm text-muted-foreground">
-              Something went wrong. Please try again later.
+              {t("Something went wrong. Please try again later.")}
             </p>
             <button
               onClick={reset}
               className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
             >
-              Try Again
+              {t("Try Again")}
             </button>
           </div>
         </div>
