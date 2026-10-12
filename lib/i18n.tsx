@@ -6,6 +6,9 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Other": "Other",
+    "Wrong cover art": "Wrong cover art",
+    "Wrong game": "Wrong game",
     "Mobile issue": "Mobile issue",
     "Controls don't work": "Controls don't work",
     "Stuck loading": "Stuck loading",
@@ -194,6 +197,9 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Other": "Arall",
+    "Wrong cover art": "Celf clawr anghywir",
+    "Wrong game": "Gêm anghywir",
     "Mobile issue": "Mater ffon symudol",
     "Controls don't work": "Nid yw'r rheolyddion yn gweithio",
     "Stuck loading": "Wedi'i lwytho'n sownd",
