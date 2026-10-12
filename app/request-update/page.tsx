@@ -99,18 +99,18 @@ function RequestUpdateContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Suggested link, optional</label>
-                <input value={newUrl} onChange={(event) => setNewUrl(event.target.value)} placeholder="Paste a link if you have one" maxLength={500} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Suggested link, optional")}</label>
+                <input value={newUrl} onChange={(event) => setNewUrl(event.target.value)} placeholder={t("Paste a link if you have one")} maxLength={500} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Details</label>
-                <textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder="What should be updated?" maxLength={1500} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Details")}</label>
+                <textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder={t("What should be updated?")} maxLength={1500} className="w-full min-h-28 px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Email, optional</label>
-                <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Only if you want us to contact you" maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
+                <label className="block text-sm font-medium text-foreground mb-2">{t("Email, optional")}</label>
+                <input value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("Only if you want us to contact you")} maxLength={250} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground" />
               </div>
 
               {message && <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm">✗ {message}</div>}
