@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "This page doesn't exist or may have been moved. Let's get you back to the games.": "This page doesn't exist or may have been moved. Let's get you back to the games.",
+    "Page Not Found": "Page Not Found",
     "An unexpected error occurred. Try refreshing the page or returning home.": "An unexpected error occurred. Try refreshing the page or returning home.",
     "Something Went Wrong": "Something Went Wrong",
     "Try Again": "Try Again",
@@ -224,6 +226,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "This page doesn't exist or may have been moved. Let's get you back to the games.": "Nid yw'r dudalen hon yn bodoli neu efallai ei bod wedi'i symud. Gadewch i ni fynd â chi yn ôl i'r gemau.",
+    "Page Not Found": "Tudalen Heb ei Chanfod",
     "An unexpected error occurred. Try refreshing the page or returning home.": "Digwyddodd gwall annisgwyl. Rhowch gynnig ar adnewyddu'r dudalen neu ddychwelyd adref.",
     "Something Went Wrong": "Aeth rhywbeth o'i le",
     "Try Again": "Rhowch Gynnig Arall",
