@@ -90,7 +90,7 @@ function ReportProblemContent() {
                 <label className="block text-sm font-medium text-foreground mb-2">{t("Problem type")}</label>
                 <select value={problemType} onChange={(event) => setProblemType(event.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground">
                   <option>{t("Won't load")}</option>
-                  <option>Black screen</option>
+                  <option>{t("Black screen")}</option>
                   <option>Stuck loading</option>
                   <option>Controls don't work</option>
                   <option>Mobile issue</option>
