@@ -6,6 +6,10 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.": "These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.",
+    "Changes to These Terms": "Changes to These Terms",
+    "Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.": "Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.",
+    "No Warranties": "No Warranties",
     "View terms": "View terms",
     "Terms": "Terms",
     "Purpose": "Purpose",
@@ -256,6 +260,10 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.": "Gall y telerau hyn gael eu diweddaru o bryd i'w gilydd. Mae parhau i ddefnyddio'r wefan ar ôl newidiadau yn golygu eich bod yn derbyn y telerau wedi'u diweddaru.",
+    "Changes to These Terms": "Newidiadau i'r Telerau hyn",
+    "Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.": "Darperir Game Portal fel y mae, heb unrhyw warantau o unrhyw fath. Defnyddiwch y wefan ar eich risg eich hun.",
+    "No Warranties": "Dim Gwarantau",
     "View terms": "Gweld telerau",
     "Terms": "Telerau",
     "Purpose": "Pwrpas",
