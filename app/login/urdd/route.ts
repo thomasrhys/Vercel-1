@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
     // 3. Resolve the host domain dynamically to safely handle redirects
     const requestUrl = new URL(request.url);
-    const redirectUrl = new URL('/profile', requestUrl.origin);
+    const redirectUrl = new URL('/', requestUrl.origin);
     
     // 4. Force browser redirection to the profile page
     return NextResponse.redirect(redirectUrl);
