@@ -96,7 +96,7 @@ export default function TermsPage() {
                 <tr>
                   <th className="p-3 font-medium">{t("Service")}</th>
                   <th className="p-3 font-medium">{t("Purpose")}</th>
-                  <th className="p-3 font-medium">{t("Terms"}</th>
+                  <th className="p-3 font-medium">{t("Terms")}</th>
                 </tr>
               </thead>
               <tbody>
