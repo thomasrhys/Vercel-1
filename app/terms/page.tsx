@@ -4,30 +4,30 @@ export const dynamic = "force-dynamic";
 
 import { t } from "@/lib/i18n";
 
-const thirdPartyServices = [
+export default function TermsPage() {
+  const thirdPartyServices = [
   {
     name: "GitHub",
-    purpose: {t("Source code hosting and version control")},
+    purpose: t("Source code hosting and version control"),
     href: "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
   },
   {
     name: "Vercel",
-    purpose: {t("Website hosting and deployments")},
+    purpose: t("Website hosting and deployments"),
     href: "https://vercel.com/legal/terms",
   },
   {
     name: "Supabase",
-    purpose: {t("Database, login, sign up, authentication, and backend services")},
+    purpose: t("Database, login, sign up, authentication, and backend services"),
     href: "https://supabase.com/terms",
   },
   {
     name: "Cloudflare",
-    purpose: {t("DNS, Email delivery and R2")},
+    purpose: t("DNS, Email delivery and R2"),
     href: "https://www.cloudflare.com/website-terms/",
   },
 ];
-
-export default function TermsPage() {
+ 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
