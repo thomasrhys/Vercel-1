@@ -6,6 +6,10 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "View terms": "View terms",
+    "Terms": "Terms",
+    "Purpose": "Purpose",
+    "Service": "Service",
     "This website relies on trusted third-party services to operate. Use of those services may also be subject to their own terms and policies.": "This website relies on trusted third-party services to operate. Use of those services may also be subject to their own terms and policies.",
     "Third-Party Services": "Third-Party Services",
     "Some games may be marked as desktop-only, especially games using technology that may not work properly on phones or tablets. These games may be blocked or limited on mobile devices.": "Some games may be marked as desktop-only, especially games using technology that may not work properly on phones or tablets. These games may be blocked or limited on mobile devices.",
@@ -252,6 +256,10 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "View terms": "Gweld telerau",
+    "Terms": "Telerau",
+    "Purpose": "Pwrpas",
+    "Service": "Gwasanaeth",
     "This website relies on trusted third-party services to operate. Use of those services may also be subject to their own terms and policies.": "Mae'r wefan hon yn dibynnu ar wasanaethau trydydd parti dibynadwy i weithredu. Gall defnyddio'r gwasanaethau hynny hefyd fod yn ddarostyngedig i'w telerau a'u polisïau eu hunain.",
     "Third-Party Services": "Gwasanaethau Trydydd Parti",
     "Some games may be marked as desktop-only, especially games using technology that may not work properly on phones or tablets. These games may be blocked or limited on mobile devices.": "Efallai y bydd rhai gemau wedi'u marcio fel rhai ar gyfer cyfrifiaduron yn unig, yn enwedig gemau sy'n defnyddio technoleg nad yw efallai'n gweithio'n iawn ar ffonau neu dabledi. Efallai y bydd y gemau hyn wedi'u rhwystro neu eu cyfyngu ar ddyfeisiau symudol.",
