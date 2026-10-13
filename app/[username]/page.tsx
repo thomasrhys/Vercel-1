@@ -1,6 +1,4 @@
 // app/[username]/page.tsx
-"use client";
-
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from '@/lib/supabase-server';
@@ -43,20 +41,20 @@ function computeBadges(profile: any): Array<{ emoji: string; name: string; descr
     const createdDate = new Date(createdAt);
     const earlyBirdDate = new Date('2026-08-01T00:00:00Z');
     if (createdDate < earlyBirdDate) {
-      badges.push({ emoji: '🔰', name: t("Early Bird"), description: t("Joined before August 2026") });
+      badges.push({ emoji: '🔰', name: 'Early Bird', description: 'Joined before August 2026' });
     }
   }
   
   if (profile.avatar_url && profile.avatar_url.trim()) {
-    badges.push({ emoji: '🖼️', name: t("Artist"), description: t("Custom avatar uploaded") });
+    badges.push({ emoji: '🖼️', name: 'Artist', description: 'Custom avatar uploaded' });
   }
   
   if (profile.accent_colour && profile.accent_colour !== 'system') {
-    badges.push({ emoji: '🎨', name: t("Customiser"), description: t("Personalised profile colours") });
+    badges.push({ emoji: '🎨', name: 'Customiser', description: 'Personalised profile colours' });
   }
   
   if (profile.role === 'owner') {
-    badges.push({ emoji: '👑', name: t("Owner"), description: t("Site administrator") });
+    badges.push({ emoji: '👑', name: 'Owner', description: 'Site administrator' });
   }
   
   return badges;
