@@ -48,7 +48,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold text-foreground">{t("Use of the Site")}</h2>
           <p>
             {t("Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.")}
-            
+            <br />
             {t("You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.")}
           </p>
 
@@ -62,18 +62,17 @@ export default function TermsPage() {
             {t("You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Third-Party Content</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Third-Party Content")}</h2>
           <p>
-            Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim
-            ownership of third-party games, trademarks, artwork, or related content.
+            {t("Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim ownership of third-party games, trademarks, artwork, or related content.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Copyright and Content Removal</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Copyright and Content Removal")}</h2>
           <p>
-            If you believe content on this website infringes your copyright, trademark, or other rights, contact us at{" "}
-            <a className="text-primary underline underline-offset-4" href="mailto:copyright@requests.fnfaw.es">
-              copyright@requests.fnfaw.es
-            </a>. We may remove or restrict content at our discretion.
+            {t("If you believe content on this website infringes your copyright, trademark, or other rights, contact us at")}{" "}
+            <a className="text-primary underline underline-offset-4" href="mailto:copyright@fnfaw.es">
+              copyright@fnfaw.es
+            </a>. {t("We may remove or restrict content at our discretion.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Availability</h2>
