@@ -6,6 +6,11 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "We may remove or restrict content at our discretion.": "We may remove or restrict content at our discretion.",
+    "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at": "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at",
+    "Copyright and Content Removal": "Copyright and Content Removal",
+    "Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim ownership of third-party games, trademarks, artwork, or related content.": "Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim ownership of third-party games, trademarks, artwork, or related content.",
+    "Third-Party Content": "Third-Party Content",
     "Game Requests": "Game Requests",
     "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.": "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.",
     "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.",
@@ -241,6 +246,11 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "We may remove or restrict content at our discretion.": "Efallai y byddwn yn dileu neu'n cyfyngu ar gynnwys yn ôl ein disgresiwn."
+    "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at": "Os ydych chi'n credu bod cynnwys ar y wefan hon yn torri eich hawlfraint, nod masnach, neu hawliau eraill, cysylltwch â ni ar",
+    "Copyright and Content Removal": "Hawlfraint a Dileu Cynnwys",
+    "Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim ownership of third-party games, trademarks, artwork, or related content.": "Efallai y bydd rhai gemau'n cael eu cynnal gan drydydd partïon neu'n perthyn i'w crewyr gwreiddiol. Nid yw Game Portal yn hawlio perchnogaeth gemau, nodau masnach, gwaith celf na chynnwys cysylltiedig trydydd parti.",
+    "Third-Party Content": "Cynnwys Trydydd Parti",
     "Game Requests": "Ceisiadau Gêm",
     "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.": "Gallwch ofyn am gemau gan ddefnyddio'r ffurflen Gofyn am Gêm. Nid yw cyflwyno cais yn gwarantu y bydd y gêm yn cael ei hychwanegu. Gellir anwybyddu, cwblhau neu ddileu ceisiadau yn ôl disgresiwn perchennog y wefan.",
     "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "Gallwch fewngofnodi gan ddefnyddio cyfeiriad e-bost a chyfrinair, rhif ffôn, cyfrif Google, cyfrif GitHub, neu unrhyw ddulliau dilysu eraill y gallai Game Portal eu cynnig yn y dyfodol. Rydych chi'n gyfrifol am gadw'ch cyfrif yn ddiogel.",
