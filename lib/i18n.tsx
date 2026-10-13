@@ -262,8 +262,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
-    "For copyright, DMCA, trademark, or content removal concerns, contact": "Ar gyfer pryderon ynghylch hawlfraint, DMCA, nod masnach, neu ddileu cynnwys, cysylltwch trwy"
-    "For general enquiries, feedback, privacy questions, or bug reports, contact": "Ar gyfer ymholiadau cyffredinol, adborth, cwestiynau preifatrwydd, neu adroddiadau am fygiau, cysylltwch trwy"
+    "For copyright, DMCA, trademark, or content removal concerns, contact": "Ar gyfer pryderon ynghylch hawlfraint, DMCA, nod masnach, neu ddileu cynnwys, cysylltwch trwy",
+    "For general enquiries, feedback, privacy questions, or bug reports, contact": "Ar gyfer ymholiadau cyffredinol, adborth, cwestiynau preifatrwydd, neu adroddiadau am fygiau, cysylltwch trwy",
     "These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.": "Gall y telerau hyn gael eu diweddaru o bryd i'w gilydd. Mae parhau i ddefnyddio'r wefan ar ôl newidiadau yn golygu eich bod yn derbyn y telerau wedi'u diweddaru.",
     "Changes to These Terms": "Newidiadau i'r Telerau hyn",
     "Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.": "Darperir Game Portal fel y mae, heb unrhyw warantau o unrhyw fath. Defnyddiwch y wefan ar eich risg eich hun.",
