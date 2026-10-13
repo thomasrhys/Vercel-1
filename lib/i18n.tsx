@@ -246,7 +246,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
-    "We may remove or restrict content at our discretion.": "Efallai y byddwn yn dileu neu'n cyfyngu ar gynnwys yn ôl ein disgresiwn."
+    "We may remove or restrict content at our discretion.": "Efallai y byddwn yn dileu neu'n cyfyngu ar gynnwys yn ôl ein disgresiwn.",
     "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at": "Os ydych chi'n credu bod cynnwys ar y wefan hon yn torri eich hawlfraint, nod masnach, neu hawliau eraill, cysylltwch â ni ar",
     "Copyright and Content Removal": "Hawlfraint a Dileu Cynnwys",
     "Some games may be hosted by third parties or belong to their original creators. Game Portal does not claim ownership of third-party games, trademarks, artwork, or related content.": "Efallai y bydd rhai gemau'n cael eu cynnal gan drydydd partïon neu'n perthyn i'w crewyr gwreiddiol. Nid yw Game Portal yn hawlio perchnogaeth gemau, nodau masnach, gwaith celf na chynnwys cysylltiedig trydydd parti.",
