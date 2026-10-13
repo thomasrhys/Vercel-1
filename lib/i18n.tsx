@@ -244,7 +244,7 @@ const translations: Record<Language, Record<string, string>> = {
     "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.": "Rhaid i chi beidio â cham-drin, ymosod, crafu, sbamio, na cheisio tarfu ar y wefan na'i gwasanaethau.",
     "Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.": "Darperir Game Portal fel porth gemau sy'n seiliedig ar borwr. Gallwch ddefnyddio'r wefan at ddefnydd personol arferol.",
     "Use of the Site": "Defnyddio'r Safle",
-    "By using Game Portal, you agree to these Terms of Use. If you do not agree, please do not use the site.": "Drwy ddefnyddio Game Portal, rydych chi'n cytuno i'r Telerau Defnyddio hyn. Os nad ydych chi'n cytuno, peidiwch â defnyddio'r wefan."
+    "By using Game Portal, you agree to these Terms of Use. If you do not agree, please do not use the site.": "Drwy ddefnyddio Game Portal, rydych chi'n cytuno i'r Telerau Defnyddio hyn. Os nad ydych chi'n cytuno, peidiwch â defnyddio'r wefan.",
     "Last Updated: 1 July 2026": "Diweddarwyd ddiwethaf: 1 Gorffennaf 2026",
     "Effective Date: 1 July 2026": "Dyddiad Effeithiol: 1 Gorffennaf 2026",
     "DNS, Email delivery and R2": "DNS, Dosbarthu E-bost ac R2",
