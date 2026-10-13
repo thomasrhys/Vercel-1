@@ -1,4 +1,6 @@
 // app/[username]/page.tsx
+"use client";
+
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from '@/lib/supabase-server';
