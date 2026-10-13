@@ -6,6 +6,10 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "DNS, Email delivery and R2": "DNS, Email delivery and R2",
+    "Database, login, sign up, authentication, and backend services": "Database, login, sign up, authentication, and backend services",
+    "Website hosting and deployments": "Website hosting and deployments",
+    "Source code hosting and version control": "Source code hosting and version control",
     "Something went wrong. Please try again later.": "Something went wrong. Please try again later.",
     "This page doesn't exist or may have been moved. Let's get you back to the games.": "This page doesn't exist or may have been moved. Let's get you back to the games.",
     "Page Not Found": "Page Not Found",
@@ -227,6 +231,10 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "DNS, Email delivery and R2": "DNS, Dosbarthu E-bost ac R2",
+    "Database, login, sign up, authentication, and backend services": "Cronfa ddata, mewngofnodi, cofrestru, dilysu, a gwasanaethau cefndirol",
+    "Website hosting and deployments": "Cynnal a defnyddio gwefannau",
+    "Source code hosting and version control": "Gwesteio cod ffynhonnell a rheoli fersiynau",
     "Something went wrong. Please try again later.": "Aeth rhywbeth o'i le. Rhowch gynnig arall arni yn nes ymlaen.",
     "This page doesn't exist or may have been moved. Let's get you back to the games.": "Nid yw'r dudalen hon yn bodoli neu efallai ei bod wedi'i symud. Gadewch i ni fynd â chi yn ôl i'r gemau.",
     "Page Not Found": "Tudalen Heb ei Chanfod",
