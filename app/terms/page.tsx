@@ -4,22 +4,22 @@ import { t } from "@/lib/i18n";
 const thirdPartyServices = [
   {
     name: "GitHub",
-    purpose: "Source code hosting and version control",
+    purpose: t("Source code hosting and version control"),
     href: "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
   },
   {
     name: "Vercel",
-    purpose: "Website hosting, deployments, and Blob storage",
+    purpose: t("Website hosting and deployments"),
     href: "https://vercel.com/legal/terms",
   },
   {
     name: "Supabase",
-    purpose: "Database, login, sign up, authentication, and backend services",
+    purpose: t("Database, login, sign up, authentication, and backend services"),
     href: "https://supabase.com/terms",
   },
   {
     name: "Cloudflare",
-    purpose: "DNS and Email delivery",
+    purpose: t("DNS, Email delivery and R2"),
     href: "https://www.cloudflare.com/website-terms/",
   },
 ];
@@ -29,7 +29,7 @@ export default function TermsPage() {
     <main className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Terms of Use</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("Terms of Use")}</h1>
           <p className="text-sm text-muted-foreground mt-2">
             Effective Date: 1 July 2026
             <br />
