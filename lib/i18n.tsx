@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "Availability": "Availability",
+    "The site may change, break, go offline, or remove games at any time. No guarantee is made that every game will work on every device, browser, or network.": "The site may change, break, go offline, or remove games at any time. No guarantee is made that every game will work on every device, browser, or network.",
     "We may remove or restrict content at our discretion.": "We may remove or restrict content at our discretion.",
     "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at": "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at",
     "Copyright and Content Removal": "Copyright and Content Removal",
@@ -246,6 +248,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "Availability": "Argaeledd",
+    "The site may change, break, go offline, or remove games at any time. No guarantee is made that every game will work on every device, browser, or network.": "Gall y wefan newid, torri, mynd all-lein, neu ddileu gemau ar unrhyw adeg. Ni roddir unrhyw warant y bydd pob gêm yn gweithio ar bob dyfais, porwr, neu rwydwaith.",
     "We may remove or restrict content at our discretion.": "Efallai y byddwn yn dileu neu'n cyfyngu ar gynnwys yn ôl ein disgresiwn.",
     "If you believe content on this website infringes your copyright, trademark, or other rights, contact us at": "Os ydych chi'n credu bod cynnwys ar y wefan hon yn torri eich hawlfraint, nod masnach, neu hawliau eraill, cysylltwch â ni ar",
     "Copyright and Content Removal": "Hawlfraint a Dileu Cynnwys",
