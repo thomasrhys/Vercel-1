@@ -125,15 +125,15 @@ export default function TermsPage() {
             {t("These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Contact</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Contact")}</h2>
           <p>
-            For general enquiries, feedback, privacy questions, or bug reports, contact{" "}
+            {t("For general enquiries, feedback, privacy questions, or bug reports, contact")}{" "}
             <a className="text-primary underline underline-offset-4" href="mailto:contact@fnfaw.es">
                contact@fnfaw.es
             </a>.
           </p>
           <p>
-            For copyright, DMCA, trademark, or content removal concerns, contact{" "}
+            {t("For copyright, DMCA, trademark, or content removal concerns, contact")}{" "}
             <a className="text-primary underline underline-offset-4" href="mailto:copyright@fnfaw.es">
               copyright@fnfaw.es
             </a>.
@@ -141,7 +141,7 @@ export default function TermsPage() {
         </section>
 
         <a href="/" className="inline-block px-4 py-2 rounded-md border border-border text-sm">
-          Back to Games
+          {t("Back to Games")}
         </a>
       </div>
     </main>
