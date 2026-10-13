@@ -80,16 +80,14 @@ export default function TermsPage() {
             {t("The site may change, break, go offline, or remove games at any time. No guarantee is made that every game will work on every device, browser, or network.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Desktop-Only Games</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Desktop-Only Games")}</h2>
           <p>
-            Some games may be marked as desktop-only, especially games using technology that may not work properly on
-            phones or tablets. These games may be blocked or limited on mobile devices.
+            {t("Some games may be marked as desktop-only, especially games using technology that may not work properly on phones or tablets. These games may be blocked or limited on mobile devices.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Third-Party Services</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Third-Party Services")}</h2>
           <p>
-            This website relies on trusted third-party services to operate. Use of those services may also be subject to
-            their own terms and policies.
+            {t("This website relies on trusted third-party services to operate. Use of those services may also be subject to their own terms and policies.")}
           </p>
 
           <div className="overflow-x-auto rounded-md border border-border">
