@@ -75,10 +75,9 @@ export default function TermsPage() {
             </a>. {t("We may remove or restrict content at our discretion.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Availability</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Availability")}</h2>
           <p>
-            The site may change, break, go offline, or remove games at any time. No guarantee is made that every game
-            will work on every device, browser, or network.
+            {t("The site may change, break, go offline, or remove games at any time. No guarantee is made that every game will work on every device, browser, or network.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Desktop-Only Games</h2>
