@@ -51,10 +51,9 @@ export default function TermsPage() {
             {t("You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Accounts and Sign In</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Accounts and Sign In")}</h2>
           <p>
-            You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other
-            authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.
+            {t("You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Game Requests</h2>
