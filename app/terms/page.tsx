@@ -115,15 +115,14 @@ export default function TermsPage() {
             </table>
           </div>
 
-          <h2 className="text-xl font-semibold text-foreground">No Warranties</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("No Warranties")}</h2>
           <p>
-            Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.
+            {t("Game Portal is provided as-is, without warranties of any kind. Use the site at your own risk.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Changes to These Terms</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Changes to These Terms")}</h2>
           <p>
-            These terms may be updated from time to time. Continued use of the site after changes means you accept the
-            updated terms.
+            {t("These terms may be updated from time to time. Continued use of the site after changes means you accept the updated terms.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Contact</h2>
