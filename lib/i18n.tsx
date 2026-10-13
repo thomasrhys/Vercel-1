@@ -490,9 +490,16 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 };
 
 export function t(key: string) {
-  const { language } = useContext(LanguageContext);
-  return translations[language]?.[key] ?? key;
-};
+  try {
+    // Safely attempt to read the context
+    const context = useContext(LanguageContext);
+    const language = context?.language ?? "en";
+    return translations[language]?.[key] ?? key;
+  } catch (error) {
+    // Fallback to English if called outside a valid React render cycle (like during builds)
+    return translations["en"]?.[key] ?? key;
+  }
+}
 
 export function useLanguage() {
   return useContext(LanguageContext);
