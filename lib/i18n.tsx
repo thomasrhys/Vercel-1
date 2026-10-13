@@ -487,7 +487,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({ language, setLanguage }), [language]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
-}
+};
 
 export function t(key: string) {
   const { language } = useContext(LanguageContext);
