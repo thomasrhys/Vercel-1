@@ -7,22 +7,22 @@ import { t } from "@/lib/i18n";
 const thirdPartyServices = [
   {
     name: "GitHub",
-    purpose: t("Source code hosting and version control"),
+    purpose: {t("Source code hosting and version control")},
     href: "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
   },
   {
     name: "Vercel",
-    purpose: t("Website hosting and deployments"),
+    purpose: {t("Website hosting and deployments")},
     href: "https://vercel.com/legal/terms",
   },
   {
     name: "Supabase",
-    purpose: t("Database, login, sign up, authentication, and backend services"),
+    purpose: {t("Database, login, sign up, authentication, and backend services")},
     href: "https://supabase.com/terms",
   },
   {
     name: "Cloudflare",
-    purpose: t("DNS, Email delivery and R2"),
+    purpose: {t("DNS, Email delivery and R2")},
     href: "https://www.cloudflare.com/website-terms/",
   },
 ];
