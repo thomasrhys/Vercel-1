@@ -34,21 +34,21 @@ export default function TermsPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t("Terms of Use")}</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Effective Date: 1 July 2026
+            {t("Effective Date: 1 July 2026")}
             <br />
-            Last Updated: 1 July 2026
+            {t("Last Updated: 1 July 2026")}
           </p>
         </div>
 
         <section className="space-y-3 text-sm text-muted-foreground leading-6">
           <p>
-            By using Game Portal, you agree to these Terms of Use. If you do not agree, please do not use the site.
+            {t("By using Game Portal, you agree to these Terms of Use. If you do not agree, please do not use the site.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Use of the Site</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Use of the Site")}</h2>
           <p>
-            Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.
-            You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.
+            {t("Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.")}
+            {t("You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Accounts and Sign In</h2>
