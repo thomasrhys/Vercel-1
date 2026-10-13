@@ -6,6 +6,8 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.",
+    "Accounts and Sign In": "Accounts and Sign In",
     "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.": "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.",
     "Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.": "Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.",
     "Use of the Site": "Use of the Site",
@@ -237,6 +239,8 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "Gallwch fewngofnodi gan ddefnyddio cyfeiriad e-bost a chyfrinair, rhif ffôn, cyfrif Google, cyfrif GitHub, neu unrhyw ddulliau dilysu eraill y gallai Game Portal eu cynnig yn y dyfodol. Rydych chi'n gyfrifol am gadw'ch cyfrif yn ddiogel.",
+    "Accounts and Sign In": "Cyfrifon a Mewngofnodi",
     "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.": "Rhaid i chi beidio â cham-drin, ymosod, crafu, sbamio, na cheisio tarfu ar y wefan na'i gwasanaethau.",
     "Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.": "Darperir Game Portal fel porth gemau sy'n seiliedig ar borwr. Gallwch ddefnyddio'r wefan at ddefnydd personol arferol.",
     "Use of the Site": "Defnyddio'r Safle",
