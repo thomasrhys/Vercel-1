@@ -492,7 +492,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 export function t(key: string) {
   const { language } = useContext(LanguageContext);
   return translations[language]?.[key] ?? key;
-},
+};
 
 export function useLanguage() {
   return useContext(LanguageContext);
