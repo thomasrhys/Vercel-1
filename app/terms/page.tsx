@@ -57,10 +57,9 @@ export default function TermsPage() {
             {t("You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.")}
           </p>
 
-          <h2 className="text-xl font-semibold text-foreground">Game Requests</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t("Game Requests")}</h2>
           <p>
-            You may request games using the Request a Game form. Submitting a request does not guarantee that the
-            game will be added. Requests may be ignored, completed, or deleted at the site owner&apos;s discretion.
+            {t("You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.")}
           </p>
 
           <h2 className="text-xl font-semibold text-foreground">Third-Party Content</h2>
