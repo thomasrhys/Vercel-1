@@ -6,6 +6,7 @@ export type Language = "en" | "cy";
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.": "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.",
     "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.",
     "Accounts and Sign In": "Accounts and Sign In",
     "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.": "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.",
@@ -239,6 +240,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Reserved for you: /owner and /pitstopyt.": "Reserved for you: /owner and /pitstopyt.",
   },
   cy: {
+    "You may request games using the Request a Game form. Submitting a request does not guarantee that the game will be added. Requests may be ignored, completed, or deleted at the site owner's discretion.": "Gallwch ofyn am gemau gan ddefnyddio'r ffurflen Gofyn am Gêm. Nid yw cyflwyno cais yn gwarantu y bydd y gêm yn cael ei hychwanegu. Gellir anwybyddu, cwblhau neu ddileu ceisiadau yn ôl disgresiwn perchennog y wefan.",
     "You may sign in using an email and password, a phone number, a Google account, a GitHub account, or any other authentication methods that Game Portal may offer in the future. You are responsible for keeping your account secure.": "Gallwch fewngofnodi gan ddefnyddio cyfeiriad e-bost a chyfrinair, rhif ffôn, cyfrif Google, cyfrif GitHub, neu unrhyw ddulliau dilysu eraill y gallai Game Portal eu cynnig yn y dyfodol. Rydych chi'n gyfrifol am gadw'ch cyfrif yn ddiogel.",
     "Accounts and Sign In": "Cyfrifon a Mewngofnodi",
     "You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.": "Rhaid i chi beidio â cham-drin, ymosod, crafu, sbamio, na cheisio tarfu ar y wefan na'i gwasanaethau.",
