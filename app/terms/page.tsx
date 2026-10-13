@@ -48,6 +48,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold text-foreground">{t("Use of the Site")}</h2>
           <p>
             {t("Game Portal is provided as a browser-based games portal. You may use the site for normal personal use.")}
+            
             {t("You must not abuse, attack, scrape, spam, or attempt to disrupt the website or its services.")}
           </p>
 
