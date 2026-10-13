@@ -94,9 +94,9 @@ export default function TermsPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-muted text-foreground">
                 <tr>
-                  <th className="p-3 font-medium">Service</th>
-                  <th className="p-3 font-medium">Purpose</th>
-                  <th className="p-3 font-medium">Terms</th>
+                  <th className="p-3 font-medium">{t("Service")}</th>
+                  <th className="p-3 font-medium">{t("Purpose")}</th>
+                  <th className="p-3 font-medium">{t("Terms"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,7 +106,7 @@ export default function TermsPage() {
                     <td className="p-3">{service.purpose}</td>
                     <td className="p-3">
                       <a href={service.href} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4">
-                        View terms
+                        {t("View terms")}
                       </a>
                     </td>
                   </tr>
