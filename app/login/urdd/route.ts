@@ -1,8 +1,5 @@
 // app/login/urdd/route.ts
-import { createServerClient } from '@/lib/supabase-server'; 
-// Note: If your file is named supabase-server-auth, change the line above to:
-// import { createServerClient } from '@/lib/supabase-server-auth';
-
+import { createServerSupabase } from '@/lib/supabase-server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
