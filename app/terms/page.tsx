@@ -131,14 +131,14 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold text-foreground">Contact</h2>
           <p>
             For general enquiries, feedback, privacy questions, or bug reports, contact{" "}
-            <a className="text-primary underline underline-offset-4" href="mailto:tom@requests.fnfaw.es">
-              tom@requests.fnfaw.es
+            <a className="text-primary underline underline-offset-4" href="mailto:contact@fnfaw.es">
+               contact@fnfaw.es
             </a>.
           </p>
           <p>
             For copyright, DMCA, trademark, or content removal concerns, contact{" "}
-            <a className="text-primary underline underline-offset-4" href="mailto:copyright@requests.fnfaw.es">
-              copyright@requests.fnfaw.es
+            <a className="text-primary underline underline-offset-4" href="mailto:copyright@fnfaw.es">
+              copyright@fnfaw.es
             </a>.
           </p>
         </section>
