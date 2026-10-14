@@ -11,7 +11,7 @@ export default function NativeAuthProxyPage() {
     async function triggerNativeGoogle() {
       if (typeof window !== 'undefined' && (window as any).Capacitor) {
         try {
-          const { GoogleAuth };
+          const { GoogleAuth } = require('@codetrix-studio/capacitor-google-auth');
           
           // 1. Fire the official native Android account picker bottom sheet panel
           const googleUser = await GoogleAuth.signIn();
