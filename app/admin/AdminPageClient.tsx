@@ -295,7 +295,7 @@ export default function AdminPageClient() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Assign Cover Art</CardTitle><CardDescription>Select a game and upload or replace its cover image.</CardDescription></CardHeader>
+          <CardHeader><CardTitle>Assign Cover Art</CardTitle><CardDescription>Select a game and upload or replace its cover image on R2.</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <select value={selectedGameId} onChange={(event) => setSelectedGameId(event.target.value)} className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground">
               <option value="">-- Choose a game --</option>
