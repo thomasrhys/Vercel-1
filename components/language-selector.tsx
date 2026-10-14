@@ -1,15 +1,12 @@
 "use client";
 
 import { useLanguage, t } from "@/lib/i18n";
-import { useLanguage as useLanguageB } from "@/lib/i18nb"; // adjust path if different
 
 export default function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
-  const { setLanguage: setLanguageB } = useLanguageB();
 
   const handleChange = (next: "en" | "cy") => {
     setLanguage(next);
-    setLanguageB(next);
   };
 
   return (
