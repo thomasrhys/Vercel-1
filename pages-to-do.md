@@ -1,1 +1,1 @@
-app/terms/page.tsx
+
