@@ -41,7 +41,7 @@ export default function GamePortalPage() {
 
 function GamePortal() { // Changed to a standard inner function component
   const { isSignedIn, isAdmin } = useSupabaseAuth()
-  const [games, setGames] = useState<PortalGame[]>(fallbackGames)
+  const [games, setGames] = useState<PortalGame[]>()
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
