@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, } from "lucide-react"
+import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 import { t } from "@/lib/i18n"
 
 type PortalGame = Game & {
@@ -41,7 +42,7 @@ export default function GamePortalPage() {
 
 function GamePortal() { // Changed to a standard inner function component
   const { isSignedIn, isAdmin } = useSupabaseAuth()
-  const [games, setGames] = useState<PortalGame[]>()
+  const [games, setGames] = useState<PortalGame[]>(fallbackGames)
   const [activeGame, setActiveGame] = useState<PortalGame | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [query, setQuery] = useState("")
