@@ -66,7 +66,7 @@ export default function FriendNotificationBell() {
     <>
       <button
         onClick={handleBellClick}
-        className="relative p-2 hover:bg-muted rounded-full transition-colors mt-[calc(env(safe-area-inset-top)*0.4)]"
+        className="relative p-2 hover:bg-muted rounded-full transition-colors mt-[calc(env(safe-area-inset-top)*0.6)]"
         aria-label="Friend requests"
       >
         <Bell className="text-foreground w-6 h-6" />
