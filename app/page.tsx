@@ -6,7 +6,7 @@ import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, MoveRight, LogIn, } from "lucide-react"
+import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, ArrowRight, LogIn, } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 import { t } from "@/lib/i18n"
 
@@ -198,7 +198,7 @@ function GamePortal() { // Changed to a standard inner function component
             {coverImage ? <img src={coverImage} alt={game.title} className={`w-full h-full object-cover ${isDesktopOnlyOnMobile ? "opacity-45" : ""}`} /> : <div className="flex items-center justify-center h-full bg-gradient-to-br from-muted to-muted-foreground/20"><Gamepad2 className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-muted-foreground" /></div>}
             {isDesktopOnlyOnMobile && <div className="absolute top-2 left-2 rounded-md bg-black/70 px-2 py-1 text-xs font-medium text-white flex items-center gap-1"><Monitor className="h-3 w-3" />{t("Desktop Only")}</div>}
             {isDesktopOnlyOnMobile ? <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-black/55 text-white" onClick={(event) => { event.preventDefault(); event.stopPropagation() }}><Smartphone className="h-8 w-8 mb-2" /><p className="font-semibold">{t("Desktop Only")}</p><p className="text-xs mt-1 max-w-[220px]">{t("This game is not supported on mobile devices. Please use a desktop or laptop.")}</p></div> : <><div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center" /><div className="absolute inset-0 flex items-center justify-center"><Button variant="secondary" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">{t("Play")}</Button></div></>}
-            <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); window.location.href = `/game/${game.id}` }} className="absolute bottom-2 right-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground shadow hover:bg-background">{t("Details")}<MoveRight /></button>
+            <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); window.location.href = `/game/${game.id}` }} className="absolute bottom-2 right-2 rounded-md bg-background/90 px-2 py-1 text-xs font-medium text-foreground shadow hover:bg-background">{t("Details")}<ArrowRight /></button>
           </div>
         </CardContent>
       </Card>
