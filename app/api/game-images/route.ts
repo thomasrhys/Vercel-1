@@ -11,7 +11,7 @@ export async function GET() {
       if (!obj.Key) continue;
 
       const filename = obj.Key.replace("covers/", "");
-      const gameId = filename.split("__")[0];
+      const gameId = filename.split("_")[0];
       images[gameId] = `${process.env.CLOUDFLARE_BUCKET_URL}/${obj.Key}`;
     }
 
