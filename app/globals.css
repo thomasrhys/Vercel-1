@@ -123,3 +123,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+.fixed.top-0.right-0, 
+.absolute.top-0.right-0,
+div[style*="position: fixed"][style*="top: 0"] {
+  top: calc(env(safe-area-inset-top) + 0.5rem) !important;
+}
