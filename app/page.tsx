@@ -6,7 +6,7 @@ import { UserButton, useSupabaseAuth } from "@/lib/supabase-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, MoveRight, } from "lucide-react"
+import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, MoveRight, LogIn, } from "lucide-react"
 import { games as fallbackGames, type Game, getGameImage } from "@/lib/games"
 import { t } from "@/lib/i18n"
 
@@ -216,7 +216,7 @@ function GamePortal() { // Changed to a standard inner function component
           <div className="flex items-center gap-2 sm:gap-3"><Gamepad2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary shrink-0" /><h1 className="text-xl sm:text-2xl font-bold text-foreground">{settings.site_name}</h1></div>
           <div className="relative w-full sm:max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("Search games...")} className="pl-9" /></div>
           <div className="sm:ml-auto flex items-center gap-2">
-            {isSignedIn ? <><Button variant="outline" onClick={() => (window.location.href = "/favourites")}><Heart className="h-4 w-4 mr-2" />{t("Favourites")}</Button>{isAdmin && <Button variant="outline" onClick={() => (window.location.href = "/admin")}>{t("Admin")}</Button>}<UserButton /></> : <Button variant="outline" onClick={() => (window.location.href = "/login")}>{t("Login")}</Button>}
+            {isSignedIn ? <><Button variant="outline" onClick={() => (window.location.href = "/favourites")}><Heart className="h-4 w-4 mr-2" />{t("Favourites")}</Button>{isAdmin && <Button variant="outline" onClick={() => (window.location.href = "/admin")}>{t("Admin")}</Button>}<UserButton /></> : <Button variant="outline" onClick={() => (window.location.href = "/login")}><LogIn />{t("Login")}</Button>}
           </div>
         </div>
       </header>
