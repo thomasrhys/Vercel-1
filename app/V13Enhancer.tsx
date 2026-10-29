@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSupabaseAuth } from "@/lib/supabase-auth";
-import { Gamepad2 } from "lucide-react";
+import { Gamepad2, Shuffle } from "lucide-react";
 import { getGameImage, type Game } from "@/lib/games";
 import { t } from "@/lib/i18n";
 
@@ -233,7 +233,7 @@ export default function V13Enhancer() {
             window.location.href = `/game/${game.id}`;
           }}
         >
-          {t("🎲 Random")}
+         <Shuffle /> {t("Random")}
         </button>,
         randomTarget
       )
