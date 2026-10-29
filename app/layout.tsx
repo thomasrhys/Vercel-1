@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import CapacitorDeepLinkHandler from "./CapacitorDeepLinkHandler"; // 1. Import the new client handler
 import { I18nProvider } from "@/lib/i18n";
 import { I18nProvider as I18nbProvider } from "@/lib/i18nb";
+import CapacitorInit from "@/components/CapacitorInit";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     siteName: "Game Portal",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: "/icon.svg",
         width: 1200,
         height: 630,
         alt: "Game Portal",
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Game Portal",
     description: "Play games online.",
-    images: ["/opengraph-image.png"],
+    images: ["/icon.svg"],
   },
   robots: {
     index: true,
@@ -86,6 +87,7 @@ export default function RootLayout({
               
               {/* 2. Put the hidden link handler inside your providers */}
               <CapacitorDeepLinkHandler /> 
+              <CapacitorInit />
               
               {process.env.NODE_ENV === "production" && <Analytics />}
               {process.env.NODE_ENV === "production" && <SpeedInsights />}

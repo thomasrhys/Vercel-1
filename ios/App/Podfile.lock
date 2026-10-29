@@ -16,6 +16,8 @@ PODS:
   - CapacitorApp (8.1.2):
     - Capacitor
   - CapacitorCordova (8.6.0)
+  - CapacitorStatusBar (8.0.4):
+    - Capacitor
   - CapgoCapacitorSocialLogin (8.7.5):
     - Capacitor
     - FBSDKCoreKit (~> 18.0)
@@ -56,6 +58,7 @@ DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - "CapgoCapacitorSocialLogin (from `../../node_modules/@capgo/capacitor-social-login`)"
 
 SPEC REPOS:
@@ -81,6 +84,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/app"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorStatusBar:
+    :path: "../../node_modules/@capacitor/status-bar"
   CapgoCapacitorSocialLogin:
     :path: "../../node_modules/@capgo/capacitor-social-login"
 
@@ -90,6 +95,7 @@ SPEC CHECKSUMS:
   Capacitor: 62cab4ab4ba04ea925576ddd1be188869e90d9ea
   CapacitorApp: 7b7e43debe505bc61beedb83796aa1368c86078b
   CapacitorCordova: 922f0a94dae286165215f0c7cf16fbde662d5ee4
+  CapacitorStatusBar: ff844df1f126da6c4fbc4028272425fa3a91e7e3
   CapgoCapacitorSocialLogin: 927379f408f3f27419386c25c0c31bc37b119d95
   FBAEMKit: fbb0a50e13109400d0615e7630a0db26ec6b8206
   FBSDKCoreKit: 0063014b3b1f7e975e70b60232b0cf8003839746
@@ -103,6 +109,6 @@ SPEC CHECKSUMS:
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
 
-PODFILE CHECKSUM: 384df1d1071133ddab27af97a65f06de6afb939a
+PODFILE CHECKSUM: 5d8989326859e2f9258e4bdf09570ce89b6f37c3
 
 COCOAPODS: 1.17.0
