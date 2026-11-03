@@ -522,7 +522,7 @@ const translations: Record<Language, Record<string, string>> = {
   fr: {
     "My Stats Card": "Ma carte de stats",
     "Your Stats Card": "Ta carte de stats",
-    "Generating...": "Génération..."
+    "Generating...": "Génération...",
     "Loading stats...": "Chargement des stats...",
     "Download": "Télécharger",
     "Close": "Fermer",
