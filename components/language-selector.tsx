@@ -5,7 +5,7 @@ import { useLanguage, t } from "@/lib/i18n";
 export default function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
 
-  const handleChange = (next: "en" | "cy") => {
+  const handleChange = (next: "en" | "cy" | "fr" ) => {
     setLanguage(next);
   };
 
@@ -21,6 +21,7 @@ export default function LanguageSelector() {
       >
         <option value="en">{t("English")}</option>
         <option value="cy">{t("Welsh")}</option>
+        <option value="fr">{t("French")}</option>
       </select>
     </label>
   );
