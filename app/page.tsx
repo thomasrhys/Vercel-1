@@ -221,7 +221,7 @@ function GamePortal() { // Changed to a standard inner function component
         </div>
       </header>
       <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        {categoryCards.length > 0 && !query.trim() && <section className="mb-6"><div className="flex items-center justify-between gap-3 mb-3"><h2 className="text-xl font-bold text-foreground">{t("Categories")}</h2>{selectedCategory !== "All"></div></section>}
+        {categoryCards.length > 0 && !query.trim() && <section className="mb-6"><div className="flex items-center justify-between gap-3 mb-3"><h2 className="text-xl font-bold text-foreground">{t("Categories")}</h2>{selectedCategory !== "All"></div>}</section>}
         {categories.length > 1 && <div className="mb-4 flex gap-2 overflow-x-auto pb-2">{categories.map((category) => <Button key={category} variant={selectedCategory === category ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(category)} className="shrink-0">{category}</Button>)}</div>}
         <p className="text-sm text-muted-foreground mb-4">{filteredGames.length} {filteredGames.length === 1 ? t("game") : t("games")}{query || selectedCategory!== "All" ? ` ${t("found")}` : ` ${t("available")}`}{selectedCategory !== "All" ? ` ${t("in")} ${selectedCategory}` : ""}</p>
         {featuredGames.length > 0 && <section className="mb-8"><div className="flex items-center gap-2 mb-3"><Star className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold text-foreground">{t("Featured Games")}</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">{featuredGames.map(renderGameCard)}</div></section>}
