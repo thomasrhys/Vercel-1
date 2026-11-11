@@ -264,7 +264,6 @@ export default function GamePageClient({ id }: { id: string }) {
           {isSignedIn ? (
             <div className="flex items-center gap-2">
               <UserButton />
-              )}
               <Button 
                 variant="outline" 
                 size="sm" 
