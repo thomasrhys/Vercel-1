@@ -4,6 +4,7 @@
 
 "use client";
 
+import { UserButton } from "@/lib/supabase-auth";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
@@ -262,10 +263,7 @@ export default function GamePageClient({ id }: { id: string }) {
           </Button>
           {isSignedIn ? (
             <div className="flex items-center gap-2">
-              {user?.email && (
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {user.email.split('@')[0]}
-                </span>
+              <UserButton />
               )}
               <Button 
                 variant="outline" 
