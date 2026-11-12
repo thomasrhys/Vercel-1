@@ -12,6 +12,7 @@ const GAME_HOSTS = [
   "fnf.fnfaw.es",
   "flash.fnfaw.es",
   "angrygames.fnfaw.es",
+  "html.fnfaw.es",
 ];
 
 self.addEventListener("install", (event) => {
