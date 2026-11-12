@@ -1,9 +1,6 @@
 // AUTO-GENERATED game catalog.
 // Featured games (hosted outside the offline pack) appear first, followed by
 // every game from the Offline-HTML-Games-Pack "offline" folder.
-
-import imageMapping from "./game-images.json";
-
 export interface Game {
   id: string
   title: string
@@ -11,10 +8,7 @@ export interface Game {
   image?: string
 }
 
-// Helper to get image for a game
-export function getGameImage(gameId: string): string | undefined {
-  return imageMapping[gameId as keyof typeof imageMapping];
-}
+
 
 export const games: Game[] = [
   {"id":"1","title":"1","url":"https://slope.fnfaw.es/1/","image":"https://storage.fnfaw.es/covers/1_1792264943737_1.jpg",},
