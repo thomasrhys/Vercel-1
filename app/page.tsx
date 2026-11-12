@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, ArrowRight, LogIn, } from "lucide-react"
-import { games as fallbackGames, } from "@/lib/games"
+import { games as fallbackGames } from "@/lib/games"
 import { t } from "@/lib/i18n"
 
 type PortalGame = Game & {
