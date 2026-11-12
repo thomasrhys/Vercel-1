@@ -8,9 +8,10 @@ const STATIC_ASSETS = [
 
 const GAME_HOSTS = [
   "thomasrhys.github.io",
-  "slope-games-psi.vercel.app",
-  "fnf-amber.vercel.app",
-  "fridaynightfunkin-gamesportal.vercel.app",
+  "slope.fnfaw.es",
+  "fnf.fnfaw.es",
+  "flash.fnfaw.es",
+  "angrygames.fnfaw.es",
 ];
 
 self.addEventListener("install", (event) => {
