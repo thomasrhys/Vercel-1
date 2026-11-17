@@ -7,14 +7,8 @@ import { useEffect, useState } from "react";
 import { useUser } from "@/lib/supabase-client";
 import { supabase } from "@/lib/supabase-client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Activity, DatabaseBackup, Lock, SearchCheck, Settings } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, DatabaseBackup, Lock, SearchCheck, Settings, Wrench } from "lucide-react";
 
 type Profile = {
   role: string;
@@ -243,6 +237,16 @@ export default function AdminUtilitiesCard() {
 
   return (
     <div className="bg-background p-4 sm:px-8 sm:pt-8 sm:pb-0">
+              <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Wrench className="h-7 w-7" />
+              Utilities
+            </h1>
+            <p className="text-muted-foreground mt-2">Make changes and updates to settings</p>
+          </div>
+          <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
+        </div>
       <div className="max-w-2xl mx-auto space-y-8">
         <Card>
           <CardHeader>
