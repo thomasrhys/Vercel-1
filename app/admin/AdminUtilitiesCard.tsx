@@ -237,7 +237,7 @@ export default function AdminUtilitiesCard() {
 
   return (
     <div className="bg-background p-4 sm:px-8 sm:pt-8 sm:pb-0">
-              <div className="flex items-start justify-between gap-4">
+                <div className="max-w-3xl mx-auto space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <Wrench className="h-7 w-7" />
@@ -247,6 +247,7 @@ export default function AdminUtilitiesCard() {
           </div>
           <Button variant="outline" onClick={() => (window.location.href = "/admin")}>Back to Admin</Button>
         </div>
+      <div className="flex items-start justify-between gap-4">
       <div className="max-w-2xl mx-auto space-y-8">
         <Card>
           <CardHeader>
