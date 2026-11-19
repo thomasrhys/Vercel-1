@@ -24,9 +24,6 @@ export async function GET(req: NextRequest) {
           persistSession: false,
           autoRefreshToken: false,
         },
-        global: {
-          headers: { Authorization: `Bearer ${authToken}` },
-        },
       }
     );
     
