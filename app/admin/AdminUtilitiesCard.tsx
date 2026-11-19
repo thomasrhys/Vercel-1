@@ -402,6 +402,7 @@ export default function AdminUtilitiesCard() {
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   );
 }
