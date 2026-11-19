@@ -67,7 +67,11 @@ export async function GET(req: NextRequest) {
           id: request.id,
           requester_id: request.requester_id,
           created_at: request.created_at,
-          requester: profileData || null,
+          requester: profileData || {
+            username: 'unknown',
+            display_name: 'Unknown user',
+            avatar_url: null,
+          },
         };
       })
     );

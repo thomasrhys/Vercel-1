@@ -33,9 +33,9 @@ export default function FriendNotificationBell() {
         return;
       }
 
-      const result = await res.json();
+      const result = await res.json().catch(() => null);
       
-      if (result.success && result.data) {
+      if (result?.success && Array.isArray(result.data)) {
         const count = result.data.length;
         setRequestCount(count);
         setHasRequests(count > 0);

@@ -13,7 +13,7 @@ interface PendingRequest {
     username: string;
     display_name?: string;
     avatar_url?: string;
-  };
+  } | null;
 }
 
 export default function PendingRequestsPanel() {
@@ -41,9 +41,9 @@ export default function PendingRequestsPanel() {
         return;
       }
 
-      const result = await res.json();
+      const result = await res.json().catch(() => null);
       
-      if (result.success && result.data) {
+      if (result?.success && Array.isArray(result.data)) {
         setRequests(result.data);
       } else {
         setRequests([]);
@@ -129,24 +129,24 @@ export default function PendingRequestsPanel() {
             className="flex items-center justify-between p-3 bg-muted rounded-md"
           >
             <div className="flex items-center gap-3">
-              {request.requester.avatar_url ? (
+              {request.requester?.avatar_url ? (
                 <img 
-                  src={request.requester.avatar_url} 
-                  alt={request.requester.display_name}
+                  src={request.requester.avatar_url}
+                  alt={request.requester.display_name || request.requester.username}
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                  {(request.requester.display_name || request.requester.username).charAt(0).toUpperCase()}
+                  {(request.requester?.display_name || request.requester?.username || 'U').charAt(0).toUpperCase()}
                 </div>
               )}
               
               <div>
                 <p className="font-medium text-foreground">
-                  {request.requester.display_name || request.requester.username}
+                  {request.requester?.display_name || request.requester?.username || 'Unknown user'}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  @{request.requester.username}
+                  @{request.requester?.username || 'unknown'}
                 </p>
               </div>
             </div>
