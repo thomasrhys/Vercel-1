@@ -70,6 +70,35 @@ export async function GET(req: NextRequest) {
       (profiles || []).map((profile) => [profile.user_id, profile])
     );
 
+    const authProfiles = await Promise.all(
+      (data || []).map(async (request) => {
+        if (profilesById.has(request.requester_id)) return null;
+
+        const { data: authProfile } = await supabase.auth.admin.getUserById(
+          request.requester_id
+        );
+
+        return authProfile?.user
+          ? {
+              user_id: request.requester_id,
+              username: authProfile.user.user_metadata?.username,
+              display_name:
+                authProfile.user.user_metadata?.display_name ||
+                authProfile.user.user_metadata?.full_name ||
+                authProfile.user.user_metadata?.name ||
+                authProfile.user.email?.split('@')[0],
+              avatar_url:
+                authProfile.user.user_metadata?.avatar_url ||
+                authProfile.user.user_metadata?.picture,
+            }
+          : null;
+      })
+    );
+
+    for (const profile of authProfiles) {
+      if (profile) profilesById.set(profile.user_id, profile);
+    }
+
     const requestsWithProfile = (data || []).map((request) => {
       const profile = profilesById.get(request.requester_id);
 
@@ -79,12 +108,12 @@ export async function GET(req: NextRequest) {
         created_at: request.created_at,
         requester: profile
           ? {
-              username: profile.username || `user-${request.requester_id.slice(0, 8)}`,
+              username: profile.username || 'unknown',
               display_name: profile.display_name || profile.username || 'Unknown user',
-              avatar_url: profile.avatar_url,
+              avatar_url: profile.avatar_url || null,
             }
           : {
-              username: `user-${request.requester_id.slice(0, 8)}`,
+              username: 'unknown',
               display_name: 'Unknown user',
               avatar_url: null,
             },
