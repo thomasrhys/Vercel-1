@@ -146,7 +146,9 @@ export default function PendingRequestsPanel() {
                   {request.requester?.display_name || request.requester?.username || 'Unknown user'}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  @{request.requester?.username || 'unknown'}
+                  @{request.requester?.username && request.requester.username !== 'unknown'
+                    ? request.requester.username
+                    : 'unknown'}
                 </p>
               </div>
             </div>
