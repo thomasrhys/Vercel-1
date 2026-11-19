@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
           .from('user_profiles')
           .select('username, display_name, avatar_url')
           .eq('user_id', request.requester_id)
-          .single();
+          .maybeSingle();
         
         return {
           id: request.id,

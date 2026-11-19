@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     // Check for existing relationship
     const { data: existing, error: existingError } = await supabase
       .from('friendships')
-      .select('status')
+      .select('id,status,requester_id,addressee_id')
       .or(
         `and(requester_id.eq.${user.id},addressee_id.eq.${addresseeId}),` +
         `and(requester_id.eq.${addresseeId},addressee_id.eq.${user.id})`
@@ -90,11 +90,20 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    if (existing && existing.status === 'accepted') {
-      return NextResponse.json(
-        { success: false, message: 'Already friends' },
-        { status: 409 }
-      );
+    if (existing) {
+      if (existing.status === 'accepted') {
+        return NextResponse.json(
+          { success: false, message: 'Already friends' },
+          { status: 409 }
+        );
+      }
+
+      if (existing.status === 'pending') {
+        return NextResponse.json(
+          { success: false, message: 'Friend request already pending' },
+          { status: 409 }
+        );
+      }
     }
     
     // Insert new friendship

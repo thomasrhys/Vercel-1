@@ -62,8 +62,10 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .from('friendships')
     .select('status')
-    .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
-    .or(`requester_id.eq.${targetId},addressee_id.eq.${targetId}`)
+    .or(
+      `and(requester_id.eq.${userId},addressee_id.eq.${targetId}),` +
+      `and(requester_id.eq.${targetId},addressee_id.eq.${userId})`
+    )
     .maybeSingle();
   
   if (error && error.code !== 'PGRST116') {

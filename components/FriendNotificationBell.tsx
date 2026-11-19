@@ -27,6 +27,12 @@ export default function FriendNotificationBell() {
         },
       });
 
+      if (!res.ok) {
+        setHasRequests(false);
+        setRequestCount(0);
+        return;
+      }
+
       const result = await res.json();
       
       if (result.success && result.data) {

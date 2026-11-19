@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', friendshipId)
         .eq('addressee_id', user.id)
+        .eq('status', 'pending')
         .select();
       
       if (error) {
@@ -70,20 +71,36 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
+
+      if (!data || data.length === 0) {
+        return NextResponse.json(
+          { success: false, message: 'Friend request no longer exists' },
+          { status: 409 }
+        );
+      }
       
       return NextResponse.json({ success: true, action: 'accepted', data });
     } else {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('friendships')
         .delete()
         .eq('id', friendshipId)
-        .eq('addressee_id', user.id);
+        .eq('addressee_id', user.id)
+        .eq('status', 'pending')
+        .select('id');
       
       if (error) {
         console.error('[Decline Error]:', error);
         return NextResponse.json(
           { error: error.message },
           { status: 500 }
+        );
+      }
+
+      if (!data || data.length === 0) {
+        return NextResponse.json(
+          { success: false, message: 'Friend request no longer exists' },
+          { status: 409 }
         );
       }
       

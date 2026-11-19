@@ -20,6 +20,7 @@ export default function PendingRequestsPanel() {
   const [requests, setRequests] = useState<PendingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchRequests = async () => {
     try {
@@ -34,6 +35,11 @@ export default function PendingRequestsPanel() {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
+
+      if (!res.ok) {
+        setRequests([]);
+        return;
+      }
 
       const result = await res.json();
       
@@ -58,6 +64,7 @@ export default function PendingRequestsPanel() {
 
   const handleResponse = async (friendshipId: string, action: 'accept' | 'decline') => {
     setUpdatingId(friendshipId);
+    setErrorMessage(null);
     
     try {
       const { data: { session } } = await supabaseAuthClient.auth.getSession();
@@ -74,16 +81,16 @@ export default function PendingRequestsPanel() {
         body: JSON.stringify({ friendshipId, action }),
       });
 
-      const result = await res.json();
+      const result = await res.json().catch(() => null);
       
-      if (result.success) {
+      if (res.ok && result?.success) {
         setRequests(prev => prev.filter(r => r.id !== friendshipId));
       } else {
-        alert(result.error || 'Something went wrong');
+        setErrorMessage(result?.message || result?.error || 'Something went wrong');
       }
     } catch (error) {
       console.error('Handle response error:', error);
-      alert('Failed to respond');
+      setErrorMessage('Failed to respond');
     } finally {
       setUpdatingId(null);
     }
@@ -103,6 +110,11 @@ export default function PendingRequestsPanel() {
 
   return (
     <div className="bg-card rounded-lg border border-border p-4 space-y-3">
+      {errorMessage && (
+        <div className="rounded-md bg-red-500/20 text-red-700 p-3 text-sm">
+          {errorMessage}
+        </div>
+      )}
       <h3 className="font-semibold text-foreground flex items-center justify-between">
         {t("Friend Requests")}
         <span className="text-sm font-normal text-muted-foreground">
