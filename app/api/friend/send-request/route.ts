@@ -77,7 +77,10 @@ export async function POST(req: NextRequest) {
     const { data: existing, error: existingError } = await supabase
       .from('friendships')
       .select('status')
-      .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`)
+      .or(
+        `and(requester_id.eq.${user.id},addressee_id.eq.${addresseeId}),` +
+        `and(requester_id.eq.${addresseeId},addressee_id.eq.${user.id})`
+      )
       .maybeSingle();
     
     if (existingError && existingError.code !== 'PGRST116') {
