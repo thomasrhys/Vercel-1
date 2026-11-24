@@ -3,6 +3,7 @@
 
 import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeGameUrl } from "@/lib/game-url";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
   const body = await request.json();
 
   const title = String(body.title || "").trim();
-  const url = String(body.url || "").trim();
+  const url = normalizeGameUrl(body.url);
   const category = String(body.category || "").trim() || null;
   const description = String(body.description || "").trim() || null;
   const id = String(body.id || makeId(title)).trim();
@@ -131,7 +132,7 @@ export async function PATCH(request: Request) {
 
   const id = String(body.id || "").trim();
   const title = String(body.title || "").trim();
-  const url = String(body.url || "").trim();
+  const url = normalizeGameUrl(body.url);
   const category = String(body.category || "").trim() || null;
   const description = String(body.description || "").trim() || null;
 

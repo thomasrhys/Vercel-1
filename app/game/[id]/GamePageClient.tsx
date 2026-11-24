@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, ArrowLeft, Check, Copy, Gamepad2, Heart, Maximize2, Minimize2, Monitor, Play, RefreshCcw, Share2, Smartphone, X } from "lucide-react";
 import { t } from "@/lib/i18n";
+import { normalizeGameUrl } from "@/lib/game-url";
 
 type PortalGame = Game & {
   image?: string | null;
@@ -422,7 +423,7 @@ export default function GamePageClient({ id }: { id: string }) {
             </div>
             <div className="flex-1 bg-black">
               <iframe
-                src={activeGame.url}
+                src={normalizeGameUrl(activeGame.url)}
                 className="w-full h-full border-0"
                 allowFullScreen
                 sandbox="allow-same-origin allow-scripts allow-pointer-lock allow-popups"

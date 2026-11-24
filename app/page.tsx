@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Maximize2, Minimize2, X, Gamepad2, Search, Star, Monitor, Smartphone, ArrowUp, Heart, Sparkles, ArrowRight, LogIn, } from "lucide-react"
 import { games as fallbackGames, getGameImage, type Game } from "@/lib/games"
 import { t } from "@/lib/i18n"
+import { normalizeGameUrl } from "@/lib/game-url"
 
 type PortalGame = Game & {
   image?: string | null
@@ -245,7 +246,7 @@ function GamePortal() { // Changed to a standard inner function component
             </div>
             {/* Added pb-[env(safe-area-bottom,0px)] to clear bottom system home indicator rows cleanly */}
             <div className="flex-1 bg-black pb-[env(safe-area-bottom,0px)]">
-              <iframe src={activeGame.url} className="w-full h-full border-0" allowFullScreen sandbox="allow-same-origin allow-scripts allow-pointer-lock" title={activeGame.title} />
+              <iframe src={normalizeGameUrl(activeGame.url)} className="w-full h-full border-0" allowFullScreen sandbox="allow-same-origin allow-scripts allow-pointer-lock" title={activeGame.title} />
             </div>
           </div>
         </div>
