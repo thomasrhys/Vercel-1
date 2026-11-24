@@ -4,6 +4,7 @@
 import { requireSupabaseAdmin } from "@/lib/supabase-server-auth";
 import { createClient } from "@supabase/supabase-js";
 import { games } from "@/lib/games";
+import { normalizeGameUrl } from "@/lib/game-url";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   const rows = games.map((game) => ({
     id: game.id,
     title: game.title,
-    url: game.url,
+    url: normalizeGameUrl(game.url),
     image: game.image ?? null,
     category: null,
     featured: false,

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { normalizeGameUrl } from "@/lib/game-url";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,5 +18,10 @@ export async function GET() {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  return Response.json(data);
+  return Response.json(
+    (data || []).map((game) => ({
+      ...game,
+      url: normalizeGameUrl(game.url),
+    }))
+  );
 }
