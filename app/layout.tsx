@@ -9,7 +9,6 @@ import { AuthProvider } from '@/lib/supabase-client';
 import { ThemeProvider } from "@/components/theme-provider";
 import CapacitorDeepLinkHandler from "./CapacitorDeepLinkHandler"; // 1. Import the new client handler
 import { I18nProvider } from "@/lib/i18n";
-import { I18nProvider as I18nbProvider } from "@/lib/i18nb";
 import CapacitorInit from "@/components/CapacitorInit";
 import "./globals.css";
 
@@ -76,7 +75,6 @@ export default function RootLayout({
       </head>
 
       <body className="font-sans antialiased">
-        <I18nbProvider>
         <I18nProvider>
         <ThemeProvider
           attribute="class"
@@ -100,7 +98,6 @@ export default function RootLayout({
           </AuthProvider>
         </ThemeProvider>
         </I18nProvider>
-        </I18nbProvider>
 
         <script
           dangerouslySetInnerHTML={{
