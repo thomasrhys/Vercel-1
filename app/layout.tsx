@@ -69,6 +69,8 @@ export default function RootLayout({
         {/* MERGED: Added viewport-fit=cover so your phone's status bar calculations work correctly */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://storage.fnfaw.es" />
+        <link rel="dns-prefetch" href="https://storage.fnfaw.es" />
       </head>
 
       <body className="font-sans antialiased">
