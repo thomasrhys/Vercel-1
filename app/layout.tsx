@@ -70,7 +70,9 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://storage.fnfaw.es" />
+        <link rel="preconnect" href="https://gpscgiqaetaigvgodfyn.supabase.co" />
         <link rel="dns-prefetch" href="https://storage.fnfaw.es" />
+        <link rel="dns-prefetch" href="https://gpscgiqaetaigvgodfyn.supabase.co" />
       </head>
 
       <body className="font-sans antialiased">
